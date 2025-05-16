@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
             $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
-            $table->foreign('sub_district_id')->references('id')->on('subdistricts')->onDelete('cascade');
+            $table->foreign('sub_district_id')->references('id')->on('sub_districts')->onDelete('cascade');
         });
     }
 

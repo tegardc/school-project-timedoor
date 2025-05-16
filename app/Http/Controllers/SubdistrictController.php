@@ -12,6 +12,8 @@ class SubdistrictController extends Controller
      */
     public function index()
     {
+        $subdistrict = SubDistrict::all();
+        return response()->json(['success' => true, 'data' => $subdistrict]);
         //
     }
 

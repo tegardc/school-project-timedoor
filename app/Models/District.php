@@ -14,7 +14,7 @@ class District extends Model
     {
         return $this->belongsTo(Province::class);
     }
-    public function subdistrict()
+    public function subDistricts()
     {
         return $this->hasMany(SubDistrict::class);
     }

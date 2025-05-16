@@ -12,6 +12,8 @@ class ProvinceController extends Controller
      */
     public function index()
     {
+        $province = Province::all();
+        return response()->json(['success' => true, 'data' => $province]);
         //
     }
 

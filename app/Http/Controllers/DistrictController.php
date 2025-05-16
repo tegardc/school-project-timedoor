@@ -12,6 +12,9 @@ class DistrictController extends Controller
      */
     public function index()
     {
+        $district = District::all();
+        return response()->json(['success' => true, 'data' => $district]);
+
         //
     }
 
@@ -28,6 +31,15 @@ class DistrictController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate(['name' => 'required|string', 'province_id' => 'required']);
+        $district = District::create(['name' => $validated['name'], 'province_id' => $validated['province_id']]);
+
+        return response()->json(['success' => true, 'message' => 'Add Successfully', 'data' => [
+            'id' => $district->id,
+            'name' => $district->name,
+            'province_id' => $district->province_id
+
+        ]]);
         //
     }
 
