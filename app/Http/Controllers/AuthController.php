@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -18,61 +21,63 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'first_name' => 'required|string',
-            'last_name'  => 'required|string',
-            'username'   => 'required|string|unique:users,username',
-            'gender'     => 'required|in:male,female',
-            'phone_no'   => 'required|string',
-            'email'      => 'required|email|unique:users,email',
-            'password'   => 'required|min:6|confirmed',
-            'role'       => 'required|in:parent,student',
-        ]);
+        try {
+            $validateData = $request->validate([
+                'firstName' => 'required|string',
+                'lastName'  => 'required|string',
+                'username'   => 'required|string|unique:users,username',
+                'gender'     => 'required|in:male,female',
+                'phoneNo'   => 'required|string',
+                'email'      => 'required|email|unique:users,email',
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
+                ],
+                'confirm_password' => 'required|string||same:password',
+                'role' => 'required|in:parent,student',
+            ]);
+            $validateData['password'] = Hash::make($validateData['password']);
+            $newUser = User::create($validateData);
+            $newUser->assignRole($request->role);
+            $hours = (int) 4;
+            $plainTextToken = $newUser->createToken($newUser->email, ['*'], now()->addHours($hours))->plainTextToken;
 
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'username'   => $request->username,
-            'email'      => $request->email,
-            'gender'     => $request->gender,
-            'phone_no'   => $request->phone_no,
-            'password'   => Hash::make($request->password),
-        ]);
-
-        $user->assignRole($request->role);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User registered successfully.',
-            'token'   => $token,
-            'user'    => $user->load('roles')
-        ]);
+            return response()->json([
+                'message' => 'User registered successfully.',
+                'data'    => new UserResource($newUser),
+                'token'   => $plainTextToken
+            ]);
+        } catch (ValidationException $e) {
+            return $this->errorResponse($e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Error Createng Data:" . $e->getMessage(), 500);
+        }
     }
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
+        $credentials = $request->validate([
+            'email' => 'required',
             'password' => 'required'
         ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login failed. Invalid credentials.',
-            ], 401);
+        $loginField = str_contains($credentials['email'], '@') ? 'email' : 'username';
+        if (!Auth::attempt([$loginField =>
+        $credentials['email'], 'password' =>
+        $credentials['password']])) {
+            return $this->errorResponse("Invalid Credential or Account Disable", 400);
         }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = Auth::user();
+        $user->tokens()->delete();
+        $hours = (int)4;
+        $plainTextToken = $user->createToken($user->email, ['*'], now()->addHours($hours))->plainTextToken;
+        $expiresAt = now()->addHours($hours)->toDateTimeString();
 
         return response()->json([
-            'success' => true,
             'message' => 'Login successful.',
-            'token' => $token,
-            'user' => $user->load('roles')
+            'data' => new UserResource($user),
+            'token' => $plainTextToken,
+            'expiresAt' => $expiresAt
         ]);
     }
 
@@ -81,7 +86,6 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'success' => true,
             'message' => 'Logged out successfully.'
         ]);
     }
@@ -94,6 +98,8 @@ class AuthController extends Controller
     {
         //
     }
+
+
 
     /**
      * Store a newly created resource in storage.

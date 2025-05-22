@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('schools', function (Blueprint $table) {
-            $table->unsignedBigInteger('province_id')->after('id');
-            $table->unsignedBigInteger('district_id')->after('id');
-            $table->unsignedBigInteger('sub_district_id')->after('id');
+            $table->unsignedBigInteger('provinceId')->after('id');
+            $table->unsignedBigInteger('districtId')->after('id');
+            $table->unsignedBigInteger('subDistrictId')->after('id');
 
-            $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
-            $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
-            $table->foreign('sub_district_id')->references('id')->on('sub_districts')->onDelete('cascade');
+            $table->foreign('provinceId')->references('id')->on('provinces')->onDelete('cascade');
+            $table->foreign('districtId')->references('id')->on('districts')->onDelete('cascade');
+            $table->foreign('subDistrictId')->references('id')->on('sub_districts')->onDelete('cascade');
         });
     }
 
@@ -28,11 +28,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('schools', function (Blueprint $table) {
-            $table->dropForeign(['province_id']);
-            $table->dropForeign(['district_id']);
-            $table->dropForeign(['sub_district_id']);
+            $table->dropForeign(['provinceId']);
+            $table->dropForeign(['districtId']);
+            $table->dropForeign(['subDistrictId']);
 
-            $table->dropColumn(['province_id', 'district_id', 'sub_district_id']);
+            $table->dropColumn(['provinceId', 'districtId', 'subDistrictId']);
         });
     }
 };

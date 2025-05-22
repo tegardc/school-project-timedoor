@@ -70,12 +70,12 @@ class UserController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
+            'firstName' => 'nullable|string|max:255',
+            'lastName' => 'nullable|string|max:255',
             'username' => ['nullable', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
             'email' => ['nullable', 'email', Rule::unique('users')->ignore($user->id)],
             'gender' => 'nullable|in:male,female',
-            'phone_no' => 'nullable|string|max:20',
+            'phoneNo' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:6|confirmed'
         ]);
         // if (empty($validated)) {

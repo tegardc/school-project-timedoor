@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('school_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('school_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('school_detail_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('image_url');
-            $table->boolean('is_cover')->default(false);
+            $table->unsignedBigInteger('schoolId');
+            $table->unsignedBigInteger('schoolDetailId');
+            $table->string('imageUrl');
+            $table->boolean('isCover')->default(false);
             $table->timestamps();
+
+
+            $table->foreign('schoolId')->references('id')->on('schools')->onDelete('cascade');
+            $table->foreign('schoolDetailId')->references('id')->on('school_details')->onDelete('cascade');
         });
     }
 

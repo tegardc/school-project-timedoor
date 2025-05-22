@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('operational_license')->nullable();
-            $table->text('exam_info')->nullable();
+            $table->string('schoolEstablishmentDecree')->nullable();
             $table->timestamps();
         });
     }

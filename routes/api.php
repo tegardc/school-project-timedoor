@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\SchoolDetailController;
 use App\Http\Controllers\SubdistrictController;
 use App\Http\Controllers\UserController;
 use App\Models\Province;
@@ -22,10 +23,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['role:admin'])->group(function () {});
+
 Route::middleware(['role:parent'])->group(function () {});
 Route::middleware(['role:student'])->group(function () {});
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum', 'role:admin')->group(function () {
+
+    Route::post('/school-details', [SchoolDetailController::class, 'store']);
     Route::get('/user-profile', [UserController::class, 'show']);
     Route::put('/user', [UserController::class, 'update']);
     Route::delete('/user', [UserController::class, 'destroy']);
@@ -46,3 +49,9 @@ Route::get('/province', [ProvinceController::class, 'index']);
 Route::get('/district', [DistrictController::class, 'index']);
 Route::post('/district', [DistrictController::class, 'store']);
 Route::get('/sub-district', [SubdistrictController::class, 'index']);
+
+Route::get('/school-details', [SchoolDetailController::class, 'index']);
+
+Route::get('/school-details/{id}', [SchoolDetailController::class, 'show']);
+Route::put('/school-details/{id}', [SchoolDetailController::class, 'update']);
+Route::delete('/school-details/{id}', [SchoolDetailController::class, 'destroy']);

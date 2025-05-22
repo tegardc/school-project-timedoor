@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ProvinceDistrictSeeder::class,
+            RoleSeeder::class,
+            EducationLevel::class,
+            Accreditation::class,
+            StatusSchool::class,
+            UserSeeder::class
         ]);
         $user = User::find(1);
         $user->assignRole('parent');

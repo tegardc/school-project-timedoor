@@ -11,12 +11,15 @@ class School extends Model
     protected $fillable = [
         'name',
         'description',
-        'province_id',
-        'district_id',
-        'sub_district_id',
-        'operational_license',
-        'exam_info'
+        'provinceId',
+        'districtId',
+        'subDistrictId',
+        'schoolEnstablishmentDecree',
     ];
+    public function school_detail()
+    {
+        return $this->hasMany(school_detail::class);
+    }
 
     public function province()
     {
@@ -28,6 +31,6 @@ class School extends Model
     }
     public function subDistrict()
     {
-        return $this->belongsTo(SubDistrict::class,  'sub_district_id', 'id');
+        return $this->belongsTo(SubDistrict::class,  'subDistrictId', 'id');
     }
 }

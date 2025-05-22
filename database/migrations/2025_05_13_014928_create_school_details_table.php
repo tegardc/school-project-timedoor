@@ -14,24 +14,30 @@ return new class extends Migration
         Schema::create('school_details', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('institution_code')->unique();
-            $table->foreignId('school_id')->constrained()->onDelete('cascade');
-            $table->foreignId('status_id')->constrained('school_statuses');
-            $table->foreignId('education_level_id')->constrained('education_levels');
-            $table->string('ownership_status');
-            $table->date('date_enstablishment_decree');
-            $table->date('date_operational_license');
+            $table->string('institutionCode')->unique();
+            $table->unsignedBigInteger('schoolId');
+            $table->unsignedBigInteger('statusId');
+            $table->unsignedBigInteger('educationLevelId');
+            $table->string('ownershipStatus');
+            $table->date('dateEstablishmentDecree');
+            $table->string('operationalLicense');
+            $table->date('dateOperationalLicense');
             $table->string('principal');
             $table->string('operator');
-            $table->foreignId('accreditation_id')->constrained('accreditations');
+            $table->unsignedBigInteger('accreditationId');
             $table->string('curriculum');
-            $table->string('telp_no');
-            $table->decimal('tuition_fee', 10, 2);
-            $table->integer('num_student');
-            $table->integer('num_teacher');
+            $table->string('telpNo');
+            $table->decimal('tuitionFee', 10, 2);
+            $table->integer('numStudent');
+            $table->integer('numTeacher');
             $table->text('movie')->nullable();
-            $table->text('exam_info')->nullable();
+            $table->text('examInfo')->nullable();
             $table->timestamps();
+
+            $table->foreign('schoolId')->references('id')->on('schools')->onDelete('cascade');
+            $table->foreign('statusId')->references('id')->on('school_statuses')->onDelete('cascade');
+            $table->foreign('educationLevelId')->references('id')->on('education_levels')->onDelete('cascade');
+            $table->foreign('accreditationId')->references('id')->on('accreditations')->onDelete('cascade');
         });
     }
 

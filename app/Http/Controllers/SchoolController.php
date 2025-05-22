@@ -20,21 +20,19 @@ class SchoolController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'province_id' => 'required|exists:provinces,id',
-            'district_id' => 'required|exists:districts,id',
-            'sub_district_id' => 'required|exists:sub_districts,id',
-            'operational_license' => 'nullable|string|max:255',
-            'telp_no' => 'nullable|string|max:20',
-            'exam_info' => 'nullable|string',
+            'provinceId' => 'required|exists:provinces,id',
+            'districtId' => 'required|exists:districts,id',
+            'subDistrictId' => 'required|exists:sub_districts,id',
+            'schoolEstablishmentDecree' => 'nullable|string|max:255'
         ]);
 
         $school = School::create([
             'name' => $validated['name'],
-            'province_id' => $validated['province_id'],
-            'district_id' => $validated['district_id'],
-            'sub_district_id' => $validated['sub_district_id'],
-            'operational_license' => $validated['operational_license'],
-            'exam_info' => $validated['exam_info'],
+            'provinceId' => $validated['provinceId'],
+            'districtId' => $validated['districtId'],
+            'subDistrictId' => $validated['subDistrictId'],
+            'schoolEstablishmentDecree' => $validated['schoolEstablishmentDecree'] ?? null,
+
         ]);
 
         return (new SchoolResource($school))->additional([
@@ -56,20 +54,18 @@ class SchoolController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'province_id' => 'sometimes|exists:provinces,id',
-            'district_id' => 'sometimes|exists:districts,id',
-            'sub_district_id' => 'sometimes|exists:sub_districts,id',
-            'operational_license' => 'nullable|string|max:255',
-            'exam_info' => 'nullable|string',
+            'provinceId' => 'sometimes|exists:provinces,id',
+            'districtId' => 'sometimes|exists:districts,id',
+            'subDistrictId' => 'sometimes|exists:sub_districts,id',
+            'schoolEstablishmentDecree' => 'nullable|string|max:255'
         ]);
 
         $school->update([
             'name' => $validated['name'] ?? $school->name,
-            'province_id' => $validated['province_id'] ?? $school->province_id,
-            'district_id' => $validated['district_id'] ?? $school->district_id,
-            'sub_district_id' => $validated['sub_district_id'] ?? $school->sub_district_id,
-            'operational_license' => $validated['operational_license'] ?? $school->operational_license,
-            'exam_info' => $validated['exam_info'] ?? $school->exam_info,
+            'provinceId' => $validated['provinceId'] ?? $school->provinceId,
+            'districtId' => $validated['districtId'] ?? $school->districtId,
+            'subDistrictId' => $validated['subDistrictId'] ?? $school->subDistrictId,
+            'schoolEstablishmentDecree' => $validated['schoolEstablishmentDecree'] ?? $school->schoolEstablishmentDecree
         ]);
 
         return response()->json([
@@ -82,7 +78,6 @@ class SchoolController extends Controller
     {
         $school = School::findOrFail($id);
         $school->delete();
-
         return response()->json([
             'message' => 'School deleted successfully'
         ]);
