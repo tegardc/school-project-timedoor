@@ -13,10 +13,26 @@ class Accreditation extends Seeder
      */
     public function run(): void
     {
-        ModelsAccreditation::create(['code' => 'Unggulan']);
-        ModelsAccreditation::create(['code' => 'A']);
-        ModelsAccreditation::create(['code' => 'B']);
-        ModelsAccreditation::create(['code' => 'C']);
+        ModelsAccreditation::create([
+            'code' => 'Unggulan',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsAccreditation::create([
+            'code' => 'A',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsAccreditation::create([
+            'code' => 'B',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsAccreditation::create([
+            'code' => 'C',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
         //
     }
 }

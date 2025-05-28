@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('school_images', function (Blueprint $table) {
+        Schema::create('school_galleries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('schoolId');
             $table->unsignedBigInteger('schoolDetailId');
             $table->string('imageUrl');
             $table->boolean('isCover')->default(false);
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
 
 
             $table->foreign('schoolId')->references('id')->on('schools')->onDelete('cascade');
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('school_images');
+        Schema::dropIfExists('school_galleries');
     }
 };

@@ -32,7 +32,8 @@ return new class extends Migration
             $table->integer('numTeacher');
             $table->text('movie')->nullable();
             $table->text('examInfo')->nullable();
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
 
             $table->foreign('schoolId')->references('id')->on('schools')->onDelete('cascade');
             $table->foreign('statusId')->references('id')->on('school_statuses')->onDelete('cascade');

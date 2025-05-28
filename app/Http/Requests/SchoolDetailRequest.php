@@ -39,6 +39,7 @@ class SchoolDetailRequest extends FormRequest
             'tuitionFee' => ['nullable', 'string'],
             'numStudent' => ['required', 'integer'],
             'numTeacher' => ['required', 'integer'],
+            'imageUrl' => ['required', 'array'],
             'movie' => ['required', 'string'],
             'examInfo' => ['nullable', 'string']
             //

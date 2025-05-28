@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
+use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Dotenv\Exception\ValidationException;
@@ -19,25 +21,10 @@ class AuthController extends Controller
         //
     }
 
-    public function register(Request $request)
+    public function register(UserRequest $request)
     {
         try {
-            $validateData = $request->validate([
-                'firstName' => 'required|string',
-                'lastName'  => 'required|string',
-                'username'   => 'required|string|unique:users,username',
-                'gender'     => 'required|in:male,female',
-                'phoneNo'   => 'required|string',
-                'email'      => 'required|email|unique:users,email',
-                'password' => [
-                    'required',
-                    'string',
-                    'min:8',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
-                ],
-                'confirm_password' => 'required|string||same:password',
-                'role' => 'required|in:parent,student',
-            ]);
+            $validateData = $request->validated();
             $validateData['password'] = Hash::make($validateData['password']);
             $newUser = User::create($validateData);
             $newUser->assignRole($request->role);
@@ -49,45 +36,49 @@ class AuthController extends Controller
                 'data'    => new UserResource($newUser),
                 'token'   => $plainTextToken
             ]);
-        } catch (ValidationException $e) {
-            return $this->errorResponse($e->errors(), 422);
         } catch (\Exception $e) {
-            return $this->errorResponse("Error Createng Data:" . $e->getMessage(), 500);
+            return ResponseHelper::error($e->getMessage());
         }
     }
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required',
-            'password' => 'required'
-        ]);
-        $loginField = str_contains($credentials['email'], '@') ? 'email' : 'username';
-        if (!Auth::attempt([$loginField =>
-        $credentials['email'], 'password' =>
-        $credentials['password']])) {
-            return $this->errorResponse("Invalid Credential or Account Disable", 400);
-        }
-        $user = Auth::user();
-        $user->tokens()->delete();
-        $hours = (int)4;
-        $plainTextToken = $user->createToken($user->email, ['*'], now()->addHours($hours))->plainTextToken;
-        $expiresAt = now()->addHours($hours)->toDateTimeString();
+        try {
+            $credentials = $request->validate([
+                'email' => 'required',
+                'password' => 'required'
+            ]);
+            $loginField = str_contains($credentials['email'], '@') ? 'email' : 'username';
+            if (!Auth::attempt([$loginField =>
+            $credentials['email'], 'password' =>
+            $credentials['password']])) {
+                return $this->errorResponse("Invalid Credential or Account Disable", 400);
+            }
+            $user = Auth::user();
+            $user->tokens()->delete();
+            $hours = (int)4;
+            $plainTextToken = $user->createToken($user->email, ['*'], now()->addHours($hours))->plainTextToken;
+            $expiresAt = now()->addHours($hours)->toDateTimeString();
 
-        return response()->json([
-            'message' => 'Login successful.',
-            'data' => new UserResource($user),
-            'token' => $plainTextToken,
-            'expiresAt' => $expiresAt
-        ]);
+            return response()->json([
+                'message' => 'Login successful.',
+                'data' => new UserResource($user),
+                'token' => $plainTextToken,
+                'expiresAt' => $expiresAt
+            ]);
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logged out successfully.'
-        ]);
+            return ResponseHelper::success('Logged out successfully.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 
 

@@ -21,9 +21,11 @@ class SchoolResource extends JsonResource
             'provinceId' => $this->provinceId,
             'districtId' => $this->districtId,
             'subDistrictId' => $this->subDistrictId,
-            'schoolEnstablishmentDecree' => $this->schoolEnstablishmentDecree,
-            'telpNo' => $this->telpNo,
+            'schoolEstablishmentDecree' => $this->schoolEstablishmentDecree,
             'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
+            // 'imageUrl' => $this->coverImage->imageUrl ?? null
+
         ];
     }
     // // public function toResponse($request)

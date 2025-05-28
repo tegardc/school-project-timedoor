@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class school_detail extends Model
 {
     use HasFactory;
+    public $timestamps = true;
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
     protected $fillable = [
         'name',
         'institutionCode',
@@ -27,7 +30,9 @@ class school_detail extends Model
         'numStudent',
         'numTeacher',
         'movie',
-        'examInfo'
+        'examInfo',
+        'createdAt',
+        'updatedAt'
     ];
     public function child()
     {
@@ -39,7 +44,7 @@ class school_detail extends Model
     }
     public function status()
     {
-        return $this->belongsTo(SchoolStatus::class);
+        return $this->belongsTo(SchoolStatus::class, 'statusId');
     }
     public function education_level()
     {
@@ -48,5 +53,13 @@ class school_detail extends Model
     public function accreditation()
     {
         return $this->belongsTo(Accreditation::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(review::class, 'schoolDetailId');
+    }
+    public function schoolGallery()
+    {
+        return $this->hasMany(SchoolGallery::class, 'schoolDetailId');
     }
 }

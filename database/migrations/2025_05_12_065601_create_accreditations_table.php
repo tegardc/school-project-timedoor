@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('accreditations', function (Blueprint $table) {
             $table->id();
             $table->string("code");
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
         });
     }
 

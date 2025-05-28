@@ -13,10 +13,30 @@ class EducationLevel extends Seeder
      */
     public function run(): void
     {
-        ModelsEducationLevel::create(['name' => 'SD']);
-        ModelsEducationLevel::create(['name' => 'SMP']);
-        ModelsEducationLevel::create(['name' => 'SMA']);
-        ModelsEducationLevel::create(['name' => 'SMK']);
-        ModelsEducationLevel::create(['name' => 'Universitas']);
+        ModelsEducationLevel::create([
+            'name' => 'SD',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsEducationLevel::create([
+            'name' => 'SMP',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsEducationLevel::create([
+            'name' => 'SMA',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsEducationLevel::create([
+            'name' => 'SMK',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        ModelsEducationLevel::create([
+            'name' => 'Universitas',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
     }
 }

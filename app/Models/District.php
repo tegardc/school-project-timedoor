@@ -9,7 +9,7 @@ class District extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'provinceId'];
-
+    public $timestamps = false;
     public function province()
     {
         return $this->belongsTo(Province::class);

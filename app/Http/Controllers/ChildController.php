@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\school_image;
+use App\Models\Child;
 use Illuminate\Http\Request;
 
-class SchoolImageController extends Controller
+class ChildController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class SchoolImageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(school_image $school_image)
+    public function show(Child $Child)
     {
         //
     }
@@ -42,7 +42,7 @@ class SchoolImageController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(school_image $school_image)
+    public function edit(Child $Child)
     {
         //
     }
@@ -50,7 +50,7 @@ class SchoolImageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, school_image $school_image)
+    public function update(Request $request, Child $Child)
     {
         //
     }
@@ -58,7 +58,7 @@ class SchoolImageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(school_image $school_image)
+    public function destroy(Child $Child)
     {
         //
     }

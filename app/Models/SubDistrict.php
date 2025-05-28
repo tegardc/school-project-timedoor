@@ -9,7 +9,7 @@ class SubDistrict extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'districtId'];
-
+    public $timestamps = false;
     public function district()
     {
         return $this->belongsTo(District::class);

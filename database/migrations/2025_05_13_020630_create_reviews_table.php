@@ -17,7 +17,8 @@ return new class extends Migration
             $table->integer('rating');
             $table->unsignedBigInteger('userId');
             $table->unsignedBigInteger('schoolDetailId');
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
 
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('schoolDetailId')->references('id')->on('school_details')->onDelete('cascade');

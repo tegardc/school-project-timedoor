@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Http\Requests\ReviewRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +20,11 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $guard_name = 'api';
+    public $timestamps = true;
+
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
     protected $fillable = [
         'firstName',
         'lastName',
@@ -26,11 +33,17 @@ class User extends Authenticatable
         'gender',
         'phoneNo',
         'password',
+        'createdAt',
+        'updatedAt'
     ];
 
     public function child()
     {
         return $this->hasMany(Child::class);
+    }
+    public function review()
+    {
+        return $this->hasMany(review::class);
     }
 
     /**

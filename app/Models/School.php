@@ -4,17 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class School extends Model
 {
     use HasFactory;
+    public $timestamps = true;
+
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
     protected $fillable = [
         'name',
         'description',
         'provinceId',
         'districtId',
         'subDistrictId',
-        'schoolEnstablishmentDecree',
+        'schoolEstablishmentDecree',
+        'createdAt',
+        'updatedAt'
+
     ];
     public function school_detail()
     {
@@ -32,5 +40,13 @@ class School extends Model
     public function subDistrict()
     {
         return $this->belongsTo(SubDistrict::class,  'subDistrictId', 'id');
+    }
+    public function schoolGallery()
+    {
+        return $this->hasMany(SchoolGallery::class, 'schoolId');
+    }
+    public function coverImage()
+    {
+        return $this->hasOne(SchoolGallery::class, 'schoolId')->where('isCover', 1);
     }
 }

@@ -22,6 +22,8 @@ class UserSeeder extends Seeder
             "gender" => "female",
             "phoneNo" => "086712721812",
             "password" => Hash::make("Admin#123"),
+            'createdAt' => now(),
+            'updatedAt' => now(),
         ]);
         $admin->assignRole('admin');
         //

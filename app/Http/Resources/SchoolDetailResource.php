@@ -35,7 +35,12 @@ class SchoolDetailResource extends JsonResource
             'numTeacher' => $this->numTeacher,
             'movie' => $this->movie,
             'examInfo' => $this->examInfo,
+            'rating' => $this->reviews ? round($this->reviews->avg('rating'), 1) : 0,
+            'reviewers' => $this->reviews ? $this->reviews->count() : 0,
+            'galleryImages' => $this->schoolGallery->pluck('imageUrl') ?? [],
             'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
+
         ];
     }
 }

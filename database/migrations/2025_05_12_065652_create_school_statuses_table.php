@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('school_statuses', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->timestamps();
+            $table->timestamp('createdAt')->nullable();
+            $table->timestamp('updatedAt')->nullable();
         });
     }
 

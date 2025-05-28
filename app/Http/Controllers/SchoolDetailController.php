@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Requests\SchoolDetailRequest;
 use App\Http\Resources\SchoolDetailResource;
 use App\Models\school_detail;
+use App\Models\SchoolGallery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class SchoolDetailController extends Controller
 {
@@ -14,13 +18,13 @@ class SchoolDetailController extends Controller
      */
     public function index()
     {
-        $schools = school_detail::with(['schools', 'status', 'education_level', 'accreditation'])->get();
+        try {
+            $schools = school_detail::with(['schools', 'status', 'education_level', 'accreditation', 'schoolGallery'])->get();
 
-        return response()->json([
-            "message" => "Display Success",
-            "data" => SchoolDetailResource::collection($schools)
-        ]);
-        //
+            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Display Data Successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 
     /**
@@ -36,16 +40,17 @@ class SchoolDetailController extends Controller
      */
     public function store(SchoolDetailRequest $request)
     {
-        $this->authorize('create', school_detail::class);
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        try {
+            $validated = $request->validated();
+            $schoolDetail = school_detail::create($validated);
+            foreach ($validated['imageUrl'] as $imageUrl) {
+                SchoolGallery::create(['schoolDetailId' => $schoolDetail->id, 'schoolId' => $schoolDetail->schoolId, 'imageUrl' => $imageUrl,]);
+            }
+            $schoolDetail->load(['schoolGallery']);
+            return ResponseHelper::created(new SchoolDetailResource($schoolDetail), 'Created Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
         }
-        $validated = $request->validated();
-        $schoolDetail = school_detail::create($validated);
-        return response()->json([
-            "message" => "Add Data Success",
-            "data" => new SchoolDetailResource($schoolDetail)
-        ]);
         //
     }
 
@@ -54,12 +59,17 @@ class SchoolDetailController extends Controller
      */
     public function show($id)
     {
-        $schools = school_detail::with(['schools', 'status', 'education_level', 'accreditation'])->findOrFail($id);
-
-        return response()->json([
-            "message" => "Show Data Success",
-            "data" => new SchoolDetailResource($schools)
-        ]);
+        try {
+            $schools = school_detail::with(['schools', 'status', 'education_level', 'accreditation', 'schoolGallery', 'reviews'])->find($id);
+            if (!$schools) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            $totalReviews = $schools->reviews->count();
+            $averageRating = round($schools->reviews->avg('rating'), 1);
+            return ResponseHelper::success(new SchoolDetailResource($schools), 'Show Data Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
         //
     }
 
@@ -76,14 +86,35 @@ class SchoolDetailController extends Controller
      */
     public function update(SchoolDetailRequest $request, $id)
     {
-        $schools = school_detail::findOrFail($id);
-        $validated = $request->validated();
-        $schools->update($validated);
+        try {
+            $schools = school_detail::find($id);
+            if (!$schools) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            $validated = $request->validated();
+            $schools->update($validated);
+            if (!empty($validated['imageUrl'])) {
+                SchoolGallery::where('schoolDetailId', $schools->id)->delete();
 
-        return response()->json([
-            "message" => "Update Data Success",
-            "data" => new SchoolDetailResource($schools)
-        ]);
+                foreach ($validated['imageUrl'] as $index => $imageUrl) {
+                    SchoolGallery::create([
+                        'schoolId' => $schools->schoolId,
+                        'schoolDetailId' => $schools->id,
+                        'imageUrl' => $imageUrl,
+                        'isCover' => $index === 0 ? 1 : 0
+                    ]);
+                }
+            }
+            DB::commit();
+            $schools->load(['schoolGallery']);
+            return ResponseHelper::success(
+                new SchoolDetailResource($schools),
+                'Update Data Success'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
+
         //
     }
 
@@ -92,13 +123,26 @@ class SchoolDetailController extends Controller
      */
     public function destroy($id)
     {
-        $schools = school_detail::findOrFail($id);
-        $schools->delete();
-
-        return response()->json([
-            "message" => "Deleleted Data Success",
-            "data" => []
-        ]);
+        try {
+            $schools = school_detail::find($id);
+            if (!$schools) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            $schools->delete();
+            return ResponseHelper::success('Deleted Successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
         //
+    }
+    public function ranking()
+    {
+        try {
+            $schools = school_detail::with(['schoolGallery', 'reviews'])->withCount(['reviews as total_reviews'])->withAvg('reviews as average_rating', 'rating')->orderByDesc('average_rating')->orderByDesc('total_reviews')->get();
+
+            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 }

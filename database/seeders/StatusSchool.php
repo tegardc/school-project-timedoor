@@ -13,7 +13,15 @@ class StatusSchool extends Seeder
      */
     public function run(): void
     {
-        SchoolStatus::create(['name' => 'Negeri']);
-        SchoolStatus::create(['name' => 'Swasta']);
+        SchoolStatus::create([
+            'name' => 'Negeri',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
+        SchoolStatus::create([
+            'name' => 'Swasta',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
     }
 }
