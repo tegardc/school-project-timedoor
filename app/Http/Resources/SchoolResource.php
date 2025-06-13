@@ -22,8 +22,8 @@ class SchoolResource extends JsonResource
             'districtId' => $this->districtId,
             'subDistrictId' => $this->subDistrictId,
             'schoolEstablishmentDecree' => $this->schoolEstablishmentDecree,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
+            // 'createdAt' => $this->createdAt,
+            // 'updatedAt' => $this->updatedAt,
             // 'imageUrl' => $this->coverImage->imageUrl ?? null
 
         ];

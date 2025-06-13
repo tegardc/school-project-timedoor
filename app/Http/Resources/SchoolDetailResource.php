@@ -38,8 +38,8 @@ class SchoolDetailResource extends JsonResource
             'rating' => $this->reviews ? round($this->reviews->avg('rating'), 1) : 0,
             'reviewers' => $this->reviews ? $this->reviews->count() : 0,
             'galleryImages' => $this->schoolGallery->pluck('imageUrl') ?? [],
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
+            // 'createdAt' => $this->createdAt,
+            // 'updatedAt' => $this->updatedAt,
 
         ];
     }

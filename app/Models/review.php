@@ -31,6 +31,6 @@ class review extends Model
     }
     public function schoolDetails()
     {
-        return $this->belongsTo(school_detail::class);
+        return $this->belongsTo(SchoolDetail::class);
     }
 }

@@ -33,18 +33,26 @@ class User extends Authenticatable
         'gender',
         'phoneNo',
         'password',
+        'nis',
+        'schoolDetailId',
         'createdAt',
         'updatedAt'
     ];
 
-    public function child()
+    public function childs()
     {
-        return $this->hasMany(Child::class);
+        return $this->hasMany(Child::class, 'userId');
     }
     public function review()
     {
         return $this->hasMany(review::class);
     }
+    public function childSchoolDetails()
+    {
+        return $this->belongsToMany(SchoolDetail::class, 'user_child_school', 'userId', 'schoolDetailId')
+            ->withPivot('childId')->withTimestamps();
+    }
+
 
     /**
      * The attributes that should be hidden for serialization.

@@ -11,8 +11,8 @@ class EducationLevel extends Model
     use HasFactory;
     public $timestamps = false;
 
-    public function school_detail()
+    public function schoolDetails()
     {
-        return $this->hasMany(school_detail::class);
+        return $this->hasMany(SchoolDetail::class);
     }
 }

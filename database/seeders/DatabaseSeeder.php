@@ -20,7 +20,10 @@ class DatabaseSeeder extends Seeder
             EducationLevel::class,
             Accreditation::class,
             StatusSchool::class,
-            UserSeeder::class
+            UserSeeder::class,
+            SchoolSeeder::class,
+            SchoolDetailSeeder::class
+
         ]);
         $user = User::find(1);
         $user->assignRole('parent');

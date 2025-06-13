@@ -9,13 +9,15 @@ class District extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'provinceId'];
-    public $timestamps = false;
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
+    public $timestamps = true;
     public function province()
     {
-        return $this->belongsTo(Province::class);
+        return $this->belongsTo(Province::class, 'provinceId');
     }
     public function subDistricts()
     {
-        return $this->hasMany(SubDistrict::class);
+        return $this->hasMany(SubDistrict::class, 'subDistrictId');
     }
 }

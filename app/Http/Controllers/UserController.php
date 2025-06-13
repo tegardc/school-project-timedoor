@@ -48,7 +48,12 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load([
+            'roles',
+            'childSchoolDetails.schools.province',
+            'childSchoolDetails.schools.district',
+            'childSchoolDetails.schools.subDistrict',
+        ]);
         return ResponseHelper::success(
             new UserResource($user),
             'Show Data Success'
@@ -71,6 +76,7 @@ class UserController extends Controller
     public function update(UserRequest $request)
     {
         $user = $request->user();
+        $this->authorize('update', $user);
         $validated = $request->validated();
         if (!empty($validated['current_password']) && !empty($validated['new_password'])) {
             if (!Hash::check($validated['current_password'], $user->password)) {

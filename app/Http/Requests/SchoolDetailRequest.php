@@ -45,7 +45,28 @@ class SchoolDetailRequest extends FormRequest
             //
         ];
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $rules['institutionCode'] = ['nullable', 'string'];
+            $rules = [
+                'name' => ['nullable', 'string'],
+                'institutionCode' => ['nullable', 'string'],
+                'schoolId' => ['nullable', 'exists:schools,id'],
+                'statusId' => ['nullable', 'exists:school_statuses,id'],
+                'educationLevelId' => ['nullable', 'exists:education_levels,id'],
+                'ownershipStatus' => ['nullable', 'string'],
+                'dateEstablishmentDecree' => ['nullable', 'string'],
+                'operationalLicense' => ['nullable', 'string'],
+                'dateOperationalLicense' => ['nullable', 'string'],
+                'principal' => ['nullable', 'string'],
+                'operator' => ['nullable', 'string'],
+                'accreditationId' => ['nullable', 'exists:accreditations,id'],
+                'curriculum' => ['nullable', 'string'],
+                'telpNo' => ['nullable', 'string'],
+                'tuitionFee' => ['nullable', 'string'],
+                'numStudent' => ['nullable', 'integer'],
+                'numTeacher' => ['nullable', 'integer'],
+                'imageUrl' => ['nullable', 'array'],
+                'movie' => ['nullable', 'string'],
+                'examInfo' => ['nullable', 'string']
+            ];
         }
 
         return $rules;

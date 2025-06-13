@@ -24,18 +24,19 @@ class School extends Model
         'updatedAt'
 
     ];
-    public function school_detail()
+
+    public function schoolDetaisl()
     {
-        return $this->hasMany(school_detail::class);
+        return $this->hasMany(SchoolDetail::class);
     }
 
     public function province()
     {
-        return $this->belongsTo(Province::class);
+        return $this->belongsTo(Province::class,  'provinceId', 'id');
     }
     public function district()
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(District::class,  'districtId', 'id');
     }
     public function subDistrict()
     {

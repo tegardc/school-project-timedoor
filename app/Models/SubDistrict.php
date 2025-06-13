@@ -9,9 +9,11 @@ class SubDistrict extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'districtId'];
-    public $timestamps = false;
-    public function district()
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
+    public $timestamps = true;
+    public function districts()
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(District::class, 'districtId');
     }
 }

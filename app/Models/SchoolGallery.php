@@ -15,9 +15,9 @@ class SchoolGallery extends Model
     {
         return $this->belongsTo(School::class);
     }
-    public function schoolDetail()
+    public function schoolDetails()
     {
-        return $this->belongsTo(school_detail::class,);
+        return $this->belongsTo(SchoolDetail::class,);
     }
 }
 

@@ -14,7 +14,9 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $isStudent = $this->hasRole('student');
+        $isParent = $this->hasRole('parent');
+        return   [
             'id' => $this->id,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
@@ -23,8 +25,41 @@ class UserResource extends JsonResource
             'gender' => $this->gender,
             'phoneNo' => $this->phoneNo,
             'roles' => $this->getRoleNames(),
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
+            'nis' => $isStudent ? $this->nis : optional($this->childs->first())->nis,
+            'childName' => $isParent ? optional($this->childs->first())->name : null,
+
+            'schoolDetails' => $this->childSchoolDetails->map(function ($detail) {
+                return [
+                    'id' => $detail->id,
+                    'name' => $detail->name,
+                    'school' => [
+                        'id' => optional($detail->schools)->id,
+                        'name' => optional($detail->schools)->name,
+                        'province' => optional($detail->schools->province)->name,
+                        'district' => optional($detail->schools->district)->name,
+                        'subDistrict' => optional($detail->schools->subDistrict)->name,
+                    ]
+                ];
+            }),
         ];
+        // $role = $this->getRoleNames()->first();
+
+        // if ($role === 'student') {
+        //     $base['nis'] = $this->nis;
+        //     $base['schoolDetailId'] = $this->schoolDetailId;
+        // }
+
+        // if ($role === 'parent') {
+        //     $base['children'] = $this->children ? $this->children->map(function ($child) {
+        //         return [
+        //             'id' => $child->id,
+        //             'name' => $child->name,
+        //             'nis' => $child->nis,
+        //             'schoolDetailId' => $child->schoolDetailId,
+        //         ];
+        //     }) : [];
+
+
+
     }
 }

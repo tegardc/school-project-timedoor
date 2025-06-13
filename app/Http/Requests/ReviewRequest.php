@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewRequest extends FormRequest
 {
@@ -29,5 +30,19 @@ class ReviewRequest extends FormRequest
             //
         ];
         return $rules;
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $schoolDetailId = $this->route('schoolDetailId');
+            $user = Auth::user();
+            if ($schoolDetailId && $user) {
+                $isStudent = $user->childSchoolDetails()->where('schoolDetailId', $schoolDetailId)->exists();
+                if (!$isStudent) {
+                    $validator->errors()->add('schoolDetailId', 'Youre Not registered in this school');
+                }
+            }
+        });
     }
 }
