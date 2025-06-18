@@ -17,5 +17,12 @@ class SchoolSeeder extends Seeder
             'subDistrictId' => 1,
             'schoolEstablishmentDecree' => 'SK-1234-DENPASAR'
         ]);
+        School::create([
+            'name' => 'SMAN 1 Denpasar',
+            'provinceId' => 1,
+            'districtId' => 2,
+            'subDistrictId' => 3,
+            'schoolEstablishmentDecree' => 'SK-1234-DENPASAR'
+        ]);
     }
 }
