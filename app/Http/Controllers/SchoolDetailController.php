@@ -47,7 +47,7 @@ class SchoolDetailController extends Controller
             $schoolDetail = $service->store($validated);
             return ResponseHelper::created(new SchoolDetailResource($schoolDetail), 'Created Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops gagal menambahkan detail sekolah", $e, "[SCHOOL DETAIL STORE]: ");
         }
         //
     }
