@@ -31,5 +31,47 @@ class SchoolDetailSeeder extends Seeder
             'movie' => 'https://youtube.com/sample',
             'examInfo' => 'UNBK'
         ]);
+        SchoolDetail::create([
+            'name' => 'SMAN 12 Denpasar',
+            'institutionCode' => 'INST0012',
+            'schoolId' => 2,
+            'statusId' => 1,
+            'educationLevelId' => 2,
+            'ownershipStatus' => 'Negeri',
+            'dateEstablishmentDecree' => '2000-01-01',
+            'operationalLicense' => 'Izin-5678',
+            'dateOperationalLicense' => '2001-01-01',
+            'principal' => 'I Nyoman Sudarma',
+            'operator' => 'Komang Yuni',
+            'accreditationId' => 1,
+            'curriculum' => 'Kurikulum Merdeka',
+            'telpNo' => '0361-123456',
+            'tuitionFee' => 200000,
+            'numStudent' => 500,
+            'numTeacher' => 50,
+            'movie' => 'https://youtube.com/sample',
+            'examInfo' => 'UNBK'
+        ]);
+        SchoolDetail::create([
+            'name' => 'SMAN 8 Denpasar',
+            'institutionCode' => 'INST0012',
+            'schoolId' => 2,
+            'statusId' => 2,
+            'educationLevelId' => 1,
+            'ownershipStatus' => 'Negeri',
+            'dateEstablishmentDecree' => '2000-01-01',
+            'operationalLicense' => 'Izin-5678',
+            'dateOperationalLicense' => '2001-01-01',
+            'principal' => 'I Nyoman Sudarma',
+            'operator' => 'Komang Yuni',
+            'accreditationId' => 1,
+            'curriculum' => 'Kurikulum Merdeka',
+            'telpNo' => '0361-123456',
+            'tuitionFee' => 200000,
+            'numStudent' => 500,
+            'numTeacher' => 50,
+            'movie' => 'https://youtube.com/sample',
+            'examInfo' => 'UNBK'
+        ]);
     }
 }
