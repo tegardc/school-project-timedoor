@@ -60,7 +60,7 @@ class SubdistrictController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Subdistrict $subdistrict)
+    public function show(SubDistrict $subDistrict)
     {
         //
     }
@@ -68,7 +68,7 @@ class SubdistrictController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Subdistrict $subdistrict)
+    public function edit(SubDistrict $subDistrict)
     {
         //
     }
