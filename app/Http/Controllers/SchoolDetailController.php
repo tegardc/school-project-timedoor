@@ -45,10 +45,8 @@ class SchoolDetailController extends Controller
         try {
             $validated = $request->validated();
             $schoolDetail = $service->store($validated);
-            DB::commit();
             return ResponseHelper::created(new SchoolDetailResource($schoolDetail), 'Created Success');
         } catch (\Exception $e) {
-            DB::rollBack();
             return ResponseHelper::serverError("Oops created school detail is failed", $e, "[SCHOOL DETAIL STORE]: ");
         }
         //
