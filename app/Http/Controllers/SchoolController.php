@@ -50,7 +50,7 @@ class SchoolController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(SchoolRequest $request, $id)
     {
         try {
             $school = School::find($id);
