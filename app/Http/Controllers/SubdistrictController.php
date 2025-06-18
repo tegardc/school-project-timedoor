@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\SubDistrictRequest;
 use App\Http\Resources\SubDistrictResource;
-use App\Models\Subdistrict;
+use App\Models\SubDistrict;
 use App\Services\SubDistrictService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
