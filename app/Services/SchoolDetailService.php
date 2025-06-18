@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Helpers\ResponseHelper;
 use App\Models\Child;
 use App\Models\SchoolDetail;
 use App\Models\SchoolGallery;
@@ -18,24 +17,20 @@ class SchoolDetailService
     public function store(array $validated): SchoolDetail
     {
         return DB::transaction(function () use ($validated) {
-            try {
-                $schoolDetail = SchoolDetail::create($validated);
-                if (!empty($validated['imageUrl'])) {
-                    foreach ($validated['imageUrl'] as $imageUrl) {
-                        SchoolGallery::create([
-                            'schoolDetailId' => $schoolDetail->id,
-                            'schoolId' => $schoolDetail->schoolId,
-                            'imageUrl' => $imageUrl,
-                        ]);
-                    }
+            $schoolDetail = SchoolDetail::create($validated);
+            if (!empty($validated['imageUrl'])) {
+                foreach ($validated['imageUrl'] as $imageUrl) {
+                    SchoolGallery::create([
+                        'schoolDetailId' => $schoolDetail->id,
+                        'schoolId' => $schoolDetail->schoolId,
+                        'imageUrl' => $imageUrl,
+                    ]);
                 }
-
-                $schoolDetail->load(['schoolGallery']);
-
-                return $schoolDetail;
-            } catch (\Exception $e) {
-                throw $e;
             }
+
+            $schoolDetail->load(['schoolGallery']);
+
+            return $schoolDetail;
         });
     }
     public function update(array $validated, int $id): ?SchoolDetail
