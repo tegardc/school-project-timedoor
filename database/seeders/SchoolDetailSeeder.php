@@ -54,7 +54,7 @@ class SchoolDetailSeeder extends Seeder
         ]);
         SchoolDetail::create([
             'name' => 'SMAN 8 Denpasar',
-            'institutionCode' => 'INST0012',
+            'institutionCode' => 'INST00123',
             'schoolId' => 2,
             'statusId' => 2,
             'educationLevelId' => 1,
