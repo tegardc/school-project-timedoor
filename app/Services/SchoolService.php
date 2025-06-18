@@ -14,4 +14,16 @@ class SchoolService
             return $school;
         });
     }
+    public function update(array $validated, int $id): ?School
+    {
+        return DB::transaction(function () use ($validated, $id) {
+            $school = School::find($id);
+            if (!$school) {
+                return null;
+            }
+            $school->update($validated);
+            return $school;
+        });
+    }
+
 }

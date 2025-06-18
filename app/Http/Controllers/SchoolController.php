@@ -50,15 +50,15 @@ class SchoolController extends Controller
         }
     }
 
-    public function update(SchoolRequest $request, $id)
+    public function update(SchoolRequest $request, $id, SchoolService $service)
     {
         try {
-            $school = School::find($id);
-            if (!$school) {
+            $validated = $request->validated();
+
+            $school = $service->update($validated, $id);
+            if(!$school){
                 return ResponseHelper::notFound('Data Not Found');
             }
-            $validated = $request->validated();
-            $school->update($validated);
             return ResponseHelper::success(new SchoolResource($school), 'Update Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops updated school is failed ", $e, "[SCHOOL UPDATE]: ");
