@@ -24,7 +24,7 @@ class SubdistrictController extends Controller
     // SubDistrictController.php
     public function getByDistrict($districtId)
     {
-        $subDistricts = Subdistrict::where('districtId', $districtId)->get();
+        $subDistricts = SubDistrict::where('districtId', $districtId)->get();
         return ResponseHelper::success(SubDistrictResource::collection($subDistricts), 'Sub-districts retrieved');
     }
 
