@@ -26,7 +26,7 @@ class DistrictController extends Controller
     public function getByProvince($provinceId)
     {
         $districts = District::where('provinceId', $provinceId)->get();
-        return ResponseHelper::success(new DistrictResource($districts), 'Districts retrieved');
+        return ResponseHelper::success(DistrictResource::collection($districts), 'Districts retrieved');
     }
 
     /**
