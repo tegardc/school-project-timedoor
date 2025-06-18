@@ -46,22 +46,23 @@ class SchoolRequest extends FormRequest
         }
         return $rules;
     }
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $provinceId = $this->input('provinceId');
-            $districtId = $this->input('districtId');
-            $subDistrictId = $this->input('subDistrictId');
-            $province = Province::find($provinceId);
-            $district = District::find($districtId);
-            $subDistrict = SubDistrict::find($subDistrictId);
-            if (
-                $province->provinceId != $provinceId ||
-                $district->districtId != $districtId ||
-                $subDistrict->subDistrictId != $subDistrictId
-            ) {
-                $validator->errors()->add('Locations', 'Location data does not match');
-            }
-        });
-    }
 }
+//     public function withValidator($validator)
+//     {
+//         $validator->after(function ($validator) {
+//             $provinceId = $this->input('provinceId');
+//             $districtId = $this->input('districtId');
+//             $subDistrictId = $this->input('subDistrictId');
+//             $province = Province::find($provinceId);
+//             $district = District::find($districtId);
+//             $subDistrict = SubDistrict::find($subDistrictId);
+//             if (
+//                 $province->provinceId != $provinceId ||
+//                 $district->districtId != $districtId ||
+//                 $subDistrict->subDistrictId != $subDistrictId
+//             ) {
+//                 $validator->errors()->add('Locations', 'Location data does not match');
+//             }
+//         });
+//     }
+// }
