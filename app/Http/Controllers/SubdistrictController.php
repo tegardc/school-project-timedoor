@@ -97,7 +97,7 @@ class SubdistrictController extends Controller
      */
     public function destroy($id)
     {
-        $subDistrict = Subdistrict::find($id);
+        $subDistrict = SubDistrict::find($id);
         if (!$subDistrict) {
             return ResponseHelper::notFound('Sub District not found');
         }
