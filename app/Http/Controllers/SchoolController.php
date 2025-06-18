@@ -19,7 +19,7 @@ class SchoolController extends Controller
             $schools = School::with(['province', 'district', 'subDistrict', 'schoolGallery'])->get();
             return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
         }
     }
 
@@ -33,7 +33,7 @@ class SchoolController extends Controller
                 'Created Data Success'
             );
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops created school is failed ", $e, "[SCHOOL STORE]: ");
         }
     }
 
@@ -46,7 +46,7 @@ class SchoolController extends Controller
                 'data' => new SchoolResource($school)
             ]);
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops display school is failed ", $e, "[SCHOOL SHOW]: ");
         }
     }
 
@@ -61,7 +61,7 @@ class SchoolController extends Controller
             $school->update($validated);
             return ResponseHelper::success(new SchoolResource($school), 'Update Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops updated school is failed ", $e, "[SCHOOL UPDATE]: ");
         }
     }
 
@@ -75,7 +75,7 @@ class SchoolController extends Controller
             $school->delete();
             return ResponseHelper::success('deleted successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops deleted school is failed ", $e, "[SCHOOL DELETED]: ");
         }
     }
 }

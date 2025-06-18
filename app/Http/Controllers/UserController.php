@@ -18,11 +18,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::all();
-        return  ResponseHelper::success(
-            UserResource::collection($user),
-            'Display Data Success'
-        );
+        try {
+            $user = User::all();
+            return  ResponseHelper::success(
+                UserResource::collection($user),
+                'Display Data Success'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
+        }
         //
     }
 
@@ -48,16 +52,20 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        $user = $request->user()->load([
-            'roles',
-            'childSchoolDetails.schools.province',
-            'childSchoolDetails.schools.district',
-            'childSchoolDetails.schools.subDistrict',
-        ]);
-        return ResponseHelper::success(
-            new UserResource($user),
-            'Show Data Success'
-        );
+        try {
+            $user = $request->user()->load([
+                'roles',
+                'childSchoolDetails.schools.province',
+                'childSchoolDetails.schools.district',
+                'childSchoolDetails.schools.subDistrict',
+            ]);
+            return ResponseHelper::success(
+                new UserResource($user),
+                'Show Data Success'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
+        }
     }
     //
 
@@ -75,28 +83,36 @@ class UserController extends Controller
      */
     public function update(UserRequest $request)
     {
-        $user = $request->user();
-        $this->authorize('update', $user);
-        $validated = $request->validated();
-        if (!empty($validated['current_password']) && !empty($validated['new_password'])) {
-            if (!Hash::check($validated['current_password'], $user->password)) {
-                return $this->errorResponse("Correct Password Is Incorrect", 400);
+        try {
+            $user = $request->user();
+            $this->authorize('update', $user);
+            $validated = $request->validated();
+            if (!empty($validated['current_password']) && !empty($validated['new_password'])) {
+                if (!Hash::check($validated['current_password'], $user->password)) {
+                    return $this->errorResponse("Correct Password Is Incorrect", 400);
+                }
+                $user->password = Hash::make($validated['new_password']);
             }
-            $user->password = Hash::make($validated['new_password']);
-        }
 
-        $user->update($validated);
-        $user->refresh();
-        return ResponseHelper::success(
-            new UserResource($user),
-            'Update Success'
-        );
+            $user->update($validated);
+            $user->refresh();
+            return ResponseHelper::success(
+                new UserResource($user),
+                'Update Success'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
+        }
     }
     public function destroy(Request $request)
     {
-        $user = $request->user();
-        $user->delete();
-        return ResponseHelper::success('User deleted successfully');
+        try {
+            $user = $request->user();
+            $user->delete();
+            return ResponseHelper::success('User deleted successfully');
+         } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
+        }
     }
 
     /**

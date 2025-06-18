@@ -15,46 +15,71 @@ class ReviewController extends Controller
      */
     public function index($schoolDetailId)
     {
-        $review = review::where('schoolDetailId', $schoolDetailId)->where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
-        return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
+        try {
+            $review = review::where('schoolDetailId', $schoolDetailId)->where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
+
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
+        }
         //
     }
     public function approve($id)
     {
-        $review = review::find($id);
-        if (!$review) {
-            return ResponseHelper::notFound('Review Not Found');
-        }
-        $review->status = review::STATUS_APPROVED;
-        $review->save();
+        try {
+            $review = review::find($id);
+            if (!$review) {
+                return ResponseHelper::notFound('Review Not Found');
+            }
+            $review->status = review::STATUS_APPROVED;
+            $review->save();
 
-        return ResponseHelper::success('Review Approved Successfully');
+            return ResponseHelper::success('Review Approved Successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops approved review is failed ", $e, "[REVIEW APPROVE]: ");
+        }
     }
     public function reject($id)
     {
-        $review = review::find($id);
-        if (!$review) {
-            return ResponseHelper::notFound('Review Not Found');
-        }
-        $review->status = review::STATUS_REJECTED;
-        $review->save();
+        try {
+            $review = review::find($id);
+            if (!$review) {
+                return ResponseHelper::notFound('Review Not Found');
+            }
+            $review->status = review::STATUS_REJECTED;
+            $review->save();
 
-        return ResponseHelper::success('Review Reject and Delete');
+            return ResponseHelper::success('Review Reject and Delete');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops rejected review is failed ", $e, "[REVIEW REJECTED]: ");
+        }
     }
     public function pendingReviews()
     {
-        $review = review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
-        return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
+        try {
+            $review = review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
+            return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display pending review is failed ", $e, "[REVIEW PENDINGREVIEWS]: ");
+        }
     }
     public function rejectedReviews()
     {
-        $review = review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
-        return ResponseHelper::success(ReviewResource::collection($review), 'List Review Reject');
+        try {
+            $review = review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
+            return ResponseHelper::success(ReviewResource::collection($review), 'List Review Reject');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display rejected review is failed ", $e, "[REVIEW REJECTEDREVIEWS]: ");
+        }
     }
     public function approvedReviews()
     {
-        $review = review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
-        return ResponseHelper::success(ReviewResource::collection($review), 'List Review Approved');
+        try {
+            $review = review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            return ResponseHelper::success(ReviewResource::collection($review), 'List Review Approved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display approved review is failed ", $e, "[REVIEW APPROVEREVIEWS]: ");
+        }
     }
 
     /**
@@ -70,18 +95,22 @@ class ReviewController extends Controller
      */
     public function store(ReviewRequest $request, $schoolDetailId)
     {
-        $userId = auth()->id();
-        $validated = $request->validated();
-        $review = review::updateOrCreate(
-            ['userId' => $userId, 'schoolDetailId' => $schoolDetailId],
-            [
-                'reviewText' => $validated['reviewText'],
-                'rating' => $validated['rating'],
-                'status' => review::STATUS_PENDING,
-            ]
-        );
-        $message = $review->wasRecentlyCreated ? 'Review Created Successfully.' : 'Review Updated Successfully';
-        return ResponseHelper::success(new ReviewResource($review), $message);
+        try {
+            $userId = auth()->id();
+            $validated = $request->validated();
+            $review = review::updateOrCreate(
+                ['userId' => $userId, 'schoolDetailId' => $schoolDetailId],
+                [
+                    'reviewText' => $validated['reviewText'],
+                    'rating' => $validated['rating'],
+                    'status' => review::STATUS_PENDING,
+                ]
+            );
+            $message = $review->wasRecentlyCreated ? 'Review Created Successfully.' : 'Review Updated Successfully';
+            return ResponseHelper::success(new ReviewResource($review), $message);
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
+        }
         //
     }
 
@@ -112,10 +141,14 @@ class ReviewController extends Controller
      */
     public function destroy($id)
     {
-        $review = review::findOrFail($id);
-        $review->delete();
+        try {
+            $review = review::findOrFail($id);
+            $review->delete();
 
-        return ResponseHelper::success('Delete Data Success');
+            return ResponseHelper::success('Delete Data Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
+        }
         //
     }
 }

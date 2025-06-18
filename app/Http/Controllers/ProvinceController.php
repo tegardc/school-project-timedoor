@@ -17,8 +17,13 @@ class ProvinceController extends Controller
      */
     public function index()
     {
-        $province = Province::all();
-        return ResponseHelper::success(ProvinceResource::collection($province), 'Success Display List Province');
+        try {
+            //code...
+            $province = Province::all();
+            return ResponseHelper::success(ProvinceResource::collection($province), 'Success Display List Province');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE INDEX]: ");
+        }
     }
 
     /**
@@ -32,7 +37,7 @@ class ProvinceController extends Controller
 
             return ResponseHelper::created(new ProvinceResource($province), 'Province Created Successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops create province is failed ", $e, "[PROVINCE STORE]: ");
         }
     }
 
@@ -41,13 +46,18 @@ class ProvinceController extends Controller
      */
     public function show($id)
     {
-        $province = Province::find($id);
+        try {
+            //code...
+            $province = Province::find($id);
 
-        if (!$province) {
-            return ResponseHelper::notFound('Province Not Found');
+            if (!$province) {
+                return ResponseHelper::notFound('Province Not Found');
+            }
+
+            return ResponseHelper::success($province, 'Province Found');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display province by id is failed ", $e, "[PROVINCE SHOW]: ");
         }
-
-        return ResponseHelper::success($province, 'Province Found');
     }
 
     /**
@@ -64,7 +74,7 @@ class ProvinceController extends Controller
 
             return ResponseHelper::success(new ProvinceResource($province), 'Province Updated Successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops update province is failed ", $e, "[PROVINCE UPDATE]: ");
         }
     }
 
@@ -73,13 +83,18 @@ class ProvinceController extends Controller
      */
     public function destroy($id)
     {
-        $province = Province::find($id);
+        try {
+            //code...
+            $province = Province::find($id);
 
-        if (!$province) {
-            return ResponseHelper::notFound('Province Not Found');
+            if (!$province) {
+                return ResponseHelper::notFound('Province Not Found');
+            }
+
+            $province->delete();
+            return ResponseHelper::success(null, 'Province Deleted Successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops delete province is failed ", $e, "[PROVINCE DESTROY]: ");
         }
-
-        $province->delete();
-        return ResponseHelper::success(null, 'Province Deleted Successfully');
     }
 }

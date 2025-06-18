@@ -17,15 +17,23 @@ class SubdistrictController extends Controller
      */
     public function index()
     {
-        $subdistrict = SubDistrict::all();
-        return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
+        try {
+            $subdistrict = SubDistrict::all();
+            return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display subdistrict is failed ", $e, "[SUBDISTRICT INDEX]: ");
+        }
         //
     }
     // SubDistrictController.php
     public function getByDistrict($districtId)
     {
-        $subDistricts = SubDistrict::where('districtId', $districtId)->get();
-        return ResponseHelper::success(SubDistrictResource::collection($subDistricts), 'Sub-districts retrieved');
+        try {
+            $subDistricts = SubDistrict::where('districtId', $districtId)->get();
+            return ResponseHelper::success(SubDistrictResource::collection($subDistricts), 'Sub-districts retrieved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display subdistrict by district id is failed ", $e, "[SUBDISTRICT GETBYDISTRICT]: ");
+        }
     }
 
 
@@ -49,7 +57,7 @@ class SubdistrictController extends Controller
             return ResponseHelper::created(new SubDistrictResource($subDistrict), 'Created Successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops created subdistrict is failed ", $e, "[SUBDISTRICT STORE]: ");
         }
 
 
@@ -86,7 +94,7 @@ class SubdistrictController extends Controller
             }
             return ResponseHelper::success(new SubDistrictResource($subDistrict), 'Sub District Update Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops updated subdistrict is failed ", $e, "[SUBDISTRICT UPDATE]: ");
         }
 
         //
@@ -97,14 +105,19 @@ class SubdistrictController extends Controller
      */
     public function destroy($id)
     {
-        $subDistrict = SubDistrict::find($id);
-        if (!$subDistrict) {
-            return ResponseHelper::notFound('Sub District not found');
+        try {
+            //code...
+            $subDistrict = SubDistrict::find($id);
+            if (!$subDistrict) {
+                return ResponseHelper::notFound('Sub District not found');
+            }
+
+            $subDistrict->delete();
+
+            return ResponseHelper::success(null, 'Sub District deleted successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops deleted subdistrict is failed ", $e, "[SUBDISTRICT DESTROY]: ");
         }
-
-        $subDistrict->delete();
-
-        return ResponseHelper::success(null, 'Sub District deleted successfully');
         //
     }
 }

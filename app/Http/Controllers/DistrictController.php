@@ -18,15 +18,25 @@ class DistrictController extends Controller
      */
     public function index()
     {
-        $district = District::all();
-        return ResponseHelper::success(DistrictResource::collection($district), 'Successfully Display Data');
+        try {
+            //code...
+            $district = District::all();
+            return ResponseHelper::success(DistrictResource::collection($district), 'Successfully Display Data');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT INDEX]: ");
+        }
 
         //
     }
     public function getByProvince($provinceId)
     {
-        $districts = District::where('provinceId', $provinceId)->get();
-        return ResponseHelper::success(DistrictResource::collection($districts), 'Districts retrieved');
+        try {
+            //code...
+            $districts = District::where('provinceId', $provinceId)->get();
+            return ResponseHelper::success(DistrictResource::collection($districts), 'Districts retrieved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display district by province id is failed ", $e, "[DISTRICT GETBYPROVINCE]: ");
+        }
     }
 
     /**
@@ -49,7 +59,7 @@ class DistrictController extends Controller
             return ResponseHelper::created(new DistrictResource($district), 'Created Successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops create district is failed ", $e, "[DISTRICT STORE]: ");
         }
 
         //
@@ -84,7 +94,7 @@ class DistrictController extends Controller
             }
             return ResponseHelper::success(new DistrictResource($district), 'District Update Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops update district is failed ", $e, "[DISTRICT UPDATE]: ");
         }
     }
 
@@ -93,13 +103,18 @@ class DistrictController extends Controller
      */
     public function destroy($id)
     {
-        $district = District::find($id);
-        if (!$district) {
-            return ResponseHelper::notFound('District not found');
+        try {
+            //code...
+            $district = District::find($id);
+            if (!$district) {
+                return ResponseHelper::notFound('District not found');
+            }
+
+            $district->delete();
+
+            return ResponseHelper::success(null, 'District deleted successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops delete district is failed ", $e, "[DISTRICT DESTROY]: ");
         }
-
-        $district->delete();
-
-        return ResponseHelper::success(null, 'District deleted successfully');
     }
 }

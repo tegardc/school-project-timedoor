@@ -31,7 +31,7 @@ class SchoolGalleryController extends Controller
                 'data' => ['urls' => $uploadedFiles]
             ], 200);
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops upload school image is failed ", $e, "[SCHOOL DELETED]: ");
         }
     }
     /**

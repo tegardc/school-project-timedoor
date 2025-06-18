@@ -25,7 +25,7 @@ class SchoolDetailController extends Controller
 
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Display Data Successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+             return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
         }
     }
 
@@ -47,17 +47,22 @@ class SchoolDetailController extends Controller
             $schoolDetail = $service->store($validated);
             return ResponseHelper::created(new SchoolDetailResource($schoolDetail), 'Created Success');
         } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops gagal menambahkan detail sekolah", $e, "[SCHOOL DETAIL STORE]: ");
+            return ResponseHelper::serverError("Oops created school detail is failed", $e, "[SCHOOL DETAIL STORE]: ");
         }
         //
     }
     public function getBySubDistrict($id)
     {
-        $schoolDetails = SchoolDetail::whereHas('schools', function ($query) use ($id) {
+        try {
+            $schoolDetails = SchoolDetail::whereHas('schools', function ($query) use ($id) {
             $query->where('subDistrictId', $id);
         })->get();
 
         return ResponseHelper::success($schoolDetails, 'School details by sub-district retrieved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
+        }
+
     }
 
     /**
@@ -74,7 +79,7 @@ class SchoolDetailController extends Controller
             $averageRating = round($schools->reviews->avg('rating'), 1);
             return ResponseHelper::success(new SchoolDetailResource($schools), 'Show Data Success');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops display school detail is failed ", $e, "[SCHOOL DETAIL SHOW]: ");
         }
         //
     }
@@ -108,7 +113,7 @@ class SchoolDetailController extends Controller
                 'Update Data Success'
             );
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+             return ResponseHelper::serverError("Oops update school detail is failed", $e, "[SCHOOL DETAIL UPDATE]: ");
         }
 
 
@@ -129,13 +134,14 @@ class SchoolDetailController extends Controller
             $schools->delete();
             return ResponseHelper::success('Deleted Successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops deleted school detail is failed ", $e, "[SCHOOL DETAIL DESTROY]: ");
         }
         //
     }
     public function filter(Request $request, SchoolDetailService $service)
     {
-        $filters = $request->only([
+        try {
+            $filters = $request->only([
             'provinceId',
             'districtId',
             'subDistrictId',
@@ -147,6 +153,9 @@ class SchoolDetailController extends Controller
 
         $data = $service->filter($filters);
         return ResponseHelper::success(SchoolDetailResource::collection($data), 'Filtered School Details');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops filter school detail is failed ", $e, "[SCHOOL DETAIL FILTER]: ");
+        }
     }
 
     public function ranking()
@@ -156,7 +165,7 @@ class SchoolDetailController extends Controller
 
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
         } catch (\Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::serverError("Oops display rangking school detail is failed ", $e, "[SCHOOL DETAIL RANKING]: ");
         }
     }
 }
