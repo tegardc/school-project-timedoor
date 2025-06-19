@@ -54,7 +54,7 @@ class AccreditationController extends Controller
     {
         //
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */

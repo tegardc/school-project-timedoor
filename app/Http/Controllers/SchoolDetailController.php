@@ -18,16 +18,22 @@ class SchoolDetailController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        try {
-            $schools = SchoolDetail::with(['schools', 'status', 'educationLevel', 'accreditation', 'schoolGallery'])->get();
+    public function index(Request $request, SchoolDetailService $service)
+{
+    try {
+        $perPage = $request->query('perPage');
 
-            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Display Data Successfully');
-        } catch (\Exception $e) {
-             return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
-        }
+        $schools = $service->getAll($perPage);
+
+        return ResponseHelper::success(
+            SchoolDetailResource::collection($schools),
+            'Display Data Successfully'
+        );
+    } catch (\Exception $e) {
+        return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
     }
+}
+
 
     /**
      * Show the form for creating a new resource.

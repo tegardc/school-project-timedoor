@@ -96,4 +96,30 @@ class SchoolDetailService
         }
         return $query->with(['schoolGallery', 'schools'])->get();
     }
+    public function getAll($perPage = 10)
+{
+    $query = SchoolDetail::select([
+        'id',
+        'name',
+        'schoolId',
+        'statusId',
+        'educationLevelId',
+        'accreditationId',
+        'telpNo'
+    ])
+    ->with([
+        'schools:id,name,provinceId,districtId,subDistrictId',
+        'status:id,name',
+        'educationLevel:id,name',
+        'accreditation:id,code',
+        'schoolGallery:id,schoolDetailId,imageUrl,isCover'
+    ]);
+
+    if ($perPage) {
+        return $query->paginate($perPage);
+    }
+
+    return $query->get();
+}
+
 }
