@@ -115,11 +115,8 @@ class SchoolDetailService
         'schoolGallery:id,schoolDetailId,imageUrl,isCover'
     ]);
 
-    if ($perPage) {
-        return $query->paginate($perPage);
-    }
 
-    return $query->get();
+    return $query->paginate($perPage??10);
 }
 
 }
