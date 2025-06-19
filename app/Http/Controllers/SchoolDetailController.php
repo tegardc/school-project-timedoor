@@ -21,9 +21,13 @@ class SchoolDetailController extends Controller
     public function index(Request $request, SchoolDetailService $service)
 {
     try {
+        $filters = $request->only([
+            'provinceId', 'districtId', 'subDistrictId',
+            'educationLevelId', 'statusId', 'accreditationId', 'schoolId'
+        ]);
         $perPage = $request->query('perPage',10);
 
-        $schools = $service->getAll($perPage);
+        $schools = $service->filter($filters, $perPage);
 
         return ResponseHelper::success(
             SchoolDetailResource::collection($schools),

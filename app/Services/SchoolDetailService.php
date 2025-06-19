@@ -58,9 +58,24 @@ class SchoolDetailService
             return $schoolDetail;
         });
     }
-    public function filter(array $filters)
+    public function filter(array $filters = [], $perPage = 10)
     {
-        $query = SchoolDetail::query();
+         $query = SchoolDetail::select([
+        'id',
+        'name',
+        'schoolId',
+        'statusId',
+        'educationLevelId',
+        'accreditationId',
+        'telpNo'
+    ])
+    ->with([
+        'schools:id,name,provinceId,districtId,subDistrictId',
+        'status:id,name',
+        'educationLevel:id,name',
+        'accreditation:id,code',
+        'schoolGallery:id,schoolDetailId,imageUrl,isCover'
+    ]);
 
         if (!empty($filters['provinceId'])) {
             $query->whereHas('schools', function ($q) use ($filters) {
@@ -94,7 +109,7 @@ class SchoolDetailService
         if (!empty($filters['schoolId'])) {
             $query->where('schoolId', $filters['schoolId']);
         }
-        return $query->with(['schoolGallery', 'schools'])->get();
+        return $query->paginate($perPage);
     }
     public function getAll($perPage = null)
 {
