@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\ReviewResource;
-use App\Models\review;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -16,7 +16,7 @@ class ReviewController extends Controller
     public function index($schoolDetailId)
     {
         try {
-            $review = review::where('schoolDetailId', $schoolDetailId)->where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            $review = Review::where('schoolDetailId', $schoolDetailId)->where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
             return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
 
         } catch (\Exception $e) {
@@ -27,7 +27,7 @@ class ReviewController extends Controller
     public function approve($id)
     {
         try {
-            $review = review::find($id);
+            $review = Review::find($id);
             if (!$review) {
                 return ResponseHelper::notFound('Review Not Found');
             }
@@ -42,7 +42,7 @@ class ReviewController extends Controller
     public function reject($id)
     {
         try {
-            $review = review::find($id);
+            $review = Review::find($id);
             if (!$review) {
                 return ResponseHelper::notFound('Review Not Found');
             }
@@ -57,7 +57,7 @@ class ReviewController extends Controller
     public function pendingReviews()
     {
         try {
-            $review = review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
+            $review = Review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display pending review is failed ", $e, "[REVIEW PENDINGREVIEWS]: ");
@@ -66,7 +66,7 @@ class ReviewController extends Controller
     public function rejectedReviews()
     {
         try {
-            $review = review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
+            $review = Review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review Reject');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display rejected review is failed ", $e, "[REVIEW REJECTEDREVIEWS]: ");
@@ -75,7 +75,7 @@ class ReviewController extends Controller
     public function approvedReviews()
     {
         try {
-            $review = review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            $review = Review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review Approved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display approved review is failed ", $e, "[REVIEW APPROVEREVIEWS]: ");
@@ -142,7 +142,7 @@ class ReviewController extends Controller
     public function destroy($id)
     {
         try {
-            $review = review::findOrFail($id);
+            $review = Review::findOrFail($id);
             $review->delete();
 
             return ResponseHelper::success('Delete Data Success');
