@@ -53,7 +53,7 @@ use App\Http\Controllers\AuthController;
             Route::post('/school-details', [SchoolDetailController::class, 'store']);
             Route::put('/school-details/{id}', [SchoolDetailController::class, 'update']);
             Route::delete('/school-details/{id}', [SchoolDetailController::class, 'destroy']);
-            Route::put('/reviews/{id}/approve', [ReviewController::class, 'approve']);
+            Route::put('/revi   ews/{id}/approve', [ReviewController::class, 'approve']);
             Route::put('/reviews/{id}/reject', [ReviewController::class, 'reject']);
             Route::get('/review/pending-reviews', [ReviewController::class, 'pendingReviews']);
             Route::get('/review/rejected-reviews', [ReviewController::class, 'rejectedReviews']);
