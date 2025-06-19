@@ -21,7 +21,7 @@ class SchoolDetailController extends Controller
     public function index(Request $request, SchoolDetailService $service)
 {
     try {
-        $perPage = $request->query('perPage');
+        $perPage = $request->query('perPage',10);
 
         $schools = $service->getAll($perPage);
 

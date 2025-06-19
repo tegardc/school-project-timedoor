@@ -96,7 +96,7 @@ class SchoolDetailService
         }
         return $query->with(['schoolGallery', 'schools'])->get();
     }
-    public function getAll($perPage = 10)
+    public function getAll($perPage = null)
 {
     $query = SchoolDetail::select([
         'id',
