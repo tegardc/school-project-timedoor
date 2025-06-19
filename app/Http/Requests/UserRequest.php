@@ -103,7 +103,7 @@ class UserRequest extends FormRequest
             $subDistrictId = $this->input('subDistrictId');
             $schoolDetailId = $this->input('schoolDetailId');
             if ($schoolDetailId && $provinceId && $districtId && $subDistrictId) {
-                $schoolDetail = \App\Models\school_detail::with('schools')->find($schoolDetailId);
+                $schoolDetail = \App\Models\SchoolDetail::with('schools')->find($schoolDetailId);
                 if (!$schoolDetail || !$schoolDetail->schools) {
                     $validator->errors()->add('schoolDetailId', 'School data not found.');
                     return;
