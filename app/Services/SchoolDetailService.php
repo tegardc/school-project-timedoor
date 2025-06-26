@@ -60,22 +60,37 @@ class SchoolDetailService
     }
     public function filter(array $filters = [], $perPage = 10)
     {
-         $query = SchoolDetail::select([
+        $query = SchoolDetail::select([
         'id',
         'name',
+        'institutionCode',
         'schoolId',
         'statusId',
         'educationLevelId',
+        'dateEstablishmentDecree',
+        'operationalLicense',
+        'dateOperationalLicense',
         'accreditationId',
-        'telpNo'
+        'telpNo',
+        'operator',
+        'ownershipStatus',
+        'curriculum',
+        'principal',
+        'tuitionFee',
+        'numStudent',
+        'numTeacher',
+        'examInfo',
+        'movie',
+
     ])
     ->with([
         'schools:id,name,provinceId,districtId,subDistrictId',
         'status:id,name',
         'educationLevel:id,name',
         'accreditation:id,code',
-        'schoolGallery:id,schoolDetailId,imageUrl,isCover'
-    ]);
+        'schoolGallery:id,schoolDetailId,imageUrl,isCover',
+    ])->withCount('reviews')
+    ->withAvg('reviews', 'rating');
 
         if (!empty($filters['provinceId'])) {
             $query->whereHas('schools', function ($q) use ($filters) {

@@ -26,4 +26,20 @@ class SchoolService
         });
     }
 
+    public function getAll($perPage = null){
+        $query = School::select([
+            'id',
+            'name',
+            'provinceId',
+            'districtId',
+            'subDistrictId',
+            'schoolEstablishmentDecree'
+        ])->with([
+            'province:id,name',
+            'district:id,name',
+            'subDistrict:id,name'
+        ]);
+        return $query->paginate($perPage??10);
+    }
+
 }

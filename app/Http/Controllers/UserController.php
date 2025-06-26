@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\UserService;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,10 +17,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, UserService $service)
     {
         try {
-            $user = User::all();
+            $perPage = $request->query('perPage',10);
+            $user =$service->getAll($perPage);
             return  ResponseHelper::success(
                 UserResource::collection($user),
                 'Display Data Success'

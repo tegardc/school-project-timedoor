@@ -26,6 +26,14 @@ class ProvinceService
             return $province;
         });
     }
+    public function getAll($perPage = null){
+        $query = Province::select([
+            'id',
+            'name',
+        ]);
+        return $query->paginate($perPage??10);
+
+    }
     // public function destroy(array $validated, int $id): ?Province
     // {
     //     return DB::transaction(function () use ($validated, $id) {

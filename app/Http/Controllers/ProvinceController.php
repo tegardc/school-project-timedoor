@@ -15,11 +15,11 @@ class ProvinceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, ProvinceService $service)
     {
         try {
-            //code...
-            $province = Province::all();
+            $perPage = $request->query('perPage',10);
+            $province = $service->getAll($perPage);
             return ResponseHelper::success(ProvinceResource::collection($province), 'Success Display List Province');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE INDEX]: ");

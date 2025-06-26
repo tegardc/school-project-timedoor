@@ -26,4 +26,15 @@ class DistrictService
             return $district;
         });
     }
+    public function getAll($perPage = null)
+    {
+        $query = District::select([
+            'id',
+            'name',
+            'provinceId'
+        ])->with([
+            'province:id,name'
+        ]);
+        return $query->paginate($perPage??10);
+    }
 }

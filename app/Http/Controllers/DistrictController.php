@@ -16,11 +16,13 @@ class DistrictController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, DistrictService $service)
     {
         try {
             //code...
-            $district = District::all();
+            $perPage = $request->query('perPage',10);
+            $district = $service->getAll($perPage);
+
             return ResponseHelper::success(DistrictResource::collection($district), 'Successfully Display Data');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT INDEX]: ");

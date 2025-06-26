@@ -10,18 +10,31 @@ use App\Models\School;
 use App\Services\SchoolService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Psr\Http\Message\RequestInterface;
 
 class SchoolController extends Controller
 {
-    public function index()
+    public function index(Request $request, SchoolService $service)
     {
         try {
-            $schools = School::with(['province', 'district', 'subDistrict', 'schoolGallery'])->get();
+            $perPage = $request->query('perPage',10);
+
+            $schools = $service->getAll($perPage);
             return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
         }
     }
+    // public function index(Request $request, SchoolService $service)
+    // {
+    //     try {
+
+    //         $schools = School::with(['province', 'district', 'subDistrict', 'schoolGallery'])->get();
+    //         return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
+    //     }
+    // }
 
     public function store(SchoolRequest $request, SchoolService $service)
     {
