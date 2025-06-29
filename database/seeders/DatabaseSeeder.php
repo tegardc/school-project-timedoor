@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             StatusSchool::class,
             UserSeeder::class,
             SchoolSeeder::class,
-            SchoolDetailSeeder::class
+            SchoolDetailSeeder::class,
+            SchoolGallerySeeder::class
 
         ]);
         $user = User::find(1);
