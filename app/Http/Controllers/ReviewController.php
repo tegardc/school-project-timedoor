@@ -96,7 +96,7 @@ class ReviewController extends Controller
     public function store(ReviewRequest $request, $schoolDetailId)
     {
         try {
-            $userId = auth()->id();
+            $userId = auth()->id(); 
             $validated = $request->validated();
             $review = review::updateOrCreate(
                 ['userId' => $userId, 'schoolDetailId' => $schoolDetailId],

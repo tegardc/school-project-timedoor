@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helpers\ResponseHelper;
+use App\Http\Requests\QuestionRequest;
+use App\Http\Resources\QuestionResource;
+use App\Models\Question;
+use App\Services\QuestionService;
+use Illuminate\Http\Request;
+
+class QuestionController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(QuestionService $service)
+    {
+        try {
+            $questions = $service->getAll();
+            return ResponseHelper::success($questions, 'List of review questions');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Failed to fetch questions", $e, "[QUESTION INDEX]: ");
+        }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(QuestionRequest $request, QuestionService $service)
+    {
+
+        try {
+            $validated = $request->validated();
+            $question =$service->store($validated);
+            return ResponseHelper::created(new QuestionResource($question), 'Question created successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Failed to create question", $e, "[QUESTION STORE]: ");
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(QuestionService $service,$id)
+    {
+        $question = $service->show($id);
+        if(!$question) return ResponseHelper::notFound('Data Not Found');
+        return ResponseHelper::success(QuestionResource::make($question), 'Question retrieved');
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Question $question)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(QuestionRequest $request, QuestionService $service, $id)
+    {
+        try {
+            $validated = $request->validated();
+            $question = $service->update($validated, $id);
+            if(!$question) return ResponseHelper::notFound('Data Not Found');
+            return ResponseHelper::success(QuestionResource::make($question), 'Question updated successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Failed to update question", $e, "[QUESTION UPDATE]: ");
+        }
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(QuestionService $service, $id)
+    {
+        try {
+            $question = $service->destroy($id);
+            if(!$question) return ResponseHelper::notFound('Data Not Found');
+            return ResponseHelper::success(null, 'Question deleted successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Failed to delete question", $e, "[QUESTION DELETE]: ");
+        }
+        //
+    }
+}

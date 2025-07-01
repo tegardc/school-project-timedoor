@@ -33,4 +33,8 @@ class Review extends Model
     {
         return $this->belongsTo(SchoolDetail::class);
     }
+    public function reviewDetails()
+    {
+        return $this->hasMany(ReviewDetail::class, 'reviewId');
+    }
 }

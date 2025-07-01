@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('question_reviews', function (Blueprint $table) {
+        Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->string('question')->nullable();
-            $table->enum('questionTypes', ['textArea', 'radio','text','file']);
-            $table->integer('scoreMin')->nullable();
-            $table->integer('scoreMax')->nullable();
-            $table->integer('scoreLabelMin')->nullable();
-            $table->integer('scoreLabelMax')->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
         });
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('question_reviews');
+        Schema::dropIfExists('questions');
     }
 };

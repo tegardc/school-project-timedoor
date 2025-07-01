@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\QuestionReviews;
+use App\Models\ReviewDetail;
 use Illuminate\Http\Request;
 
-class QuestionReviewsController extends Controller
+class ReviewDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class QuestionReviewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(QuestionReviews $questionReviews)
+    public function show(ReviewDetail $reviewDetail)
     {
         //
     }
@@ -42,7 +42,7 @@ class QuestionReviewsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(QuestionReviews $questionReviews)
+    public function edit(ReviewDetail $reviewDetail)
     {
         //
     }
@@ -50,7 +50,7 @@ class QuestionReviewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, QuestionReviews $questionReviews)
+    public function update(Request $request, ReviewDetail $reviewDetail)
     {
         //
     }
@@ -58,7 +58,7 @@ class QuestionReviewsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(QuestionReviews $questionReviews)
+    public function destroy(ReviewDetail $reviewDetail)
     {
         //
     }
