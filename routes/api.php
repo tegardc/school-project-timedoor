@@ -3,8 +3,10 @@
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\AuthController;
     use App\Http\Controllers\DistrictController;
-    use App\Http\Controllers\ProvinceController;
-    use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\EducationLevelController;
+use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\ReviewController;
     use App\Http\Controllers\SchoolController;
     use App\Http\Controllers\SchoolDetailController;
     use App\Http\Controllers\SchoolGalleryController;
@@ -58,6 +60,10 @@ use App\Http\Controllers\AuthController;
             Route::get('/review/pending-reviews', [ReviewController::class, 'pendingReviews']);
             Route::get('/review/rejected-reviews', [ReviewController::class, 'rejectedReviews']);
             Route::get('/review/approved-reviews', [ReviewController::class, 'approvedReviews']);
+            Route::apiResource('questions', \App\Http\Controllers\QuestionController::class);
+            Route::put('/questions/{id}',[QuestionController::class,'update']);
+            Route::delete('/questions/{id}',[QuestionController::class,'destroy']);
+            Route::get('/questions/{id}',[QuestionController::class,'show']);
         });
     });
     //ROUTE FOR EVERYONE//
@@ -105,3 +111,6 @@ use App\Http\Controllers\AuthController;
     Route::get('/school-details/ranking', [SchoolDetailController::class, 'ranking']);
 
     Route::get('/school-details/{id}', [SchoolDetailController::class, 'show']);
+
+    Route::get('/education-levels', [EducationLevelController::class, 'index']);
+    Route::get('/education-levels/{id}', [EducationLevelController::class, 'show']);
