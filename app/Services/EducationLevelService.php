@@ -23,4 +23,12 @@ class EducationLevelService
         ]);
         return $educationLevel->find($id);
     }
+    public function getByName($name)
+    {
+        $educationLevel = EducationLevel::select([
+            'id',
+            'name'
+        ]);
+        return $educationLevel->where('name', $name)->first();
+    }
 }

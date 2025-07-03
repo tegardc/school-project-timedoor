@@ -10,7 +10,7 @@ class EducationLevel extends Model
 {
     use HasFactory;
     public $timestamps = true;
-        public const CREATED_AT = 'createdAt';
+    public const CREATED_AT = 'createdAt';
     public const UPDATED_AT = 'updatedAt';
     protected $fillable = ['name'];
 

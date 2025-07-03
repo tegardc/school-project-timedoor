@@ -22,6 +22,7 @@ class SchoolDetailResource extends JsonResource
             'schoolId' => $this->schoolId,
             'statusId' => $this->statusId,
             'educationLevelId' => $this->educationLevelId,
+            'educationLevelName' => $this->educationLevel->name ?? null,
             'ownershipStatus' => $this->ownershipStatus,
             'dateEstablishmentDecree' => $this->dateEstablishmentDecree,
             'operationalLicense' => $this->operationalLicense,

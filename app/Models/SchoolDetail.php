@@ -49,7 +49,7 @@ class SchoolDetail extends Model
     }
     public function educationLevel()
     {
-        return $this->belongsTo(EducationLevel::class);
+        return $this->belongsTo(EducationLevel::class,'educationLevelId');
     }
     public function accreditation()
     {

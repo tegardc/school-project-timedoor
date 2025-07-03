@@ -110,8 +110,10 @@ class SchoolDetailService
             });
         }
 
-        if (!empty($filters['educationLevelId'])) {
-            $query->where('educationLevelId', $filters['educationLevelId']);
+        if (!empty($filters['educationLevelName'])) {
+            $query->whereHas('educationLevel', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['educationLevelName'] . '%');
+            });
         }
 
         if (!empty($filters['statusId'])) {

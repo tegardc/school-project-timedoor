@@ -23,7 +23,7 @@ class SchoolDetailController extends Controller
     try {
         $filters = $request->only([
             'provinceId', 'districtId', 'subDistrictId',
-            'educationLevelId', 'statusId', 'accreditationId', 'schoolId'
+            'educationLevelName', 'statusId', 'accreditationId', 'schoolId'
         ]);
         $perPage = $request->query('perPage',10);
 

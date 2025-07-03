@@ -57,6 +57,18 @@ class EducationLevelController extends Controller
             return ResponseHelper::serverError("Oops display education level by id is failed ", $e, "[EDUCATION LEVEL SHOW]: ");
         }
     }
+    public function showByName(EducationLevelService $service, $name)
+    {
+        try {
+            $educationLevel = $service->getByName($name);
+            if (!$educationLevel) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            return ResponseHelper::success(new EducationLevelResource($educationLevel), 'Show Data Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display education level by name is failed ", $e, "[EDUCATION LEVEL SHOW]: ");
+        }
+    }
 
     /**
      * Show the form for editing the specified resource.

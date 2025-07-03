@@ -1,6 +1,7 @@
     <?php
 
 use App\Helpers\ResponseHelper;
+use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AuthController;
     use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\EducationLevelController;
@@ -11,7 +12,8 @@ use App\Http\Controllers\ReviewController;
     use App\Http\Controllers\SchoolDetailController;
     use App\Http\Controllers\SchoolGalleryController;
     use App\Http\Controllers\SchoolImageController;
-    use App\Http\Controllers\SubdistrictController;
+use App\Http\Controllers\SchoolStatusController;
+use App\Http\Controllers\SubdistrictController;
     use App\Http\Controllers\UserController;
     use App\Http\Requests\ReviewRequest;
     use App\Models\Province;
@@ -114,3 +116,10 @@ use App\Http\Controllers\ReviewController;
 
     Route::get('/education-levels', [EducationLevelController::class, 'index']);
     Route::get('/education-levels/{id}', [EducationLevelController::class, 'show']);
+    Route::get('/education-levels/{name}', [EducationLevelController::class, 'showByName']);
+
+    Route::get('/accreditation', [AccreditationController::class, 'index']);
+    Route::get('/accreditation/{id}', [AccreditationController::class, 'show']);
+
+    Route::get('/school-status', [SchoolStatusController::class, 'index']);
+    Route::get('/school-status/{id}', [SchoolStatusController::class, 'show']);

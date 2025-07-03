@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Models\Review;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -13,10 +14,11 @@ class ReviewController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($schoolDetailId)
+    public function index(Request $request, ReviewService $service)
     {
         try {
-            $review = Review::where('schoolDetailId', $schoolDetailId)->where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            $perPage = $request->query('perPage',10);
+            $review = $service->getAll($perPage);
             return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
 
         } catch (\Exception $e) {
@@ -96,7 +98,7 @@ class ReviewController extends Controller
     public function store(ReviewRequest $request, $schoolDetailId)
     {
         try {
-            $userId = auth()->id(); 
+            $userId = auth()->id();
             $validated = $request->validated();
             $review = review::updateOrCreate(
                 ['userId' => $userId, 'schoolDetailId' => $schoolDetailId],
