@@ -39,6 +39,7 @@ class SchoolDetail extends Model
     {
         return $this->hasMany(Child::class);
     }
+/*******  8e9353a6-8544-41e4-a689-b2cee904b425  *******/
     public function schools()
     {
         return $this->belongsTo(School::class, 'schoolId');
@@ -53,7 +54,7 @@ class SchoolDetail extends Model
     }
     public function accreditation()
     {
-        return $this->belongsTo(Accreditation::class);
+        return $this->belongsTo(Accreditation::class,'accreditationId');
     }
     public function reviews()
     {

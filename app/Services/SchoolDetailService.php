@@ -92,21 +92,21 @@ class SchoolDetailService
     ])->withCount('reviews')
     ->withAvg('reviews', 'rating');
 
-        if (!empty($filters['provinceId'])) {
-            $query->whereHas('schools', function ($q) use ($filters) {
-                $q->where('provinceId', $filters['provinceId']);
+        if (!empty($filters['provinceName'])) {
+            $query->whereHas('schools.province', function ($q) use ($filters) {
+                $q->where('name', 'like' , '%' . $filters['provinceName'] . '%');
             });
         }
 
-        if (!empty($filters['districtId'])) {
-            $query->whereHas('schools', function ($q) use ($filters) {
-                $q->where('districtId', $filters['districtId']);
+        if (!empty($filters['districtName'])) {
+            $query->whereHas('schools.district', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['districtName'] . '%');
             });
         }
 
-        if (!empty($filters['subDistrictId'])) {
-            $query->whereHas('schools', function ($q) use ($filters) {
-                $q->where('subDistrictId', $filters['subDistrictId']);
+        if (!empty($filters['subDistrictName'])) {
+            $query->whereHas('schools.subDistrict', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['subDistrictName'] . '%');
             });
         }
 
@@ -116,15 +116,21 @@ class SchoolDetailService
             });
         }
 
-        if (!empty($filters['statusId'])) {
-            $query->where('statusId', $filters['statusId']);
+        if (!empty($filters['statusName'])) {
+            $query->whereHas('status', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['statusName'] . '%');
+        });
         }
 
-        if (!empty($filters['accreditationId'])) {
-            $query->where('accreditationId', $filters['accreditationId']);
+        if (!empty($filters['accreditationCode'])) {
+            $query->whereHas('accreditation', function ($q) use ($filters) {
+                $q->where('code', 'like', '%' . $filters['accreditationCode'] . '%');
+        });
         }
-        if (!empty($filters['schoolId'])) {
-            $query->where('schoolId', $filters['schoolId']);
+        if (!empty($filters['schoolName'])) {
+            $query->whereHas('schools', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['schoolName'] . '%');
+        });
         }
         return $query->paginate($perPage);
     }
