@@ -26,7 +26,6 @@ class SchoolDetailController extends Controller
             'educationLevelName', 'statusName', 'accreditationCode', 'schoolName'
         ]);
         $perPage = $request->query('perPage',10);
-
         $schools = $service->filter($filters, $perPage);
 
         return ResponseHelper::success(
@@ -61,19 +60,19 @@ class SchoolDetailController extends Controller
         }
         //
     }
-    public function getBySubDistrict($id)
-    {
-        try {
-            $schoolDetails = SchoolDetail::whereHas('schools', function ($query) use ($id) {
-            $query->where('subDistrictId', $id);
-        })->get();
+    // public function getBySubDistrict($id)
+    // {
+    //     try {
+    //         $schoolDetails = SchoolDetail::whereHas('schools', function ($query) use ($id) {
+    //         $query->where('subDistrictId', $id);
+    //     })->get();
 
-        return ResponseHelper::success($schoolDetails, 'School details by sub-district retrieved');
-        } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
-        }
+    //     return ResponseHelper::success($schoolDetails, 'School details by sub-district retrieved');
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
+    //     }
 
-    }
+    // }
 
     /**
      * Display the specified resource.
@@ -176,6 +175,15 @@ class SchoolDetailController extends Controller
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display rangking school detail is failed ", $e, "[SCHOOL DETAIL RANKING]: ");
+        }
+    }
+    public function getSchoolDetailBySchoolId(SchoolDetailService $service, $schoolId)
+    {
+        try {
+            $schools = $service->getSchoolDetailBySchoolId($schoolId);
+            return ResponseHelper::success(SchoolDetailResource::collection($schools)->values(), 'School details by school retrieved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
         }
     }
 }

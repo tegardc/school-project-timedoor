@@ -123,3 +123,5 @@ use App\Http\Controllers\SubdistrictController;
 
     Route::get('/school-status', [SchoolStatusController::class, 'index']);
     Route::get('/school-status/{id}', [SchoolStatusController::class, 'show']);
+
+    Route::get('/school-detail/{schoolId}',[SchoolDetailController::class,'getSchoolDetailBySchoolId']);

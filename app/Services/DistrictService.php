@@ -37,4 +37,10 @@ class DistrictService
         ]);
         return $query->paginate($perPage??10);
     }
+
+    public function getByProvince(string $provinceName){
+        return District::whereHas('province', function ($query) use ($provinceName)  {
+            $query->where('name','like',"%{$provinceName}%");
+        })->get();
+    }
 }

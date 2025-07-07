@@ -25,9 +25,9 @@ class School extends Model
 
     ];
 
-    public function schoolDetaisl()
+    public function schoolDetais()
     {
-        return $this->hasMany(SchoolDetail::class);
+        return $this->hasMany(SchoolDetail::class,'schoolId');
     }
 
     public function province()

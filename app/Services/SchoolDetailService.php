@@ -127,12 +127,17 @@ class SchoolDetailService
                 $q->where('code', 'like', '%' . $filters['accreditationCode'] . '%');
         });
         }
-        if (!empty($filters['schoolName'])) {
-            $query->whereHas('schools', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['schoolName'] . '%');
-        });
-        }
+        // if (!empty($filters['schoolName'])) {
+        //     $query->whereHas('schools', function ($q) use ($filters) {
+        //         $q->where('name', 'like', '%' . $filters['schoolName'] . '%');
+        // });
+        // }
         return $query->paginate($perPage);
+    }
+    public function getSchoolDetailBySchoolId($schoolId)
+    {
+        return SchoolDetail::where('schoolId', $schoolId)->get();
+
     }
     public function getAll($perPage = null)
 {
@@ -156,5 +161,6 @@ class SchoolDetailService
 
     return $query->paginate($perPage??10);
 }
+
 
 }

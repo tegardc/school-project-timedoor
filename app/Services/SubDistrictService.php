@@ -26,4 +26,12 @@ class SubDistrictService
             return $subDistrict;
         });
     }
+    public function getByDistrict(string $districtName)
+    {
+        return SubDistrict::whereHas('districts', function ($query) use ($districtName)  {
+            $query->where('name','like',"%{$districtName}%");
+        })->get();
+
+        }
+
 }

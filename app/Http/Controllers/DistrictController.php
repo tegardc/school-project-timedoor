@@ -19,10 +19,11 @@ class DistrictController extends Controller
     public function index(Request $request, DistrictService $service)
     {
         try {
-            //code...
-            $perPage = $request->query('perPage',10);
-            $district = $service->getAll($perPage);
-
+            $provinceName = $request->query('provinceName');
+            if (!$provinceName) {
+                return ResponseHelper::notFound('Province Name Not Found');
+            }
+            $district = $service->getByProvince($provinceName);
             return ResponseHelper::success(DistrictResource::collection($district), 'Successfully Display Data');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT INDEX]: ");

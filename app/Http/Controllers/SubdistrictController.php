@@ -15,10 +15,15 @@ class SubdistrictController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, SubDistrictService $service)
     {
         try {
-            $subdistrict = SubDistrict::all();
+            $districtName = $request->query('districtName');
+            if (!$districtName) {
+                return ResponseHelper::notFound('District Name Not Found');
+
+            }
+            $subdistrict = $service->getByDistrict($districtName);
             return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display subdistrict is failed ", $e, "[SUBDISTRICT INDEX]: ");
