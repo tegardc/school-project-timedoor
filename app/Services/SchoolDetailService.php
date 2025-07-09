@@ -12,8 +12,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class SchoolDetailService
+class SchoolDetailService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = SchoolDetail::class;
+    }
     public function store(array $validated): SchoolDetail
     {
         return DB::transaction(function () use ($validated) {

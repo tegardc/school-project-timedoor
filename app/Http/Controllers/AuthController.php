@@ -60,11 +60,11 @@ class AuthController extends Controller
 
 
 
-    public function logout(Request $request)
+    public function logout(Request $request, AuthService $service)
     {
         try {
-            $request->user()->currentAccessToken()->delete();
-            return ResponseHelper::success('Logged out successfully.');
+            $service->logout($request);
+            return ResponseHelper::success([],'Logged out successfully.');
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to logout user', $e, '[LOGOUT]');
         }

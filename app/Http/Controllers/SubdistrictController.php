@@ -108,21 +108,34 @@ class SubdistrictController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(SubDistrictService $service, $id)
     {
         try {
-            //code...
             $subDistrict = SubDistrict::find($id);
             if (!$subDistrict) {
                 return ResponseHelper::notFound('Sub District not found');
             }
-
-            $subDistrict->delete();
-
-            return ResponseHelper::success(null, 'Sub District deleted successfully');
+            $service->softDelete($id);
+            return ResponseHelper::success([], 'Sub District moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted subdistrict is failed ", $e, "[SUBDISTRICT DESTROY]: ");
         }
         //
+    }
+    public function trash(SubDistrictService $service) {
+        try {
+            $subdistrict = $service->trash();
+            return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Sub District trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display subdistrict is failed ", $e, "[SUBDISTRICT TRASH]: ");
+        }
+    }
+    public function restore(SubDistrictService $service, $id) {
+        try {
+            $subdistrict = $service->restore($id);
+            return ResponseHelper::success(new SubDistrictResource($subdistrict), 'Sub District restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore subdistrict is failed ", $e, "[SUBDISTRICT RESTORE]: ");
+        }
     }
 }

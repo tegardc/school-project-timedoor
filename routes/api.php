@@ -42,6 +42,7 @@ use App\Http\Controllers\SubdistrictController;
         Route::get('/user', [UserController::class, 'show']);
         Route::put('/user', [UserController::class, 'update']);
         Route::delete('/user', [UserController::class, 'destroy']);
+            Route::post('/logout', [AuthController::class, 'logout']);
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
@@ -66,11 +67,25 @@ use App\Http\Controllers\SubdistrictController;
             Route::put('/questions/{id}',[QuestionController::class,'update']);
             Route::delete('/questions/{id}',[QuestionController::class,'destroy']);
             Route::get('/questions/{id}',[QuestionController::class,'show']);
+
+            Route::get('/sub-district/trash', [SubDistrictController::class, 'trash']);
+            Route::post('/sub-district/{id}/restore', [SubDistrictController::class, 'restore']);
+            Route::get('/district/trash', [DistrictController::class, 'trash']);
+            Route::post('/district/{id}/restore', [DistrictController::class, 'restore']);
+            Route::get('/school/trash', [SchoolController::class, 'trash']);
+            Route::post('/school/{id}/restore', [SchoolController::class, 'restore']);
+            Route::get('/school-detail/trash', [SchoolDetailController::class, 'trash']);
+            Route::post('/school-detail/{id}/restore', [SchoolDetailController::class, 'restore']);
+            Route::apiResource('province', ProvinceController::class);
+            Route::apiResource('sub-district', SubDistrictController::class);
+            Route::apiResource('district', DistrictController::class);
+
         });
     });
     //ROUTE FOR EVERYONE//
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
     Route::get('/schools', [SchoolController::class, 'index']);
     Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
     Route::get('/review/{schoolDetailId}', [ReviewController::class, 'index']);
@@ -92,20 +107,20 @@ use App\Http\Controllers\SubdistrictController;
     // Route::put('/school/{id}', [SchoolController::class, 'update']);
     // Route::delete('/school/{id}', [SchoolController::class, 'destroy']);
 
-    Route::apiResource('province', ProvinceController::class);
-    // Route::get('/province', [ProvinceController::class, 'index']);
+
+    Route::get('/province', [ProvinceController::class, 'index']);
     // Route::post('/province', [ProvinceController::class, 'store']);
     // Route::put('/province/{id}', [ProvinceController::class, 'update']);
     // Route::delete('/province/{id}', [ProvinceController::class, 'destroy']);
     Route::get('/district', [DistrictController::class, 'index']);
-    Route::post('/district', [DistrictController::class, 'store']);
-    Route::put('/district/{id}', [DistrictController::class, 'update']);
-    Route::delete('/district/{id}', [DistrictController::class, 'destroy']);
+    // Route::post('/district', [DistrictController::class, 'store']);
+    // Route::put('/district/{id}', [DistrictController::class, 'update']);
+    // Route::delete('/district/{id}', [DistrictController::class, 'destroy']);
 
     Route::get('/sub-district', [SubdistrictController::class, 'index']);
-    Route::post('/sub-district', [SubdistrictController::class, 'store']);
-    Route::put('/sub-district/{id}', [SubdistrictController::class, 'update']);
-    Route::delete('/sub-district/{id}', [SubdistrictController::class, 'destroy']);
+    // Route::post('/sub-district', [SubdistrictController::class, 'store']);
+    // Route::put('/sub-district/{id}', [SubdistrictController::class, 'update']);
+    // Route::delete('/sub-district/{id}', [SubdistrictController::class, 'destroy']);
 
 
 

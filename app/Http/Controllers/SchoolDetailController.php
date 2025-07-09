@@ -133,19 +133,35 @@ class SchoolDetailController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(SchoolDetailService $service, $id)
     {
         try {
             $schools = SchoolDetail::find($id);
             if (!$schools) {
                 return ResponseHelper::notFound('Data Not Found');
             }
-            $schools->delete();
+            $service->softDelete($id);
             return ResponseHelper::success('Deleted Successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school detail is failed ", $e, "[SCHOOL DETAIL DESTROY]: ");
         }
         //
+    }
+    public function trash(SchoolDetailService $service) {
+        try {
+            $schools = $service->trash();
+            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'School detail trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display school detail is failed ", $e, "[SCHOOL DETAIL TRASH]: ");
+        }
+    }
+    public function restore(SchoolDetailService $service, $id) {
+        try {
+            $schools = $service->restore($id);
+            return ResponseHelper::success(new SchoolDetailResource($schools), 'School detail restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore school detail is failed ", $e, "[SCHOOL DETAIL RESTORE]: ");
+        }
     }
     public function filter(Request $request, SchoolDetailService $service)
     {

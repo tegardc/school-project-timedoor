@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Models\School;
 use Illuminate\Support\Facades\DB;
 
-class SchoolService
+class SchoolService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = School::class;
+    }
     public function store(array $validated): School
     {
         return DB::transaction(function () use ($validated) {

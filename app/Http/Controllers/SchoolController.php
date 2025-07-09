@@ -78,17 +78,34 @@ class SchoolController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(SchoolService $service, $id)
     {
         try {
             $school = School::find($id);
             if (!$school) {
                 return ResponseHelper::notFound('Data Not Found');
             }
-            $school->delete();
-            return ResponseHelper::success('deleted successfully');
+            $service->softDelete($id);
+            return ResponseHelper::success([],'deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school is failed ", $e, "[SCHOOL DELETED]: ");
+        }
+    }
+    public function trash(SchoolService $service) {
+        try {
+            $school = $service->trash();
+            return ResponseHelper::success(SchoolResource::collection($school), 'School trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display school is failed ", $e, "[SCHOOL TRASH]: ");
+        }
+    }
+
+    public function restore(SchoolService $service, $id) {
+        try {
+            $school = $service->restore($id);
+            return ResponseHelper::success(new SchoolResource($school), 'School restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore school is failed ", $e, "[SCHOOL RESTORE]: ");
         }
     }
 }

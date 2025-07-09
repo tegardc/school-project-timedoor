@@ -104,7 +104,7 @@ class DistrictController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(DistrictService $service, $id)
     {
         try {
             //code...
@@ -113,11 +113,27 @@ class DistrictController extends Controller
                 return ResponseHelper::notFound('District not found');
             }
 
-            $district->delete();
+            $service->softDelete($id);
 
-            return ResponseHelper::success(null, 'District deleted successfully');
+            return ResponseHelper::success([], 'District deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops delete district is failed ", $e, "[DISTRICT DESTROY]: ");
+        }
+    }
+    public function trash(DistrictService $service) {
+        try {
+            $district = $service->trash();
+            return ResponseHelper::success(DistrictResource::collection($district), 'District trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT TRASH]: ");
+        }
+    }
+    public function restore(DistrictService $service, $id) {
+        try {
+            $district = $service->restore($id);
+            return ResponseHelper::success(new DistrictResource($district), 'District restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore district is failed ", $e, "[DISTRICT RESTORE]: ");
         }
     }
 }

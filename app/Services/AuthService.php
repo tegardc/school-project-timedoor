@@ -77,4 +77,8 @@ class AuthService
             'expiresAt' => now()->addHours($hours)->toDateTimeString(),
         ];
     }
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+    }
 }
