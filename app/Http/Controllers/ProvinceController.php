@@ -81,20 +81,34 @@ class ProvinceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(ProvinceService $service, $id)
     {
         try {
             //code...
             $province = Province::find($id);
-
             if (!$province) {
                 return ResponseHelper::notFound('Province Not Found');
             }
-
-            $province->delete();
-            return ResponseHelper::success(null, 'Province Deleted Successfully');
+            $service->softDelete($id);
+            return ResponseHelper::success([], 'Province moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops delete province is failed ", $e, "[PROVINCE DESTROY]: ");
+        }
+    }
+    public function trash(ProvinceService $service) {
+        try {
+            $province = $service->trash();
+            return ResponseHelper::success(ProvinceResource::collection($province), 'Province trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE TRASH]: ");
+        }
+    }
+    public function restore(ProvinceService $service, $id) {
+        try {
+            $province = $service->restore($id);
+            return ResponseHelper::success(new ProvinceResource($province), 'Province Restored Successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore province is failed ", $e, "[PROVINCE RESTORE]: ");
         }
     }
 }

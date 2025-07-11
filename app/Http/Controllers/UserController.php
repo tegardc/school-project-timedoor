@@ -106,14 +106,46 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
         }
     }
-    public function destroy(Request $request)
+    public function destroy(UserService $service, Request $request)
     {
         try {
             $user = $request->user();
-            $user->delete();
+            $service->softDelete($user->id);
             return ResponseHelper::success('User deleted successfully');
          } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
+        }
+    }
+
+    public function deleteUser(UserService $service, $id)
+    {
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            $service->softDelete($id);
+            return ResponseHelper::success('User deleted successfully');
+         } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
+        }
+    }
+
+    public function trash(UserService $service) {
+        try {
+            $user = $service->trash();
+            return ResponseHelper::success(UserResource::collection($user), 'User trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display user is failed ", $e, "[USER TRASH]: ");
+        }
+    }
+
+    public function restore(UserService $service, $id) {
+        try {
+            $user = $service->restore($id);
+            return ResponseHelper::success(new UserResource($user), 'User restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore user is failed ", $e, "[USER RESTORE]: ");
         }
     }
 

@@ -86,7 +86,7 @@ class SchoolController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success([],'deleted successfully');
+            return ResponseHelper::success([],'School Moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school is failed ", $e, "[SCHOOL DELETED]: ");
         }

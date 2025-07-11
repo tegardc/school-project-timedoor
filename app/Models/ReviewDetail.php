@@ -15,6 +15,7 @@ class ReviewDetail extends Model
         'reviewId',
         'questionId',
         'score',
+        'createdAt',
     ];
 
     public function review()

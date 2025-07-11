@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Models\Question;
 use Illuminate\Support\Facades\DB;
 
-class QuestionService
+class QuestionService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = Question::class;
+    }
     public function store(array $validated): Question
     {
         return DB::transaction(function () use ($validated) {
@@ -32,17 +36,7 @@ class QuestionService
             return $question;
         });
     }
-    public function destroy(int $id): ?Question
-    {
-        return DB::transaction(function () use ($id) {
-            $question = Question::find($id);
-            if (!$question) {
-                return null;
-            }
-            $question->delete();
-            return $question;
-        });
-    }
+
     public function show(int $id): ?Question
     {
         return Question::find($id);

@@ -88,12 +88,29 @@ class QuestionController extends Controller
     public function destroy(QuestionService $service, $id)
     {
         try {
-            $question = $service->destroy($id);
+            $question = $service->show($id);
             if(!$question) return ResponseHelper::notFound('Data Not Found');
-            return ResponseHelper::success(null, 'Question deleted successfully');
+            $service->softDelete($id);
+            return ResponseHelper::success([], 'Question deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Failed to delete question", $e, "[QUESTION DELETE]: ");
         }
         //
+    }
+    public function trash(QuestionService $service) {
+        try {
+            $questions = $service->trash();
+            return ResponseHelper::success(QuestionResource::collection($questions), 'Question trashed items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display question is failed ", $e, "[QUESTION TRASH]: ");
+        }
+    }
+    public function restore(QuestionService $service, $id) {
+        try {
+            $question = $service->restore($id);
+            return ResponseHelper::success(new QuestionResource($question), 'Question restored successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops restore question is failed ", $e, "[QUESTION RESTORE]: ");
+        }
     }
 }

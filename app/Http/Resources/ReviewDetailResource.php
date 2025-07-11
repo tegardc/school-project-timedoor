@@ -17,8 +17,9 @@ class ReviewDetailResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'questionReviewId' => $this->questionReviewId,
+            'questionId' => $this->questionId,
             'score' => $this->score,
+            // 'createdAt'=> $this->createdAt
         ];
     }
 }

@@ -24,10 +24,9 @@ class ReviewRequest extends FormRequest
     {
         $rules = [
             'reviewText' => ['required', 'string'],
-            'rating' => ['required', 'integer', 'between:1,5'],
-            // 'answer' => ['required', 'array','min:1'],
-            // 'answer.*.questionId' => ['required', 'exists:questions,id'],
-            // 'answer.*.score' => ['required', 'integer', 'between:1,5'],
+            'details' => ['required', 'array', 'min:1'],
+            'details.*.questionId' => ['required', 'exists:questions,id'],
+            'details.*.score' => ['required', 'integer', 'between:1,5'],
 
         ];
         return $rules;

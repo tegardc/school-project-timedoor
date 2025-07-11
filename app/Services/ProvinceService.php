@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Models\Province;
 use Illuminate\Support\Facades\DB;
 
-class ProvinceService
+class ProvinceService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = Province::class;
+    }
 
     public function store(array $validated): Province
     {

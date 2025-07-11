@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Models\User;
 Use Illuminate\Support\Facades\DB;
 
-class UserService
+class UserService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = User::class;
+    }
     public function getAll($perPage = null){
         $query = User::select([
             'id',

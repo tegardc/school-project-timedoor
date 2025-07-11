@@ -20,9 +20,10 @@ class ReviewResource extends JsonResource
             'rating' => $this->rating,
             'userId' => $this->userId,
             'schoolDetailId' => $this->schoolDetailId,
-            'user' => new UserResource($this->whenLoaded('users')),
+            // 'user' => new UserResource($this->whenLoaded('users')),
             'reviewDetails' => ReviewDetailResource::collection($this->whenLoaded('reviewDetails')),
-            'createdAt' => $this->created_at,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
             // 'createdAt' => $this->createdAt,
             // 'updatedAt' => $this->updatedAt,
         ];

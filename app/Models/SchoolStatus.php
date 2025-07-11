@@ -9,8 +9,8 @@ class SchoolStatus extends Model
 {
     use HasFactory;
     public $timestamps = true;
-    public const CREATED_AT = 'created_at';
-    public const UPDATED_AT = 'updated_at';
+    public const CREATED_AT = 'createdAt';
+    public const UPDATED_AT = 'updatedAt';
     protected $fillable = [
         'name',
     ];

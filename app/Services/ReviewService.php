@@ -3,19 +3,25 @@
 namespace App\Services;
 
 use App\Models\Review;
+use App\Models\ReviewDetail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class ReviewService
 {
     public function getReview($id)
     {
-        return Review::where('school_id', $id)->get();
+        return Review::where('schoolId', $id)->get();
+    }
+    public function getReviewDetail($id)
+    {
+        return ReviewDetail::where('reviewId', $id)->get();
     }
 
     public function getAll($schoolDetailId,$perPage = null)
     {
         $review = Review::select([
-            'id','reviewsText','rating'])->where('schoolDetailId', $schoolDetailId)->where('status', Review::STATUS_APPROVED)->with('users','schoolDetails');
+             'id', 'reviewText', 'rating', 'userId',  'schoolDetailId', 'createdAt', 'updatedAt'])->where('schoolDetailId', $schoolDetailId)->where('status', Review::STATUS_APPROVED)->with('users','schoolDetails');
 
         return $review->paginate($perPage??10);
     }
@@ -42,4 +48,48 @@ class ReviewService
             return $review;
         });
     }
+    public function createOrUpdateReview(array $data, int $userId, int $schoolDetailId):Review
+    {
+    $details = $data['details'];
+    $reviewText = $data['reviewText'] ?? null;
+
+    $totalScore = array_sum(array_column($details, 'score'));
+    $rating = round($totalScore / count($details), 2);
+
+    return DB::transaction(function () use ($userId, $schoolDetailId, $reviewText, $rating, $details) {
+
+        $review = Review::where('userId', $userId)
+            ->where('schoolDetailId', $schoolDetailId)
+            ->first();
+
+        if ($review) {
+            // Update
+            $review->update([
+                'reviewText' => $reviewText,
+                'rating' => $rating,
+                'status' => Review::STATUS_PENDING
+            ]);
+            $review->reviewDetails()->delete();
+        } else {
+            // Create baru
+            $review = Review::create([
+                'reviewText' => $reviewText,
+                'rating' => $rating,
+                'userId' => $userId,
+                'schoolDetailId' => $schoolDetailId,
+                'status' => Review::STATUS_PENDING
+            ]);
+        }
+
+        foreach ($details as $detail) {
+            ReviewDetail::create([
+                'reviewId' => $review->id,
+                'questionId' => $detail['questionId'],
+                'score' => $detail['score'],
+            ]);
+        }
+
+        return $review->load(['reviewDetails.question']);
+    });
+}
 }
