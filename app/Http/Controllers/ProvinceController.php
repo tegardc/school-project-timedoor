@@ -20,6 +20,9 @@ class ProvinceController extends Controller
         try {
             $perPage = $request->query('perPage',10);
             $province = $service->getAll($perPage);
+            if($province->isEmpty()){
+                return ResponseHelper::notFound('Province Not Found');
+            }
             return ResponseHelper::success(ProvinceResource::collection($province), 'Success Display List Province');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE INDEX]: ");
@@ -49,11 +52,9 @@ class ProvinceController extends Controller
         try {
             //code...
             $province = Province::find($id);
-
             if (!$province) {
                 return ResponseHelper::notFound('Province Not Found');
             }
-
             return ResponseHelper::success($province, 'Province Found');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display province by id is failed ", $e, "[PROVINCE SHOW]: ");
@@ -98,6 +99,9 @@ class ProvinceController extends Controller
     public function trash(ProvinceService $service) {
         try {
             $province = $service->trash();
+            if($province->isEmpty()) {
+                return ResponseHelper::notFound('Provinces not found');
+            }
             return ResponseHelper::success(ProvinceResource::collection($province), 'Province trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE TRASH]: ");
@@ -106,6 +110,9 @@ class ProvinceController extends Controller
     public function restore(ProvinceService $service, $id) {
         try {
             $province = $service->restore($id);
+            if(!$province) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new ProvinceResource($province), 'Province Restored Successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore province is failed ", $e, "[PROVINCE RESTORE]: ");

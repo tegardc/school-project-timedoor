@@ -20,10 +20,10 @@ class DistrictController extends Controller
     {
         try {
             $provinceName = $request->query('provinceName');
-            if (!$provinceName) {
-                return ResponseHelper::notFound('Province Name Not Found');
-            }
             $district = $service->getByProvince($provinceName);
+             if ($district->isEmpty()) {
+            return ResponseHelper::notFound('Districts not found for the given province name');
+        }
             return ResponseHelper::success(DistrictResource::collection($district), 'Successfully Display Data');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT INDEX]: ");
@@ -36,6 +36,9 @@ class DistrictController extends Controller
         try {
             //code...
             $districts = District::where('provinceId', $provinceId)->get();
+            if ($districts->isEmpty()) {
+                return ResponseHelper::notFound('Districts not found for the given province id');
+            }
             return ResponseHelper::success(DistrictResource::collection($districts), 'Districts retrieved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display district by province id is failed ", $e, "[DISTRICT GETBYPROVINCE]: ");
@@ -123,6 +126,9 @@ class DistrictController extends Controller
     public function trash(DistrictService $service) {
         try {
             $district = $service->trash();
+            if($district->isEmpty()) {
+                return ResponseHelper::notFound('Districts not found');
+            }
             return ResponseHelper::success(DistrictResource::collection($district), 'District trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display district is failed ", $e, "[DISTRICT TRASH]: ");
@@ -131,6 +137,9 @@ class DistrictController extends Controller
     public function restore(DistrictService $service, $id) {
         try {
             $district = $service->restore($id);
+            if (!$district) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new DistrictResource($district), 'District restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore district is failed ", $e, "[DISTRICT RESTORE]: ");

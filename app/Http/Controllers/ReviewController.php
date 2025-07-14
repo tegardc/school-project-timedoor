@@ -19,6 +19,7 @@ class ReviewController extends Controller
         try {
             $perPage = $request->query('perPage',10);
             $review = $service->getAll($schoolDetailId,$perPage);
+            if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
             return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
 
         } catch (\Exception $e) {
@@ -35,7 +36,6 @@ class ReviewController extends Controller
             }
             $review->status = review::STATUS_APPROVED;
             $review->save();
-
             return ResponseHelper::success('Review Approved Successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops approved review is failed ", $e, "[REVIEW APPROVE]: ");
@@ -60,6 +60,7 @@ class ReviewController extends Controller
     {
         try {
             $review = Review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
+            if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display pending review is failed ", $e, "[REVIEW PENDINGREVIEWS]: ");
@@ -69,6 +70,7 @@ class ReviewController extends Controller
     {
         try {
             $review = Review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
+            if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review Reject');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display rejected review is failed ", $e, "[REVIEW REJECTEDREVIEWS]: ");
@@ -78,6 +80,7 @@ class ReviewController extends Controller
     {
         try {
             $review = Review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
+            if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review Approved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display approved review is failed ", $e, "[REVIEW APPROVEREVIEWS]: ");
@@ -107,16 +110,16 @@ class ReviewController extends Controller
             );
             $message = $review->wasRecentlyCreated ? 'Review Created Successfully.' : 'Review Updated Successfully';
             return ResponseHelper::success(new ReviewResource($review), $message);
-        // } catch (\Exception $e) {
-        //     return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
-        // }
-         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'success' => false,
-                'message' => 'Error Updating Data: ' . $e->getMessage(),
-            ], 500);
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
         }
+        //  } catch (\Exception $e) {
+        //     return response()->json([
+        //         'status' => 500,
+        //         'success' => false,
+        //         'message' => 'Error Updating Data: ' . $e->getMessage(),
+        //     ], 500);
+        // }
         //
     }
 
@@ -126,6 +129,7 @@ class ReviewController extends Controller
     public function show(ReviewService $service,$id) {
         try {
             $review = $service->getReviewDetail($id);
+            if(!$review) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(new ReviewResource($review), 'Review Display Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW SHOW]: ");
@@ -168,6 +172,9 @@ class ReviewController extends Controller
     public function trash(ReviewService $service) {
         try {
             $review = $service->trash();
+            if($review->isEmpty()) {
+                return ResponseHelper::notFound('Reviews not found');
+            }
             return ResponseHelper::success(ReviewResource::collection($review), 'Review trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW TRASH]: ");

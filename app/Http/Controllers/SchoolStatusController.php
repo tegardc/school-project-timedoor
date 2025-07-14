@@ -18,6 +18,7 @@ class SchoolStatusController extends Controller
         try {
             //code...
             $schoolStatus = $service->getAll();
+            if($schoolStatus->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(SchoolStatusResource::collection($schoolStatus), 'Display Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all school status is failed ", $e, "[SCHOOL STATUS INDEX]: ");

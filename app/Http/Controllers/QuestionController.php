@@ -18,6 +18,7 @@ class QuestionController extends Controller
     {
         try {
             $questions = $service->getAll();
+            if($questions->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success($questions, 'List of review questions');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Failed to fetch questions", $e, "[QUESTION INDEX]: ");
@@ -100,6 +101,9 @@ class QuestionController extends Controller
     public function trash(QuestionService $service) {
         try {
             $questions = $service->trash();
+            if($questions->isEmpty()) {
+                return ResponseHelper::notFound('Questions not found');
+            }
             return ResponseHelper::success(QuestionResource::collection($questions), 'Question trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display question is failed ", $e, "[QUESTION TRASH]: ");
@@ -108,6 +112,9 @@ class QuestionController extends Controller
     public function restore(QuestionService $service, $id) {
         try {
             $question = $service->restore($id);
+            if(!$question) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new QuestionResource($question), 'Question restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore question is failed ", $e, "[QUESTION RESTORE]: ");

@@ -27,6 +27,7 @@ class SchoolDetailController extends Controller
         ]);
         $perPage = $request->query('perPage',10);
         $schools = $service->filter($filters, $perPage);
+        if($schools->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
 
         return ResponseHelper::success(
             SchoolDetailResource::collection($schools),
@@ -150,6 +151,9 @@ class SchoolDetailController extends Controller
     public function trash(SchoolDetailService $service) {
         try {
             $schools = $service->trash();
+            if($schools->isEmpty()) {
+                return ResponseHelper::notFound('Schools not found');
+            }
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'School detail trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display school detail is failed ", $e, "[SCHOOL DETAIL TRASH]: ");
@@ -158,6 +162,9 @@ class SchoolDetailController extends Controller
     public function restore(SchoolDetailService $service, $id) {
         try {
             $schools = $service->restore($id);
+            if (!$schools) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new SchoolDetailResource($schools), 'School detail restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore school detail is failed ", $e, "[SCHOOL DETAIL RESTORE]: ");
@@ -177,6 +184,7 @@ class SchoolDetailController extends Controller
         ]);
 
         $data = $service->filter($filters);
+        if($data->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
         return ResponseHelper::success(SchoolDetailResource::collection($data), 'Filtered School Details');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops filter school detail is failed ", $e, "[SCHOOL DETAIL FILTER]: ");
@@ -186,8 +194,12 @@ class SchoolDetailController extends Controller
     public function ranking()
     {
         try {
-            $schools = SchoolDetail::with(['schoolGallery', 'reviews'])->withCount(['reviews as total_reviews'])->withAvg('reviews as average_rating', 'rating')->orderByDesc('average_rating')->orderByDesc('total_reviews')->get();
+            $schools = SchoolDetail::with([
+                'schoolGallery', 'reviews'])->withCount(['reviews as total_reviews'])->withAvg('reviews as average_rating', 'rating')->orderByDesc('average_rating')->orderByDesc('total_reviews')->get();
 
+            if ($schools->isEmpty()) {
+                return ResponseHelper::notFound('Schools not found');
+            }
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display rangking school detail is failed ", $e, "[SCHOOL DETAIL RANKING]: ");
@@ -197,6 +209,7 @@ class SchoolDetailController extends Controller
     {
         try {
             $schools = $service->getSchoolDetailBySchoolId($schoolId);
+            if($schools->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
             return ResponseHelper::success(SchoolDetailResource::collection($schools)->values(), 'School details by school retrieved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");

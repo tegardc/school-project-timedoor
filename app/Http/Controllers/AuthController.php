@@ -48,11 +48,6 @@ class AuthController extends Controller
                 'token' => $result['token'],
                 'expiresAt' => $result['expiresAt']
             ], 'Login Successfully');
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Login failed',
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to login user', $e, '[LOGIN]');
         }

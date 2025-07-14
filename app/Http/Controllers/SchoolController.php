@@ -20,6 +20,7 @@ class SchoolController extends Controller
             $perPage = $request->query('perPage',10);
 
             $schools = $service->getAll($perPage);
+            if($schools->isEmpty()) return ResponseHelper::notFound('School Not Found');
             return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
@@ -54,6 +55,7 @@ class SchoolController extends Controller
     {
         try {
             $school = School::with(['province', 'district', 'subDistrict'])->findOrFail($id);
+            if(!$school) return ResponseHelper::notFound('Data Not Found');
             return response()->json([
                 'message' => 'Show Data Success',
                 'data' => new SchoolResource($school)
@@ -67,7 +69,6 @@ class SchoolController extends Controller
     {
         try {
             $validated = $request->validated();
-
             $school = $service->update($validated, $id);
             if(!$school){
                 return ResponseHelper::notFound('Data Not Found');
@@ -94,6 +95,9 @@ class SchoolController extends Controller
     public function trash(SchoolService $service) {
         try {
             $school = $service->trash();
+            if($school->isEmpty()) {
+                return ResponseHelper::notFound('Schools not found');
+            }
             return ResponseHelper::success(SchoolResource::collection($school), 'School trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display school is failed ", $e, "[SCHOOL TRASH]: ");
@@ -103,6 +107,9 @@ class SchoolController extends Controller
     public function restore(SchoolService $service, $id) {
         try {
             $school = $service->restore($id);
+            if (!$school) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new SchoolResource($school), 'School restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore school is failed ", $e, "[SCHOOL RESTORE]: ");

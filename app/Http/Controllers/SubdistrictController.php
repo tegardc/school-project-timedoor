@@ -20,10 +20,10 @@ class SubdistrictController extends Controller
         try {
             $districtName = $request->query('districtName');
             if (!$districtName) {
-                return ResponseHelper::notFound('District Name Not Found');
-
+                return ResponseHelper::notFound('Data Not Found');
             }
             $subdistrict = $service->getByDistrict($districtName);
+            if($subdistrict->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display subdistrict is failed ", $e, "[SUBDISTRICT INDEX]: ");
@@ -35,6 +35,9 @@ class SubdistrictController extends Controller
     {
         try {
             $subDistricts = SubDistrict::where('districtId', $districtId)->get();
+            if ($subDistricts->isEmpty()) {
+                return ResponseHelper::notFound('Sub-districts not found');
+            }
             return ResponseHelper::success(SubDistrictResource::collection($subDistricts), 'Sub-districts retrieved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display subdistrict by district id is failed ", $e, "[SUBDISTRICT GETBYDISTRICT]: ");
@@ -125,6 +128,9 @@ class SubdistrictController extends Controller
     public function trash(SubDistrictService $service) {
         try {
             $subdistrict = $service->trash();
+            if($subdistrict->isEmpty()) {
+                return ResponseHelper::notFound('Sub Districts not found');
+            }
             return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Sub District trashed items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display subdistrict is failed ", $e, "[SUBDISTRICT TRASH]: ");
@@ -133,6 +139,9 @@ class SubdistrictController extends Controller
     public function restore(SubDistrictService $service, $id) {
         try {
             $subdistrict = $service->restore($id);
+            if (!$subdistrict) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
             return ResponseHelper::success(new SubDistrictResource($subdistrict), 'Sub District restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore subdistrict is failed ", $e, "[SUBDISTRICT RESTORE]: ");

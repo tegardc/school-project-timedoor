@@ -142,9 +142,9 @@ use App\Models\SubDistrict;
     // Route::put('/sub-district/{id}', [SubdistrictController::class, 'update']);
     // Route::delete('/sub-district/{id}', [SubdistrictController::class, 'destroy']);
 
-    Route::get('/school-details', [SchoolDetailController::class, 'index']);
-    Route::get('/school-details/{id}', [SchoolDetailController::class, 'show']);
+    Route::apiResource('school-details', SchoolDetailController::class)->only(['index', 'show']);
     Route::get('/school-details/ranking', [SchoolDetailController::class, 'ranking']);
+    Route::get('/school-detail/{schoolId}',[SchoolDetailController::class,'getSchoolDetailBySchoolId']);
 
     Route::get('/education-levels', [EducationLevelController::class, 'index']);
     Route::get('/education-levels/{id}', [EducationLevelController::class, 'show']);
