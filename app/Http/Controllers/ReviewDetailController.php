@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReviewDetail;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;    
 
 class ReviewDetailController extends Controller
 {

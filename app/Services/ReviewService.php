@@ -7,8 +7,12 @@ use App\Models\ReviewDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
-class ReviewService
+class ReviewService extends BaseService
 {
+    public function __construct()
+    {
+        $this->modelClass = Review::class;
+    }
     public function getReview($id)
     {
         return Review::where('schoolId', $id)->get();

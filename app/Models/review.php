@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Review extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     public $timestamps = true;
     public const CREATED_AT = 'createdAt';
     public const UPDATED_AT = 'updatedAt';
+    public const DELETED_AT = 'deletedAt';
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
+    protected $dates = ['deletedAt'];
     protected $fillable = [
         'reviewText',
         'rating',

@@ -19,7 +19,6 @@ class ProvinceService extends BaseService
             return $province;
         });
     }
-/*************  ✨ Windsurf Command ⭐  *************/
     /**
      * Update the specified province resource in storage.
      *
@@ -28,7 +27,6 @@ class ProvinceService extends BaseService
      * @return Province|null The updated province instance, or null if not found.
      */
 
-/*******  72d7a11c-0d46-4718-a08b-aa3f99b8459a  *******/
     public function update(array $validated, int $id): ?Province
     {
         return DB::transaction(function () use ($validated, $id) {
