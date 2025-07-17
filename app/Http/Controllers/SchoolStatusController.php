@@ -30,18 +30,6 @@ class SchoolStatusController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -57,33 +45,9 @@ class SchoolStatusController extends Controller
             return ResponseHelper::success(new SchoolStatusResource($schoolStatus), 'Show Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display school status by id is failed ", $e, "[SCHOOL STATUS SHOW]: ");
-            //throw $th;
         }
 
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SchoolStatus $schoolStatus)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, SchoolStatus $schoolStatus)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SchoolStatus $schoolStatus)
-    {
-        //
-    }
 }

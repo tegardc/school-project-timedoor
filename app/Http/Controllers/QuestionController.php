@@ -25,20 +25,8 @@ class QuestionController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(QuestionRequest $request, QuestionService $service)
     {
-
         try {
             $validated = $request->validated();
             $question =$service->store($validated);
@@ -59,17 +47,7 @@ class QuestionController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Question $question)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(QuestionRequest $request, QuestionService $service, $id)
     {
         try {
@@ -92,7 +70,7 @@ class QuestionController extends Controller
             $question = $service->show($id);
             if(!$question) return ResponseHelper::notFound('Data Not Found');
             $service->softDelete($id);
-            return ResponseHelper::success([], 'Question deleted successfully');
+            return ResponseHelper::success(null, 'Question deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Failed to delete question", $e, "[QUESTION DELETE]: ");
         }

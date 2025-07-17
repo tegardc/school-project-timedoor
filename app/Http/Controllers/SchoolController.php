@@ -26,16 +26,6 @@ class SchoolController extends Controller
             return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
         }
     }
-    // public function index(Request $request, SchoolService $service)
-    // {
-    //     try {
-
-    //         $schools = School::with(['province', 'district', 'subDistrict', 'schoolGallery'])->get();
-    //         return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
-    //     } catch (\Exception $e) {
-    //         return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
-    //     }
-    // }
 
     public function store(SchoolRequest $request, SchoolService $service)
     {
@@ -87,7 +77,7 @@ class SchoolController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success([],'School Moved to trash successfully');
+            return ResponseHelper::success(null,'School Moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school is failed ", $e, "[SCHOOL DELETED]: ");
         }

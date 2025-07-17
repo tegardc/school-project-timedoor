@@ -151,9 +151,9 @@ use App\Models\SubDistrict;
     Route::get('/education-levels/{name}', [EducationLevelController::class, 'showByName']);
 
     Route::get('/accreditations', [AccreditationController::class, 'index']);
-    Route::get('/accreditations/{id}', [AccreditationController::class, 'show']);
+    // Route::get('/accreditations/{id}', [AccreditationController::class, 'show']);
 
     Route::get('/school-status', [SchoolStatusController::class, 'index']);
-    Route::get('/school-status/{id}', [SchoolStatusController::class, 'show']);
+    // Route::get('/school-status/{id}', [SchoolStatusController::class, 'show']);
 
     Route::get('/school-detail/{schoolId}',[SchoolDetailController::class,'getSchoolDetailBySchoolId']);

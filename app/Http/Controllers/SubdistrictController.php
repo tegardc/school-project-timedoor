@@ -44,18 +44,6 @@ class SubdistrictController extends Controller
         }
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(SubDistrictRequest $request, SubDistrictService $service)
     {
         try {
@@ -68,30 +56,8 @@ class SubdistrictController extends Controller
             return ResponseHelper::serverError("Oops created subdistrict is failed ", $e, "[SUBDISTRICT STORE]: ");
         }
 
-
-
-        //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SubDistrict $subDistrict)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SubDistrict $subDistrict)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(SubDistrictRequest $request, SubDistrictService $service, $id)
     {
         try {
@@ -104,13 +70,8 @@ class SubdistrictController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops updated subdistrict is failed ", $e, "[SUBDISTRICT UPDATE]: ");
         }
-
-        //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(SubDistrictService $service, $id)
     {
         try {
@@ -119,7 +80,7 @@ class SubdistrictController extends Controller
                 return ResponseHelper::notFound('Sub District not found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success([], 'Sub District moved to trash successfully');
+            return ResponseHelper::success(null, 'Sub District moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted subdistrict is failed ", $e, "[SUBDISTRICT DESTROY]: ");
         }

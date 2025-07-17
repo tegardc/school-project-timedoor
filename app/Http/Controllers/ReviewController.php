@@ -136,33 +136,13 @@ class ReviewController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(review $review)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update($request, $id)
-    {
-
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(ReviewService $service, $id)
     {
         try {
             $review = Review::findOrFail($id);
             if(!$review) return ResponseHelper::notFound('Data Not Found');
             $service->softDelete($id);
-            return ResponseHelper::success([],'Review moved to trash successfully');
+            return ResponseHelper::success(null,'Review moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
         }

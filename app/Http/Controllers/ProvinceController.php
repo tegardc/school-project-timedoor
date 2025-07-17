@@ -91,7 +91,7 @@ class ProvinceController extends Controller
                 return ResponseHelper::notFound('Province Not Found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success([], 'Province moved to trash successfully');
+            return ResponseHelper::success(null, 'Province moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops delete province is failed ", $e, "[PROVINCE DESTROY]: ");
         }

@@ -39,13 +39,6 @@ class SchoolDetailController extends Controller
 }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -95,14 +88,6 @@ class SchoolDetailController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SchoolDetail $SchoolDetail)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     // SchoolDetailController.php
@@ -125,10 +110,6 @@ class SchoolDetailController extends Controller
         } catch (\Exception $e) {
              return ResponseHelper::serverError("Oops update school detail is failed", $e, "[SCHOOL DETAIL UPDATE]: ");
         }
-
-
-
-        //
     }
 
     /**
@@ -142,7 +123,7 @@ class SchoolDetailController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success('School Detail moved to trash successfully');
+            return ResponseHelper::success(null,'School Detail moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school detail is failed ", $e, "[SCHOOL DETAIL DESTROY]: ");
         }
