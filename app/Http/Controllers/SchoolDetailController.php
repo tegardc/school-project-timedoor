@@ -196,4 +196,19 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
         }
     }
+    public function getBySubDistrict($id, SchoolDetailService $service)
+{
+    try {
+        $schoolDetails = $service->getBySubDistrict($id);
+
+        if ($schoolDetails->isEmpty()) {
+            return ResponseHelper::notFound('School details not found for this sub-district');
+        }
+
+        return ResponseHelper::success(SchoolDetailResource::collection($schoolDetails), 'School details by sub-district retrieved');
+    } catch (\Exception $e) {
+        return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
+    }
+}
+
 }

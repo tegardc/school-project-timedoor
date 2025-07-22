@@ -143,6 +143,23 @@ class SchoolDetailService extends BaseService
         return SchoolDetail::where('schoolId', $schoolId)->get();
 
     }
+    public function getBySubDistrict($subDistrictId)
+{
+    return SchoolDetail::whereHas('schools', function ($query) use ($subDistrictId) {
+        $query->where('subDistrictId', $subDistrictId);
+    })
+    ->with([
+        'schools:id,name,provinceId,districtId,subDistrictId',
+        'status:id,name',
+        'educationLevel:id,name',
+        'accreditation:id,code',
+        'schoolGallery:id,schoolDetailId,imageUrl,isCover',
+        'reviews'
+    ])
+    ->withCount('reviews')
+    ->withAvg('reviews', 'rating')
+    ->get();
+}
     public function getAll($perPage = null)
 {
     $query = SchoolDetail::select([
@@ -165,6 +182,7 @@ class SchoolDetailService extends BaseService
 
     return $query->paginate($perPage??10);
 }
+
 
 
 }
