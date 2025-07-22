@@ -44,116 +44,90 @@ use App\Models\SubDistrict;
         Route::put('/user', [UserController::class, 'update']);
         Route::delete('/user', [UserController::class, 'destroy']);
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
-            Route::post('/review/{schoolDetailId}', [ReviewController::class, 'store']);
-             Route::get('/questions/{id}',[QuestionController::class,'show']);
-             Route::get('/questions',[QuestionController::class,'index']);
+            Route::get('/questions', [QuestionController::class, 'index']);
+            Route::get('/questions/{id}', [QuestionController::class, 'show']);
+            Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
+            Route::put('/reviews/{id}', [ReviewController::class, 'update']);
 
         });
 
-        //ROUTE FOR USER ROLE//
+        //ROUTE FOR ADMIN ROLE//
         Route::middleware('check.role:admin')->group(function () {
             Route::get('/users', [UserController::class, 'index']);
+            Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
-            // Route::post('/schools', [SchoolController::class, 'store']);
-            // Route::put('/schools/{id}', [SchoolController::class, 'update']);
-            // Route::delete('/schools/{id}', [SchoolController::class, 'destroy']);
-            // Route::post('/school-details', [SchoolDetailController::class, 'store']);
-            // Route::put('/school-details/{id}', [SchoolDetailController::class, 'update']);
-            // Route::delete('/school-details/{id}', [SchoolDetailController::class, 'destroy']);
-
-            // Route::apiResource('questions', \App\Http\Controllers\QuestionController::class);
-
-
-            // Route::put('/questions/{id}',[QuestionController::class,'update']);
-            // Route::delete('/questions/{id}',[QuestionController::class,'destroy']);
-
-            //Trash and Restore Route
-            Route::get('/sub-district/trash', [SubDistrictController::class, 'trash']);
-            Route::post('/sub-district/{id}/restore', [SubDistrictController::class, 'restore']);
-            Route::get('/district/trash', [DistrictController::class, 'trash']);
-            Route::post('/district/{id}/restore', [DistrictController::class, 'restore']);
-            Route::get('/province/trash', [ProvinceController::class, 'trash']);
-            Route::post('/province/{id}/restore', [ProvinceController::class, 'restore']);
-            Route::get('/school/trash', [SchoolController::class, 'trash']);
-            Route::post('/school/{id}/restore', [SchoolController::class, 'restore']);
-            Route::get('/school-detail/trash', [SchoolDetailController::class, 'trash']);
-            Route::post('/school-detail/{id}/restore', [SchoolDetailController::class, 'restore']);
-            Route::get('/user/trash', [UserController::class, 'trash']);
-            Route::post('/user/{id}/restore', [UserController::class, 'restore']);
-            Route::get('/question/trash', [QuestionController::class, 'trash']);
-            Route::post('/question/{id}/restore', [QuestionController::class, 'restore']);
-            Route::delete('/user/{id}', [UserController::class, 'deleteUser']);
-            Route::get('/reviews/trash',[ReviewController::class,'trash']);
-            Route::post('/reviews/{id}/restore',[ReviewController::class,'restore']);
-
-
-            Route::put('/reviews/{id}/approve', [ReviewController::class, 'approve']);
-            Route::put('/reviews/{id}/reject', [ReviewController::class, 'reject']);
-            Route::get('/review/pending-reviews', [ReviewController::class, 'pendingReviews']);
-            Route::get('/review/rejected-reviews', [ReviewController::class, 'rejectedReviews']);
-            Route::get('/review/approved-reviews', [ReviewController::class, 'approvedReviews']);
-
-
+                // School & Detail
             Route::apiResource('schools', SchoolController::class);
             Route::apiResource('school-details', SchoolDetailController::class);
-            Route::apiResource('questions', QuestionController::class);
+
+            // Master Data
             Route::apiResource('provinces', ProvinceController::class);
-            Route::apiResource('sub-districts', SubDistrictController::class);
             Route::apiResource('districts', DistrictController::class);
+            Route::apiResource('sub-districts', SubDistrictController::class);
+            Route::apiResource('education-levels', EducationLevelController::class)->only(['index']);
+            Route::apiResource('accreditations', AccreditationController::class)->only(['index']);
+            Route::get('/school-status', [SchoolStatusController::class, 'index']);
+
+            // Upload image
+            Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
+
+            // Questions
+            Route::apiResource('questions', QuestionController::class)->only(['store', 'update', 'destroy','trash', 'restore']);
+
+            //Trash and Restore Route
+            Route::prefix('trash')->group(function () {
+            Route::get('/users', [UserController::class, 'trash']);
+            Route::get('/schools', [SchoolController::class, 'trash']);
+            Route::get('/school-details', [SchoolDetailController::class, 'trash']);
+            Route::get('/districts', [DistrictController::class, 'trash']);
+            Route::get('/sub-districts', [SubdistrictController::class, 'trash']);
+            Route::get('/provinces', [ProvinceController::class, 'trash']);
+            Route::get('/questions', [QuestionController::class, 'trash']);
+            Route::get('/reviews', [ReviewController::class, 'trash']);
+        });
+
+        Route::prefix('restore')->group(function () {
+            Route::post('/users/{id}', [UserController::class, 'restore']);
+            Route::post('/schools/{id}', [SchoolController::class, 'restore']);
+            Route::post('/school-details/{id}', [SchoolDetailController::class, 'restore']);
+            Route::post('/districts/{id}', [DistrictController::class, 'restore']);
+            Route::post('/sub-districts/{id}', [SubdistrictController::class, 'restore']);
+            Route::post('/provinces/{id}', [ProvinceController::class, 'restore']);
+            Route::post('/questions/{id}', [QuestionController::class, 'restore']);
+            Route::post('/reviews/{id}', [ReviewController::class, 'restore']);
+        });
+
+        // Review Approval
+            Route::get('/reviews/pending', [ReviewController::class, 'pendingReviews']);
+            Route::get('/reviews/approved', [ReviewController::class, 'approvedReviews']);
+            Route::get('/reviews/rejected', [ReviewController::class, 'rejectedReviews']);
+            Route::put('/reviews/{id}/approve', [ReviewController::class, 'approve']);
+            Route::put('/reviews/{id}/reject', [ReviewController::class, 'reject']);
+            Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
 
         });
-    });
+            });
+
     //ROUTE FOR EVERYONE//
+   // Auth
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
+    // School Browsing
     Route::get('/schools', [SchoolController::class, 'index']);
-    Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
-    Route::get('/review/{schoolDetailId}', [ReviewController::class, 'index']);
-    // Route::delete('/review/{id}', [ReviewController::class, 'destroy']);
-    // Route::apiResource('schools', SchoolController::class);
-
-    Route::get('/school-details/filter', [SchoolDetailController::class, 'filter']);
-    Route::get('/provinces/{provinceId}/districts', [DistrictController::class, 'getByProvince']);
-    Route::get('/districts/{districtId}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
-    Route::get('/sub-districts/{subDistrictId}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
-
-    // Route::get('/school', [SchoolController::class, 'index']);
-    // Route::post('/school', [SchoolController::class, 'store']);
-    // Route::get('/school/{id}', [SchoolController::class, 'show']);
-    // Route::put('/school/{id}', [SchoolController::class, 'update']);
-    // Route::delete('/school/{id}', [SchoolController::class, 'destroy']);
-
-    Route::get('/provinces', [ProvinceController::class, 'index']);
-    // Route::get('/province', [ProvinceController::class, 'index']);
-    // Route::post('/province', [ProvinceController::class, 'store']);
-    // Route::put('/province/{id}', [ProvinceController::class, 'update']);
-    // Route::delete('/province/{id}', [ProvinceController::class, 'destroy']);
-    Route::get('/districts', [DistrictController::class, 'index']);
-    // Route::post('/district', [DistrictController::class, 'store']);
-    // Route::put('/district/{id}', [DistrictController::class, 'update']);
-    // Route::delete('/district/{id}', [DistrictController::class, 'destroy']);
-
-    Route::get('/sub-districts', [SubdistrictController::class, 'index']);
-    // Route::post('/sub-district', [SubdistrictController::class, 'store']);
-    // Route::put('/sub-district/{id}', [SubdistrictController::class, 'update']);
-    // Route::delete('/sub-district/{id}', [SubdistrictController::class, 'destroy']);
-
-    Route::apiResource('school-details', SchoolDetailController::class)->only(['index', 'show']);
+    Route::get('/school-details', [SchoolDetailController::class, 'index']);
     Route::get('/school-details/ranking', [SchoolDetailController::class, 'ranking']);
-    Route::get('/school-detail/{schoolId}',[SchoolDetailController::class,'getSchoolDetailBySchoolId']);
+    Route::get('/schools/{id}/details', [SchoolDetailController::class, 'getSchoolDetailBySchoolId']);
+    Route::get('/schools/{schoolDetailId}/reviews', [ReviewController::class, 'index']);
 
-    Route::get('/education-levels', [EducationLevelController::class, 'index']);
-    Route::get('/education-levels/{id}', [EducationLevelController::class, 'show']);
-    Route::get('/education-levels/{name}', [EducationLevelController::class, 'showByName']);
-
-    Route::get('/accreditations', [AccreditationController::class, 'index']);
-    // Route::get('/accreditations/{id}', [AccreditationController::class, 'show']);
-
-    Route::get('/school-status', [SchoolStatusController::class, 'index']);
-    // Route::get('/school-status/{id}', [SchoolStatusController::class, 'show']);
-
-    Route::get('/school-detail/{schoolId}',[SchoolDetailController::class,'getSchoolDetailBySchoolId']);
+    // Wilayah
+    Route::get('/provinces', [ProvinceController::class, 'index']);
+    Route::get('/districts', [DistrictController::class, 'index']);
+    Route::get('/sub-districts', [SubdistrictController::class, 'index']);
+    Route::get('/provinces/{id}/districts', [DistrictController::class, 'getByProvince']);
+    Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
+    Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
