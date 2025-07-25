@@ -118,7 +118,7 @@ class DistrictController extends Controller
 
             $service->softDelete($id);
 
-            return ResponseHelper::success([], 'District deleted successfully');
+            return ResponseHelper::success(null, 'District deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops delete district is failed ", $e, "[DISTRICT DESTROY]: ");
         }

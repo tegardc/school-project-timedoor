@@ -163,9 +163,9 @@ class ReviewController extends Controller
     public function restore(ReviewService $service, $id) {
         try {
 
-            $review = Review::find($id);
+            $review = $service->restore($id);
             if(!$review) return ResponseHelper::notFound('Data Not Found');
-            $service->restore($id);
+
             return ResponseHelper::success([],'Review restored successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore review is failed ", $e, "[REVIEW RESTORE]: ");

@@ -60,16 +60,15 @@ use App\Models\SubDistrict;
             Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
                 // School & Detail
-            Route::apiResource('schools', SchoolController::class);
-            Route::apiResource('school-details', SchoolDetailController::class);
+            Route::apiResource('schools', SchoolController::class)->except(['index', 'show']);
+            Route::apiResource('school-details', SchoolDetailController::class)->except(['index', 'show']);
 
             // Master Data
-            Route::apiResource('provinces', ProvinceController::class);
-            Route::apiResource('districts', DistrictController::class);
-            Route::apiResource('sub-districts', SubDistrictController::class);
-            Route::apiResource('education-levels', EducationLevelController::class)->only(['index']);
-            Route::apiResource('accreditations', AccreditationController::class)->only(['index']);
-            Route::get('/school-status', [SchoolStatusController::class, 'index']);
+            Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
+            Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
+            Route::apiResource('sub-districts', SubDistrictController::class)->except(['index', 'show']);
+
+
 
             // Upload image
             Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
@@ -120,9 +119,13 @@ use App\Models\SubDistrict;
     // School Browsing
     Route::get('/schools', [SchoolController::class, 'index']);
     Route::get('/school-details', [SchoolDetailController::class, 'index']);
+    Route::get('/school-details/{id}', [SchoolDetailController::class, 'show']);
     Route::get('/school-details/ranking', [SchoolDetailController::class, 'ranking']);
     Route::get('/schools/{id}/details', [SchoolDetailController::class, 'getSchoolDetailBySchoolId']);
     Route::get('/schools/{schoolDetailId}/reviews', [ReviewController::class, 'index']);
+    Route::get('/school-status', [SchoolStatusController::class, 'index']);
+    Route::get('/education-levels', [EducationLevelController::class, 'index']);
+    Route::get('/accreditations', [AccreditationController::class, 'index']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);
