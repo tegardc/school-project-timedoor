@@ -37,7 +37,8 @@ class SchoolService extends BaseService
             'provinceId',
             'districtId',
             'subDistrictId',
-            'schoolEstablishmentDecree'
+            'schoolEstablishmentDecree',
+            'description'
         ])->with([
             'province:id,name',
             'district:id,name',

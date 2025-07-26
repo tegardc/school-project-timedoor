@@ -3,7 +3,8 @@
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AuthController;
-    use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\CSVImportController;
+use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\EducationLevelController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\QuestionController;
@@ -134,3 +135,11 @@ use App\Models\SubDistrict;
     Route::get('/provinces/{id}/districts', [DistrictController::class, 'getByProvince']);
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
+
+
+    //IMPORT CSV
+    Route::prefix('csv')->group(function () {
+    Route::post('/preview', [CSVImportController::class, 'previews']);
+    Route::post('/import', [CsvImportController::class, 'imports']);
+
+});

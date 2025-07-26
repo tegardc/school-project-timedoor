@@ -9,6 +9,7 @@ use App\Http\Resources\SchoolResourceCollection;
 use App\Models\School;
 use App\Services\SchoolService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Psr\Http\Message\RequestInterface;
 
@@ -18,8 +19,17 @@ class SchoolController extends Controller
     {
         try {
             $perPage = $request->query('perPage',10);
-
             $schools = $service->getAll($perPage);
+            if($schools->isEmpty()) return ResponseHelper::notFound('School Not Found');
+            return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
+        }
+    }
+    public function getAll()
+    {
+        try {
+            $schools = School::with(['province', 'district', 'subDistrict'])->get();
             if($schools->isEmpty()) return ResponseHelper::notFound('School Not Found');
             return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
         } catch (\Exception $e) {
