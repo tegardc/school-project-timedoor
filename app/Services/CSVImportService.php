@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use App\Models\{
-    Province, District, Subdistrict, School, SchoolDetail,
+    Province, District, SubDistrict, School, SchoolDetail,
     SchoolStatus, EducationLevel, Accreditation, SchoolGallery
 };
 use Illuminate\Support\Facades\DB;
