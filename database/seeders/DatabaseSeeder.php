@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
             EducationLevel::class,
             Accreditation::class,
             StatusSchool::class,
-            UserSeeder::class,
             SchoolSeeder::class,
             SchoolDetailSeeder::class,
             SchoolGallerySeeder::class,
+            UserSeeder::class,
             QuestionsSeeder::class
 
         ]);

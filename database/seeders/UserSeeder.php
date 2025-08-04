@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SchoolDetail;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,6 +27,9 @@ class UserSeeder extends Seeder
             'updatedAt' => now(),
         ]);
         $admin->assignRole('admin');
+
+
+
         //
     }
 }

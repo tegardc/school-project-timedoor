@@ -84,7 +84,6 @@ class ReviewService extends BaseService
                 'status' => Review::STATUS_PENDING
             ]);
         }
-
         foreach ($details as $detail) {
             ReviewDetail::create([
                 'reviewId' => $review->id,

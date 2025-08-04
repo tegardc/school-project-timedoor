@@ -26,16 +26,7 @@ class SchoolController extends Controller
             return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
         }
     }
-    public function getAll()
-    {
-        try {
-            $schools = School::with(['province', 'district', 'subDistrict'])->get();
-            if($schools->isEmpty()) return ResponseHelper::notFound('School Not Found');
-            return ResponseHelper::success(SchoolResource::collection($schools), 'Display Data Success');
-        } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops display all school is failed ", $e, "[SCHOOL INDEX]: ");
-        }
-    }
+
 
     public function store(SchoolRequest $request, SchoolService $service)
     {

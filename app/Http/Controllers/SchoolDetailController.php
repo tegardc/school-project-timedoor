@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\SchoolDetailRequest;
 use App\Http\Resources\SchoolDetailResource;
+use App\Models\Review;
 use App\Models\SchoolDetail;
 use App\Models\SchoolGallery;
 use App\Services\SchoolDetailService;
@@ -27,7 +28,9 @@ class SchoolDetailController extends Controller
         ]);
         $perPage = $request->query('perPage',10);
         $schools = $service->filter($filters, $perPage);
-        if($schools->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
+        if($schools->isEmpty()){
+            return ResponseHelper::notFound('School Detail Not Found');
+        }
 
         return ResponseHelper::success(
             SchoolDetailResource::collection($schools),
@@ -172,20 +175,29 @@ class SchoolDetailController extends Controller
         }
     }
 
-    public function ranking()
-    {
-        try {
-            $schools = SchoolDetail::with([
-                'schoolGallery', 'reviews'])->withCount(['reviews as total_reviews'])->withAvg('reviews as average_rating', 'rating')->orderByDesc('average_rating')->orderByDesc('total_reviews')->get();
+     public function ranking(Request $request, SchoolDetailService $service)
+{
+    try {
+        $filters = $request->only([
+            'provinceName',
+            'districtName',
+            'subDistrictName',
+            'educationLevelName',
+            'statusName',
+            'accreditationCode'
+        ]);
 
-            if ($schools->isEmpty()) {
-                return ResponseHelper::notFound('Schools not found');
-            }
-            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
-        } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops display rangking school detail is failed ", $e, "[SCHOOL DETAIL RANKING]: ");
+        $perPage = $request->input('perPage', 10);
+        $schools = $service->ranking($filters, $perPage);
+
+        if ($schools->isEmpty()) {
+            return ResponseHelper::notFound('No ranking data found.');
         }
+        return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
+    } catch (\Exception $e) {
+        return ResponseHelper::serverError("Oops display ranking school detail failed", $e, "[SCHOOL DETAIL RANKING]: ");
     }
+}
     public function getSchoolDetailBySchoolId(SchoolDetailService $service, $schoolId)
     {
         try {
@@ -211,4 +223,7 @@ class SchoolDetailController extends Controller
     }
 }
 
+
 }
+
+

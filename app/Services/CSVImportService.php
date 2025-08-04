@@ -30,7 +30,7 @@ class CSVImportService
             foreach ($data as $item) {
                 $province = Province::firstOrCreate(['name' => $item['provinsi']]);
                 $district = District::firstOrCreate(['name' => $item['kabupaten'], 'provinceId' => $province->id]);
-                $subdistrict = Subdistrict::firstOrCreate(['name' => $item['kecamatan'], 'districtId' => $district->id]);
+                $subdistrict = SubDistrict::firstOrCreate(['name' => $item['kecamatan'], 'districtId' => $district->id]);
 
                 $status = SchoolStatus::firstOrCreate(['name' => $item['status']]);
                 $educationLevel = EducationLevel::firstOrCreate(['name' => $item['bentuk_pendidikan']]);

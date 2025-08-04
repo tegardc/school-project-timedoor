@@ -53,8 +53,6 @@ class AuthController extends Controller
         }
     }
 
-
-
     public function logout(Request $request, AuthService $service)
     {
         try {
