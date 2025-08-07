@@ -150,12 +150,11 @@ use App\Models\SubDistrict;
 //     Route::get('/trash/all', [FacilityController::class, 'trash']);
 //     Route::patch('/restore/{id}', [FacilityController::class, 'restore']);
 // });
+});
 
     //IMPORT CSV
-    Route::prefix('csv')->group(function () {
+
+   Route::prefix('csv')->group(function () {
     Route::post('/preview', [CSVImportController::class, 'previews']);
     Route::post('/import', [CsvImportController::class, 'imports']);
-
-
-});
     });
