@@ -11,6 +11,7 @@ use App\Models\SchoolGallery;
 use App\Services\SchoolDetailService;
 use Database\Seeders\SchoolDetailSeeder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 
@@ -27,6 +28,11 @@ class SchoolDetailController extends Controller
             'educationLevelName', 'statusName', 'accreditationCode', 'search', 'sortBy', 'sortDirection'
         ]);
         $perPage = $request->query('perPage',10);
+        $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
+
+        $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
+            return $service->filter($filters, $perPage);
+        });
         $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
             return ResponseHelper::notFound('School Detail Not Found');
