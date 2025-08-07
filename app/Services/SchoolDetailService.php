@@ -193,9 +193,9 @@ class SchoolDetailService extends BaseService
         }else{
             $query->orderByDesc('createdAt');
         }
-        // return $query->paginate($perPage);
+        return $query->paginate($perPage);
 
-        return $query->get();
+        // return $query->get();
     }
     public function getSchoolDetailBySchoolId($schoolId)
     {
