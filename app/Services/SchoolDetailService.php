@@ -93,6 +93,12 @@ class SchoolDetailService extends BaseService
 
     public function filter(array $filters = [], $perPage = 10)
     {
+        $page = request('page',1);
+        $cacheKey = 'school_details_' . md5(json_encode($filters) . "_per_$page" . "_perPage_$perPage");
+
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($filters, $perPage) {
+
+        });
         $query = SchoolDetail::select([
         'id',
         'name',
@@ -198,7 +204,6 @@ class SchoolDetailService extends BaseService
     public function getSchoolDetailBySchoolId($schoolId)
     {
         return SchoolDetail::where('schoolId', $schoolId)->get();
-
     }
 //     public function getBySubDistrict($subDistrictId)
 // {
