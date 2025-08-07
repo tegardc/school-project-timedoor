@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('operator')->nullable();
             $table->unsignedBigInteger('accreditationId');
             $table->string('curriculum')->nullable();
-            $table->string('telpNo')->nullable();
+            // $table->string('telpNo')->nullable();
             $table->decimal('tuitionFee', 10, 2)->nullable();
             $table->integer('numStudent')->nullable();
             $table->integer('numTeacher')->nullable();

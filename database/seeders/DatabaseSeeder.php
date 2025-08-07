@@ -18,13 +18,15 @@ class DatabaseSeeder extends Seeder
             ProvinceDistrictSeeder::class,
             RoleSeeder::class,
             EducationLevel::class,
+            Facility::class,
             Accreditation::class,
             StatusSchool::class,
             SchoolSeeder::class,
             SchoolDetailSeeder::class,
             SchoolGallerySeeder::class,
             UserSeeder::class,
-            QuestionsSeeder::class
+            QuestionsSeeder::class,
+            ContactSeeder::class,
 
         ]);
         $user = User::find(1);

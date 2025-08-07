@@ -21,49 +21,76 @@ class SchoolDetailService extends BaseService
         $this->modelClass = SchoolDetail::class;
     }
     public function store(array $validated): SchoolDetail
-    {
-        return DB::transaction(function () use ($validated) {
-            $schoolDetail = SchoolDetail::create($validated);
-            if (!empty($validated['imageUrl'])) {
-                foreach ($validated['imageUrl'] as $imageUrl) {
-                    SchoolGallery::create([
-                        'schoolDetailId' => $schoolDetail->id,
-                        'schoolId' => $schoolDetail->schoolId,
-                        'imageUrl' => $imageUrl,
-                    ]);
-                }
+{
+    return DB::transaction(function () use ($validated) {
+        $facilityIds = $validated['facilityIds'] ?? [];
+        unset($validated['facilityIds']);
+
+        $schoolDetail = SchoolDetail::create($validated);
+
+        if (!empty($validated['imageUrl'])) {
+            foreach ($validated['imageUrl'] as $imageUrl) {
+                SchoolGallery::create([
+                    'schoolDetailId' => $schoolDetail->id,
+                    'schoolId' => $schoolDetail->schoolId,
+                    'imageUrl' => $imageUrl,
+                ]);
             }
+        }
+        if (!empty($validated['contacts'])) {
+            $schoolDetail->contacts()->createMany($validated['contacts']);
+        }
 
-            $schoolDetail->load(['schoolGallery']);
+        if (!empty($facilityIds)) {
+            $schoolDetail->facilities()->attach($facilityIds);
+        }
 
-            return $schoolDetail;
-        });
-    }
+
+        $schoolDetail->load(['schoolGallery', 'facilities','contacts']);
+
+        return $schoolDetail;
+    });
+}
+
     public function update(array $validated, int $id): ?SchoolDetail
-    {
-        return DB::transaction(function () use ($validated, $id) {
-            $schoolDetail = SchoolDetail::find($id);
-            if (!$schoolDetail) {
-                return null;
-            }
-            $schoolDetail->update($validated);
-            if (!empty($validated['imageUrl'])) {
-                SchoolGallery::where('schoolDetailId', $schoolDetail->id)->delete();
-                foreach ($validated['imageUrl'] as $index => $imageUrl) {
-                    SchoolGallery::create([
-                        'schoolDetailId' => $schoolDetail->id,
-                        'schoolId' => $schoolDetail->schoolId,
-                        'imageUrl' => $imageUrl,
-                        'isCover' => $index === 0 ? 1 : 0
-                    ]);
-                }
-            }
+{
+    return DB::transaction(function () use ($validated, $id) {
+        $schoolDetail = SchoolDetail::find($id);
+        if (!$schoolDetail) {
+            return null;
+        }
 
-            $schoolDetail->load(['schoolGallery']);
+        $facilityIds = $validated['facilityIds'] ?? null;
+        unset($validated['facilityIds']);
 
-            return $schoolDetail;
-        });
-    }
+        $schoolDetail->update($validated);
+
+        if (!empty($validated['imageUrl'])) {
+            SchoolGallery::where('schoolDetailId', $schoolDetail->id)->delete();
+            foreach ($validated['imageUrl'] as $index => $imageUrl) {
+                SchoolGallery::create([
+                    'schoolDetailId' => $schoolDetail->id,
+                    'schoolId' => $schoolDetail->schoolId,
+                    'imageUrl' => $imageUrl,
+                    'isCover' => $index === 0 ? 1 : 0
+                ]);
+            }
+        }
+
+        if (is_array($facilityIds)) {
+            $schoolDetail->facilities()->sync($facilityIds);
+        }
+        if (!empty($validated['contacts'])) {
+            $schoolDetail->contacts()->delete();
+            $schoolDetail->contacts()->createMany($validated['contacts']);
+        }
+
+        $schoolDetail->load(['schoolGallery', 'facilities','contacts']);
+
+        return $schoolDetail;
+    });
+}
+
     public function filter(array $filters = [], $perPage = 10)
     {
         $query = SchoolDetail::select([
@@ -77,7 +104,7 @@ class SchoolDetailService extends BaseService
         'operationalLicense',
         'dateOperationalLicense',
         'accreditationId',
-        'telpNo',
+        // 'telpNo',
         'operator',
         'ownershipStatus',
         'curriculum',
@@ -87,7 +114,6 @@ class SchoolDetailService extends BaseService
         'numTeacher',
         'examInfo',
         'movie',
-
     ])
     ->with([
         'schools:id,name,provinceId,districtId,subDistrictId',
@@ -95,8 +121,20 @@ class SchoolDetailService extends BaseService
         'educationLevel:id,name',
         'accreditation:id,code',
         'schoolGallery:id,schoolDetailId,imageUrl,isCover',
+        'facilities:id,name',
+        'contacts'
     ])->withCount('reviews')
     ->withAvg('reviews', 'rating');
+
+        if(!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['search'] . '%')
+                ->orWhere('institutionCode', 'like', '%' . $filters['search'] . '%')
+                ->orWhereHas('schools', function ($q2) use ($filters) {
+                    $q2->where('name', 'like', '%' . $filters['search'] . '%');
+                });
+            });
+        }
 
         if (!empty($filters['provinceName'])) {
             $query->whereHas('schools.province', function ($q) use ($filters) {
@@ -133,11 +171,28 @@ class SchoolDetailService extends BaseService
                 $q->where('code', 'like', '%' . $filters['accreditationCode'] . '%');
         });
         }
-        // if (!empty($filters['schoolName'])) {
-        //     $query->whereHas('schools', function ($q) use ($filters) {
-        //         $q->where('name', 'like', '%' . $filters['schoolName'] . '%');
-        // });
-        // }
+        if(!empty($filters['sortBy'])) {
+            $sortField = $filters['sortBy'];
+            $sortDirection = $filters['sortDirection'] ?? 'asc';
+
+            $allowedSortFields = [
+                'name',
+                'institutionCode',
+                'numStudent',
+                'numTeacher',
+                'tuitionFee',
+                'reviews_avg_rating',
+                'reviews_count',
+                'createdAt',
+            ];
+
+            if (in_array($sortField, $allowedSortFields)) {
+                $query->orderBy($sortField, $sortDirection);
+            }
+
+        }else{
+            $query->orderByDesc('createdAt');
+        }
         return $query->paginate($perPage);
     }
     public function getSchoolDetailBySchoolId($schoolId)
@@ -145,43 +200,43 @@ class SchoolDetailService extends BaseService
         return SchoolDetail::where('schoolId', $schoolId)->get();
 
     }
-    public function getBySubDistrict($subDistrictId)
-{
-    return SchoolDetail::whereHas('schools', function ($query) use ($subDistrictId) {
-        $query->where('subDistrictId', $subDistrictId);
-    })
-    ->with([
-        'schools:id,name,provinceId,districtId,subDistrictId',
-        'status:id,name',
-        'educationLevel:id,name',
-        'accreditation:id,code',
-        'schoolGallery:id,schoolDetailId,imageUrl,isCover',
-        'reviews'
-    ])
-    ->withCount('reviews')
-    ->withAvg('reviews', 'rating')
-    ->get();
-}
-    public function getAll($perPage = null)
-{
-    $query = SchoolDetail::select([
-        'id',
-        'name',
-        'schoolId',
-        'statusId',
-        'educationLevelId',
-        'accreditationId',
-        'telpNo'
-    ])
-    ->with([
-        'schools:id,name,provinceId,districtId,subDistrictId',
-        'status:id,name',
-        'educationLevel:id,name',
-        'accreditation:id,code',
-        'schoolGallery:id,schoolDetailId,imageUrl,isCover'
-    ]);
-    return $query->paginate($perPage??10);
-}
+//     public function getBySubDistrict($subDistrictId)
+// {
+//     return SchoolDetail::whereHas('schools', function ($query) use ($subDistrictId) {
+//         $query->where('subDistrictId', $subDistrictId);
+//     })
+//     ->with([
+//         'schools:id,name,provinceId,districtId,subDistrictId',
+//         'status:id,name',
+//         'educationLevel:id,name',
+//         'accreditation:id,code',
+//         'schoolGallery:id,schoolDetailId,imageUrl,isCover',
+//         'reviews'
+//     ])
+//     ->withCount('reviews')
+//     ->withAvg('reviews', 'rating')
+//     ->get();
+// }
+//     public function getAll($perPage = null)
+// {
+//     $query = SchoolDetail::select([
+//         'id',
+//         'name',
+//         'schoolId',
+//         'statusId',
+//         'educationLevelId',
+//         'accreditationId',
+//         'telpNo'
+//     ])
+//     ->with([
+//         'schools:id,name,provinceId,districtId,subDistrictId',
+//         'status:id,name',
+//         'educationLevel:id,name',
+//         'accreditation:id,code',
+//         'schoolGallery:id,schoolDetailId,imageUrl,isCover'
+//     ]);
+//     return $query->paginate($perPage??10);
+// }
 public function ranking(array $filters = [], $perPage = null)
 {
     $query = SchoolDetail::select([
@@ -195,7 +250,6 @@ public function ranking(array $filters = [], $perPage = null)
         'operationalLicense',
         'dateOperationalLicense',
         'accreditationId',
-        'telpNo',
         'operator',
         'ownershipStatus',
         'curriculum',

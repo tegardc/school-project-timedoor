@@ -29,7 +29,8 @@ class SchoolDetail extends Model
         'operator',
         'accreditationId',
         'curriculum',
-        'telpNo',
+        'facilityId',
+        // 'telpNo',
         'tuitionFee',
         'numStudent',
         'numTeacher',
@@ -67,5 +68,12 @@ class SchoolDetail extends Model
     public function schoolGallery()
     {
         return $this->hasMany(SchoolGallery::class, 'schoolDetailId');
+    }
+    public function facilities()
+    {
+        return $this->belongsToMany(Facility::class,  'school_detail_facility','schoolDetailId', 'facilityId');
+    }
+    public function contacts(){
+        return $this->hasMany(Contact::class, 'schoolDetailId');
     }
 }

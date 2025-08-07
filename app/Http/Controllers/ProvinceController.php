@@ -24,9 +24,11 @@ class ProvinceController extends Controller
                 return ResponseHelper::notFound('Province Not Found');
             }
             return ResponseHelper::success(ProvinceResource::collection($province), 'Success Display List Province');
-        } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE INDEX]: ");
-        }
+            } catch (\Exception $e) {
+            dd($e->getMessage());
+            return ResponseHelper::serverError("Oops display all facilities failed", $e, "[FACILITY INDEX]: ");
+}
+
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CSVImportController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\EducationLevelController;
+use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ReviewController;
@@ -87,6 +88,7 @@ use App\Models\SubDistrict;
             Route::get('/provinces', [ProvinceController::class, 'trash']);
             Route::get('/questions', [QuestionController::class, 'trash']);
             Route::get('/reviews', [ReviewController::class, 'trash']);
+            Route::get('/facilities', [FacilityController::class, 'trash']);
         });
 
         Route::prefix('restore')->group(function () {
@@ -98,6 +100,7 @@ use App\Models\SubDistrict;
             Route::post('/provinces/{id}', [ProvinceController::class, 'restore']);
             Route::post('/questions/{id}', [QuestionController::class, 'restore']);
             Route::post('/reviews/{id}', [ReviewController::class, 'restore']);
+            Route::post('/facilities/{id}', [FacilityController::class, 'restore']);
         });
 
         // Review Approval
@@ -138,10 +141,21 @@ use App\Models\SubDistrict;
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
 
+    Route::prefix('facilities')->group(function () {
+    Route::get('/', [FacilityController::class, 'index']);
+    Route::post('/', [FacilityController::class, 'store']);
+    Route::get('/{id}', [FacilityController::class, 'show']);
+    Route::put('/{id}', [FacilityController::class, 'update']);
+    Route::delete('/{id}', [FacilityController::class, 'destroy']);
+//     Route::get('/trash/all', [FacilityController::class, 'trash']);
+//     Route::patch('/restore/{id}', [FacilityController::class, 'restore']);
+// });
 
     //IMPORT CSV
     Route::prefix('csv')->group(function () {
     Route::post('/preview', [CSVImportController::class, 'previews']);
     Route::post('/import', [CsvImportController::class, 'imports']);
 
+
 });
+    });
