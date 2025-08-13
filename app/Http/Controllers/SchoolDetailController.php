@@ -29,11 +29,11 @@ class SchoolDetailController extends Controller
         ]);
         $perPage = $request->query('perPage',12);
 
-        // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
+        $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
 
-        // $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
-        //     return $service->filter($filters, $perPage);
-        // });
+        $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
+            return $service->filter($filters, $perPage);
+        });
         $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
             return ResponseHelper::notFound('School Detail Not Found');
@@ -177,6 +177,30 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
         }
     }
+    public function updateFeatured(Request $request, SchoolDetailService $service)
+{
+    $validated = $request->validate([
+        'featured_ids' => 'required|array|max:4',
+        'featured_ids.*' => 'integer|exists:school_details,id',
+    ]);
+
+    try {
+        $result = $service->setFeaturedSchools($validated['featured_ids']);
+        return ResponseHelper::success($result, 'Featured schools updated successfully');
+    } catch (\Exception $e) {
+        return ResponseHelper::error($e->getMessage(), 400);
+    }
+}
+public function getFeaturedSchools(SchoolDetailService $service)
+{
+    try {
+        $featuredSchools = $service->getFeaturedSchools();
+        return ResponseHelper::success($featuredSchools, 'Featured schools retrieved successfully');
+    } catch (\Exception $e) {
+        return ResponseHelper::error($e->getMessage(), 400);
+    }
+}
+
 
 
 }

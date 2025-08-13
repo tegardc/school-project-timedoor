@@ -283,5 +283,24 @@ public function ranking(array $filters = [])
     return $query->take(10)->get();
 
 }
+public function setFeaturedSchools(array $featuredIds)
+{
+    if (count($featuredIds) > 4) {
+        throw new \Exception('Maksimal hanya bisa memilih 4 sekolah sebagai featured.');
+    }
+    // Reset semua jadi false dulu
+    SchoolDetail::query()->update(['isFeatured' => false]);
+    // Set yang dipilih jadi true
+    if (!empty($featuredIds)) {
+        SchoolDetail::whereIn('id', $featuredIds)->update(['isFeatured' => true]);
+    }
+
+    return SchoolDetail::where('isFeatured', true)->get();
+}
+public function getFeaturedSchools()
+{
+    return SchoolDetail::where('isFeatured', true)->get();
+
+}
 
 }

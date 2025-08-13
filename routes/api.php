@@ -65,6 +65,9 @@ use App\Models\SubDistrict;
                 // School & Detail
             Route::apiResource('schools', SchoolController::class)->except(['index', 'show']);
             Route::apiResource('school-details', SchoolDetailController::class)->except(['index', 'show']);
+            Route::post('/school-details/featured', [SchoolDetailController::class, 'updateFeatured']);
+            Route::get('/school-details/featured', [SchoolDetailController::class, 'getFeaturedSchools']);
+
 
             // Master Data
             Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
@@ -142,14 +145,6 @@ use App\Models\SubDistrict;
     Route::get('/provinces/{id}/districts', [DistrictController::class, 'getByProvince']);
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
-
-    //Filter By
-    Route::get('/provinces/{provinceName}/school-details', [SchoolDetailController::class, 'getByProvince']);
-    Route::get('/districts/{districtName}/school-details', [SchoolDetailController::class, 'getByDistrict']);
-    Route::get('/sub-districts/{subDistrictName}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
-    Route::get('/education-levels/{educationLevelName}/school-details', [SchoolDetailController::class, 'getByEducationLevel']);
-    Route::get('/statuses/{statusName}/school-details', [SchoolDetailController::class, 'getByStatus']);
-    Route::get('/accreditations/{accreditationCode}/school-details', [SchoolDetailController::class, 'getByAccreditation']);
 
 
     Route::prefix('facilities')->group(function () {
