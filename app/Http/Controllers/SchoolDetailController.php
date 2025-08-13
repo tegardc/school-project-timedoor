@@ -27,7 +27,7 @@ class SchoolDetailController extends Controller
             'provinceName', 'districtName', 'subDistrictName',
             'educationLevelName', 'statusName', 'accreditationCode', 'search', 'sortBy', 'sortDirection'
         ]);
-        $perPage = $request->query('perPage',10);
+        $perPage = $request->query('perPage',12);
 
         // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
 
