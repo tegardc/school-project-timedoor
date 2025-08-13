@@ -49,6 +49,7 @@ use App\Models\SubDistrict;
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
+
             Route::get('/questions', [QuestionController::class, 'index']);
             Route::get('/questions/{id}', [QuestionController::class, 'show']);
             Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
@@ -132,6 +133,7 @@ use App\Models\SubDistrict;
     Route::get('/school-status', [SchoolStatusController::class, 'index']);
     Route::get('/education-levels', [EducationLevelController::class, 'index']);
     Route::get('/accreditations', [AccreditationController::class, 'index']);
+    Route::get('/reviews/recent', [ReviewController::class, 'recent']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);
@@ -140,6 +142,15 @@ use App\Models\SubDistrict;
     Route::get('/provinces/{id}/districts', [DistrictController::class, 'getByProvince']);
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
+
+    //Filter By
+    Route::get('/provinces/{provinceName}/school-details', [SchoolDetailController::class, 'getByProvince']);
+    Route::get('/districts/{districtName}/school-details', [SchoolDetailController::class, 'getByDistrict']);
+    Route::get('/sub-districts/{subDistrictName}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
+    Route::get('/education-levels/{educationLevelName}/school-details', [SchoolDetailController::class, 'getByEducationLevel']);
+    Route::get('/statuses/{statusName}/school-details', [SchoolDetailController::class, 'getByStatus']);
+    Route::get('/accreditations/{accreditationCode}/school-details', [SchoolDetailController::class, 'getByAccreditation']);
+
 
     Route::prefix('facilities')->group(function () {
     Route::get('/', [FacilityController::class, 'index']);

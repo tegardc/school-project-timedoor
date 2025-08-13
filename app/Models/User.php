@@ -37,6 +37,7 @@ class User extends Authenticatable
         'password',
         'nis',
         'schoolDetailId',
+        'image',
         'createdAt',
         'updatedAt'
     ];

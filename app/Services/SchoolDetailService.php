@@ -126,6 +126,14 @@ class SchoolDetailService extends BaseService
     ])->withCount('reviews')
     ->withAvg('reviews', 'rating');
 
+    $query = $this->applyFilters($query, $filters);
+
+    return $query->paginate($perPage);
+    }
+
+    private function applyFilters($query, array $filters)
+    {
+
         if(!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['search'] . '%')
@@ -189,11 +197,14 @@ class SchoolDetailService extends BaseService
             if (in_array($sortField, $allowedSortFields)) {
                 $query->orderBy($sortField, $sortDirection);
             }
+            // if($perPage === 'all'){
+            //     return $query->get();
+            // }
 
         }else{
             $query->orderByDesc('createdAt');
         }
-        return $query->paginate($perPage);
+        return $query;
 
         // return $query->get();
     }
@@ -201,44 +212,8 @@ class SchoolDetailService extends BaseService
     {
         return SchoolDetail::where('schoolId', $schoolId)->get();
     }
-//     public function getBySubDistrict($subDistrictId)
-// {
-//     return SchoolDetail::whereHas('schools', function ($query) use ($subDistrictId) {
-//         $query->where('subDistrictId', $subDistrictId);
-//     })
-//     ->with([
-//         'schools:id,name,provinceId,districtId,subDistrictId',
-//         'status:id,name',
-//         'educationLevel:id,name',
-//         'accreditation:id,code',
-//         'schoolGallery:id,schoolDetailId,imageUrl,isCover',
-//         'reviews'
-//     ])
-//     ->withCount('reviews')
-//     ->withAvg('reviews', 'rating')
-//     ->get();
-// }
-//     public function getAll($perPage = null)
-// {
-//     $query = SchoolDetail::select([
-//         'id',
-//         'name',
-//         'schoolId',
-//         'statusId',
-//         'educationLevelId',
-//         'accreditationId',
-//         'telpNo'
-//     ])
-//     ->with([
-//         'schools:id,name,provinceId,districtId,subDistrictId',
-//         'status:id,name',
-//         'educationLevel:id,name',
-//         'accreditation:id,code',
-//         'schoolGallery:id,schoolDetailId,imageUrl,isCover'
-//     ]);
-//     return $query->paginate($perPage??10);
-// }
-public function ranking(array $filters = [], $perPage = null)
+
+public function ranking(array $filters = [])
 {
     $query = SchoolDetail::select([
        'id',
@@ -305,7 +280,7 @@ public function ranking(array $filters = [], $perPage = null)
             $q->where('code', 'like', '%' . $filters['accreditationCode'] . '%');
         });
     }
-    return $query->paginate($perPage);
+    return $query->take(10)->get();
 
 }
 

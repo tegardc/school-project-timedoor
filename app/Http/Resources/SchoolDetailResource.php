@@ -38,7 +38,7 @@ class SchoolDetailResource extends JsonResource
             'principal' => $this->principal,
             'operator' => $this->operator,
             'accreditationId' => $this->accreditationId,
-            'accreditationName' => $this->accreditation->code ?? null,
+            'accreditationCode' => $this->accreditation->code ?? null,
             'curriculum' => $this->curriculum,
             // 'contacts' => ContactResource::collection($this->whenLoaded('contacts')),
             'contacts'=> $this->contacts->pluck('value','type') ?? [],

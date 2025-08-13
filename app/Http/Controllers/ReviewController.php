@@ -171,5 +171,16 @@ class ReviewController extends Controller
             return ResponseHelper::serverError("Oops restore review is failed ", $e, "[REVIEW RESTORE]: ");
         }
     }
+    public function recent(ReviewService $service) {
+        try {
+            $review = $service->getRecentReview(5);
+            if($review->isEmpty()) {
+                return ResponseHelper::notFound('Reviews not found');
+            }
+            return ResponseHelper::success(ReviewResource::collection($review), 'Review recent items retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW RECENT]: ");
+        }
+    }
 
 }

@@ -28,19 +28,27 @@ class SchoolDetailController extends Controller
             'educationLevelName', 'statusName', 'accreditationCode', 'search', 'sortBy', 'sortDirection'
         ]);
         $perPage = $request->query('perPage',10);
-        $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
 
-        $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
-            return $service->filter($filters, $perPage);
-        });
+        // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
+
+        // $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
+        //     return $service->filter($filters, $perPage);
+        // });
         $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
             return ResponseHelper::notFound('School Detail Not Found');
         }
+
+        $schoolDetailsTransform = SchoolDetailResource::collection($schools);
         return ResponseHelper::success(
-            SchoolDetailResource::collection($schools),
-            'Display Data Successfully'
-        );
+                [ 'datas' => $schoolDetailsTransform,
+                'meta' => [
+                    'current_page' => $schoolDetailsTransform->currentPage(),
+                    'last_page' => $schoolDetailsTransform->lastPage(),
+                    'limit' => $schoolDetailsTransform->perPage(),
+                    'total' => $schoolDetailsTransform->total(),
+                ]
+            ], 'Display Data Success');
     } catch (\Exception $e) {
         return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
     }
@@ -62,23 +70,8 @@ class SchoolDetailController extends Controller
         }
         //
     }
-    // public function getBySubDistrict($id)
-    // {
-    //     try {
-    //         $schoolDetails = SchoolDetail::whereHas('schools', function ($query) use ($id) {
-    //         $query->where('subDistrictId', $id);
-    //     })->get();
 
-    //     return ResponseHelper::success($schoolDetails, 'School details by sub-district retrieved');
-    //     } catch (\Exception $e) {
-    //         return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
-    //     }
 
-    // }
-
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         try {
@@ -95,22 +88,16 @@ class SchoolDetailController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    // SchoolDetailController.php
 
+    // SchoolDetailController.php
     public function update(SchoolDetailRequest $request, $id, SchoolDetailService $service)
     {
         try {
             $validated = $request->validated();
-
             $school = $service->update($validated, $id);
-
             if (!$school) {
                 return ResponseHelper::notFound('Data Not Found');
             }
-
             return ResponseHelper::success(
                 new SchoolDetailResource($school),
                 'Update Data Success'
@@ -120,9 +107,6 @@ class SchoolDetailController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(SchoolDetailService $service, $id)
     {
         try {
@@ -135,8 +119,8 @@ class SchoolDetailController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school detail is failed ", $e, "[SCHOOL DETAIL DESTROY]: ");
         }
-        //
     }
+
     public function trash(SchoolDetailService $service) {
         try {
             $schools = $service->trash();
@@ -148,6 +132,7 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops display school detail is failed ", $e, "[SCHOOL DETAIL TRASH]: ");
         }
     }
+
     public function restore(SchoolDetailService $service, $id) {
         try {
             $schools = $service->restore($id);
@@ -159,27 +144,8 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops restore school detail is failed ", $e, "[SCHOOL DETAIL RESTORE]: ");
         }
     }
-    // public function filter(Request $request, SchoolDetailService $service)
-    // {
-    //     try {
-    //         $filters = $request->only([
-    //         'provinceId',
-    //         'districtId',
-    //         'subDistrictId',
-    //         'educationLevelId',
-    //         'statusId',
-    //         'accreditationId',
-    //         'schoolId'
-    //     ]);
 
-    //     $data = $service->filter($filters);
-    //     if($data->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
-    //     return ResponseHelper::success(SchoolDetailResource::collection($data), 'Filtered School Details');
-    //     } catch (\Exception $e) {
-    //         return ResponseHelper::serverError("Oops filter school detail is failed ", $e, "[SCHOOL DETAIL FILTER]: ");
-    //     }
-    // }
-
+    //Ranking School with filter
      public function ranking(Request $request, SchoolDetailService $service)
 {
     try {
@@ -192,9 +158,7 @@ class SchoolDetailController extends Controller
             'accreditationCode'
         ]);
 
-        $perPage = $request->input('perPage', 10);
-        $schools = $service->ranking($filters, $perPage);
-
+        $schools = $service->ranking($filters);
         if ($schools->isEmpty()) {
             return ResponseHelper::notFound('No ranking data found.');
         }
@@ -213,20 +177,6 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
         }
     }
-//     public function getBySubDistrict($id, SchoolDetailService $service)
-// {
-//     try {
-//         $schoolDetails = $service->getBySubDistrict($id);
-
-//         if ($schoolDetails->isEmpty()) {
-//             return ResponseHelper::notFound('School details not found for this sub-district');
-//         }
-
-//         return ResponseHelper::success(SchoolDetailResource::collection($schoolDetails), 'School details by sub-district retrieved');
-//     } catch (\Exception $e) {
-//         return ResponseHelper::serverError("Oops display school detail by sub district is failed", $e, "[SCHOOL DETAIL GETBYSUBDISTRICT]: ");
-//     }
-// }
 
 
 }

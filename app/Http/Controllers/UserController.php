@@ -21,11 +21,17 @@ class UserController extends Controller
     {
         try {
             $perPage = $request->query('perPage',10);
-            $user =$service->getAll($perPage);
-            return  ResponseHelper::success(
-                UserResource::collection($user),
-                'Display Data Success'
-            );
+            $user = $service->getAll($perPage);
+            $userTransform = UserResource::collection($user);
+            return ResponseHelper::success([
+                'datas' => $userTransform,
+                'meta' => [
+                    'current_page' => $userTransform->currentPage(),
+                    'last_page' => $userTransform->lastPage(),
+                    'limit' => $userTransform->perPage(),
+                    'total' => $userTransform->total(),
+                ],'Display User Success'
+            ]);
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
         }
@@ -55,12 +61,7 @@ class UserController extends Controller
     public function show(Request $request)
     {
         try {
-            $user = $request->user()->load([
-                'roles',
-                'childSchoolDetails.schools.province',
-                'childSchoolDetails.schools.district',
-                'childSchoolDetails.schools.subDistrict',
-            ]);
+            $user = $request->user();
             return ResponseHelper::success(
                 new UserResource($user),
                 'Show Data Success'
@@ -83,21 +84,13 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request)
+    public function update(UserRequest $request, UserService $service)
     {
         try {
             $user = $request->user();
-            $this->authorize('update', $user);
+            // $this->authorize('update', $user);
             $validated = $request->validated();
-            if (!empty($validated['current_password']) && !empty($validated['new_password'])) {
-                if (!Hash::check($validated['current_password'], $user->password)) {
-                    return $this->errorResponse("Correct Password Is Incorrect", 400);
-                }
-                $user->password = Hash::make($validated['new_password']);
-            }
-
-            $user->update($validated);
-            $user->refresh();
+            $user = $service->updateUser($user, $validated);
             return ResponseHelper::success(
                 new UserResource($user),
                 'Update Success'
@@ -106,6 +99,7 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
         }
     }
+    //User Delete Akun Sendiri
     public function destroy(UserService $service, Request $request)
     {
         try {
@@ -117,6 +111,7 @@ class UserController extends Controller
         }
     }
 
+    //Admin Delete Akun User
     public function deleteUser(UserService $service, $id)
     {
         try {

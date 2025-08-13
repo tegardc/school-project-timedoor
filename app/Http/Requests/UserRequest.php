@@ -88,6 +88,7 @@ class UserRequest extends FormRequest
                 'username'  => ['nullable', 'string', Rule::unique('users', 'username')->ignore($userId)],
                 'gender'    => ['nullable', 'in:male,female'],
                 'phoneNo'   => ['nullable', 'string'],
+                'image'     => ['nullable','string'],
                 'email'     => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
                 'current_password' => ['nullable', 'required_with:new_password'],
                 'new_password' => ['nullable', 'min:8', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'],

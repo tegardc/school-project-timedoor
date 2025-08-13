@@ -94,5 +94,26 @@ class ReviewService extends BaseService
 
         return $review->load(['reviewDetails.question']);
     });
+
+
 }
+public function getRecentReview($limit = 5)
+    {
+        return Review::select([
+            'id',
+            'reviewText',
+            'rating',
+            'userId',
+            'schoolDetailId',
+            'createdAt'
+        ])
+        ->where('status', Review::STATUS_APPROVED)
+        ->with([
+            'users:id,name,image',
+            'schoolDetails:id,name'
+        ])
+        ->orderByDesc('createdAt')
+        ->limit($limit)
+        ->get();
+    }
 }
