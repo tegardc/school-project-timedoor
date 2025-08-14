@@ -8,6 +8,7 @@ use App\Http\Resources\DistrictResource;
 use App\Models\District;
 use App\Services\DistrictService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,7 +21,14 @@ class DistrictController extends Controller
     {
         try {
             $provinceName = $request->query('provinceName');
-            $district = $service->getByProvince($provinceName);
+            if (!$provinceName) {
+            return ResponseHelper::notFound('Province name is required');
+}
+            $cacheKey = 'district_' . md5($provinceName);
+            $district = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($service, $provinceName) {
+                return $service->getByProvince($provinceName);
+            });
+            // $district = $service->getByProvince($provinceName);
              if ($district->isEmpty()) {
             return ResponseHelper::notFound('Districts not found for the given province name');
         }
@@ -62,6 +70,7 @@ class DistrictController extends Controller
             $validated = $request->validated();
             $district = $service->store($validated);
             DB::commit();
+            Cache::flush();
             return ResponseHelper::created(new DistrictResource($district), 'Created Successfully');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -98,6 +107,7 @@ class DistrictController extends Controller
             if (!$district) {
                 return ResponseHelper::notFound('Data Not Found');
             }
+            Cache::flush();
             return ResponseHelper::success(new DistrictResource($district), 'District Update Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops update district is failed ", $e, "[DISTRICT UPDATE]: ");

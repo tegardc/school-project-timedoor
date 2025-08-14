@@ -24,7 +24,7 @@ class SubdistrictController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             $cacheKey = 'subdistrict_' . md5($districtName);
-            $subdistrict = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $districtName) {
+            $subdistrict = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($service, $districtName) {
                 return $service->getByDistrict($districtName);
             });
             // $subdistrict = $service->getByDistrict($districtName);
@@ -55,7 +55,7 @@ class SubdistrictController extends Controller
             $validated = $request->validated();
             $subDistrict = $service->store($validated);
             DB::commit();
-            Cache::forget('subdistrict');
+            Cache::flush();
             return ResponseHelper::created(new SubDistrictResource($subDistrict), 'Created Successfully');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -72,6 +72,7 @@ class SubdistrictController extends Controller
             if (!$subDistrict) {
                 return ResponseHelper::notFound('Data Not Found');
             }
+            Cache::flush();
             return ResponseHelper::success(new SubDistrictResource($subDistrict), 'Sub District Update Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops updated subdistrict is failed ", $e, "[SUBDISTRICT UPDATE]: ");
