@@ -34,7 +34,7 @@ class SchoolDetailController extends Controller
         $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
             return $service->filter($filters, $perPage);
         });
-        $schools = $service->filter($filters, $perPage);
+        // $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
             return ResponseHelper::notFound('School Detail Not Found');
         }

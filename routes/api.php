@@ -66,7 +66,7 @@ use App\Models\SubDistrict;
             Route::apiResource('schools', SchoolController::class)->except(['index', 'show']);
             Route::apiResource('school-details', SchoolDetailController::class)->except(['index', 'show']);
             Route::post('/school-details/featured', [SchoolDetailController::class, 'updateFeatured']);
-            Route::get('/school-details/featured', [SchoolDetailController::class, 'getFeaturedSchools']);
+
 
 
             // Master Data
@@ -137,6 +137,7 @@ use App\Models\SubDistrict;
     Route::get('/education-levels', [EducationLevelController::class, 'index']);
     Route::get('/accreditations', [AccreditationController::class, 'index']);
     Route::get('/reviews/recent', [ReviewController::class, 'recent']);
+    Route::get('/school-details/featured', [SchoolDetailController::class, 'getFeaturedSchools']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);

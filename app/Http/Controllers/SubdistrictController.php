@@ -8,6 +8,7 @@ use App\Http\Resources\SubDistrictResource;
 use App\Models\SubDistrict;
 use App\Services\SubDistrictService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class SubdistrictController extends Controller
@@ -22,7 +23,11 @@ class SubdistrictController extends Controller
             if (!$districtName) {
                 return ResponseHelper::notFound('Data Not Found');
             }
-            $subdistrict = $service->getByDistrict($districtName);
+            $cacheKey = 'subdistrict_' . md5($districtName);
+            $subdistrict = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $districtName) {
+                return $service->getByDistrict($districtName);
+            });
+            // $subdistrict = $service->getByDistrict($districtName);
             if($subdistrict->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
         } catch (\Exception $e) {
@@ -50,6 +55,7 @@ class SubdistrictController extends Controller
             $validated = $request->validated();
             $subDistrict = $service->store($validated);
             DB::commit();
+            Cache::forget('subdistrict');
             return ResponseHelper::created(new SubDistrictResource($subDistrict), 'Created Successfully');
         } catch (\Exception $e) {
             DB::rollBack();
