@@ -125,8 +125,11 @@ public function getRecentReview($limit = 5)
         ])
         ->where('status', Review::STATUS_APPROVED)
         ->with([
-            'users:id,name,image',
-            'schoolDetails:id,name'
+            'users:id,username,image',
+            'schoolDetails:id,name',
+            'reviewDetails' => function ($q) {
+                $q->with('question:id,question');
+            }
         ])
         ->orderByDesc('createdAt')
         ->limit($limit)
