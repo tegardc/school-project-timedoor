@@ -20,6 +20,7 @@ class ReviewResource extends JsonResource
             'rating' => $this->rating,
             'userId' => $this->userId,
             'username' => $this->users->username ?? null,
+            'image' => $this->users->image ?? null,
             'schoolDetailId' => $this->schoolDetailId,
             'schoolDetailName' => $this->schoolDetails->name ?? null,
             // 'user' => new UserResource($this->whenLoaded('users')),

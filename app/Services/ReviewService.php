@@ -36,7 +36,7 @@ class ReviewService extends BaseService
         ->where('schoolDetailId', $schoolDetailId)
         ->where('status', Review::STATUS_APPROVED)
         ->with([
-            'users:id,username',
+            'users:id,username,image',
             'schoolDetails:id,name',
             'reviewDetails' => function ($q) {
                 $q->with('question:id,question');
