@@ -137,7 +137,7 @@ use App\Models\SubDistrict;
     Route::get('/education-levels', [EducationLevelController::class, 'index']);
     Route::get('/accreditations', [AccreditationController::class, 'index']);
     Route::get('/reviews/recent', [ReviewController::class, 'recent']);
-    Route::get('/school-details/featured', [SchoolDetailController::class, 'getFeaturedSchools']);
+    Route::get('/school-detail/featured', [SchoolDetailController::class, 'featured']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);

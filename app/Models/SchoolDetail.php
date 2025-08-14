@@ -36,6 +36,7 @@ class SchoolDetail extends Model
         'numTeacher',
         'movie',
         'examInfo',
+        'isFeatured',
         'createdAt',
         'updatedAt'
     ];

@@ -299,6 +299,7 @@ public function setFeaturedSchools(array $featuredIds)
 }
 public function getFeaturedSchools()
 {
+
     return SchoolDetail::where('isFeatured', true)->get();
 
 }

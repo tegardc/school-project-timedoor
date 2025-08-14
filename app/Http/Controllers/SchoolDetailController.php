@@ -191,15 +191,19 @@ class SchoolDetailController extends Controller
         return ResponseHelper::error($e->getMessage(), 400);
     }
 }
-public function getFeaturedSchools(SchoolDetailService $service)
+public function featured(SchoolDetailService $service)
 {
-    try {
-        $featuredSchools = $service->getFeaturedSchools();
-        return ResponseHelper::success($featuredSchools, 'Featured schools retrieved successfully');
-    } catch (\Exception $e) {
-        return ResponseHelper::error($e->getMessage(), 400);
+    $data = $service->getFeaturedSchools();
+
+    if ($data->isEmpty()) {
+        return ResponseHelper::error('Data Not Found');
     }
+    return ResponseHelper::success(
+        SchoolDetailResource::collection($data),
+        'Featured schools retrieved successfully'
+    );
 }
+
 
 
 
