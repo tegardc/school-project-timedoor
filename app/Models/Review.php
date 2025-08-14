@@ -29,14 +29,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         ];
         public function users()
         {
-            return $this->belongsTo(User::class);
+            return $this->belongsTo(User::class, 'userId','id');
         }
         public function schoolDetails()
         {
-            return $this->belongsTo(SchoolDetail::class);
+            return $this->belongsTo(SchoolDetail::class, 'schoolDetailId','id');
         }
         public function reviewDetails()
         {
-            return $this->hasMany(ReviewDetail::class, 'reviewId');
+            return $this->hasMany(ReviewDetail::class, 'reviewId','id');
         }
     }

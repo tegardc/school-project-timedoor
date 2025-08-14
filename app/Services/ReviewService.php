@@ -22,13 +22,29 @@ class ReviewService extends BaseService
         return ReviewDetail::where('reviewId', $id)->get();
     }
 
-    public function getAll($schoolDetailId,$perPage = null)
-    {
-        $review = Review::select([
-             'id', 'reviewText', 'rating', 'userId',  'schoolDetailId', 'createdAt', 'updatedAt'])->where('schoolDetailId', $schoolDetailId)->where('status', Review::STATUS_APPROVED)->with('users','schoolDetails');
+    public function getAll($schoolDetailId, $perPage = null)
+{
+    $review = Review::select([
+            'id',
+            'reviewText',
+            'rating',
+            'userId',
+            'schoolDetailId',
+            'createdAt',
+            'updatedAt'
+        ])
+        ->where('schoolDetailId', $schoolDetailId)
+        ->where('status', Review::STATUS_APPROVED)
+        ->with([
+            'users:id,username',
+            'schoolDetails:id,name',
+            'reviewDetails' => function ($q) {
+                $q->with('question:id,question');
+            }
+        ]);
 
-        return $review->paginate($perPage??10);
-    }
+    return $review->paginate($perPage ?? 10);
+}
     public function approve($id)
     {
         $review = Review::find($id);
