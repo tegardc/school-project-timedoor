@@ -74,6 +74,8 @@ use App\Models\SubDistrict;
             Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
             Route::apiResource('sub-districts', SubDistrictController::class)->except(['index', 'show']);
 
+            Route::delete('/education-levels/{id}', [EducationLevelController::class, 'delete']);
+
 
 
             // Upload image
@@ -146,6 +148,7 @@ use App\Models\SubDistrict;
     Route::get('/provinces/{id}/districts', [DistrictController::class, 'getByProvince']);
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
+
 
 
     Route::prefix('facilities')->group(function () {

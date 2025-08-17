@@ -20,7 +20,16 @@ class ReviewController extends Controller
             $perPage = $request->query('perPage',10);
             $review = $service->getAll($schoolDetailId,$perPage);
             if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
-            return ResponseHelper::success(ReviewResource::collection($review), 'Review Display Success');
+            $reviewTransform = ReviewResource::collection($review);
+            return ResponseHelper::success([
+                'datas' => $reviewTransform,
+                'meta' => [
+                    'current_page' => $reviewTransform->currentPage(),
+                    'last_page' => $reviewTransform->lastPage(),
+                    'limit' => $reviewTransform->perPage(),
+                    'total' => $reviewTransform->total(),
+                ]
+                ],'Review Display Success');
 
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");

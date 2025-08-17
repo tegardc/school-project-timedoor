@@ -51,5 +51,17 @@ class EducationLevelController extends Controller
             return ResponseHelper::serverError("Oops display education level by name is failed ", $e, "[EDUCATION LEVEL SHOW]: ");
         }
     }
+    public function delete($id){
+        try {
+            $educationLevel = EducationLevel::find($id);
+            if (!$educationLevel) {
+                return ResponseHelper::notFound('Data Not Found');
+            }
+            $educationLevel->delete();
+            return ResponseHelper::success(null, 'Delete Data Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops delete education level by id is failed ", $e, "[EDUCATION LEVEL DELETE]: ");
+        }
+    }
 
 }
