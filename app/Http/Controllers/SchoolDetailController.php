@@ -29,12 +29,12 @@ class SchoolDetailController extends Controller
         ]);
         $perPage = $request->query('perPage',12);
 
-        $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
+        // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
 
-        $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
-            return $service->filter($filters, $perPage);
-        });
-        // $schools = $service->filter($filters, $perPage);
+        // $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
+        //     return $service->filter($filters, $perPage);
+        // });
+        $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
             return ResponseHelper::notFound('School Detail Not Found');
         }
