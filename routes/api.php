@@ -75,6 +75,7 @@ use App\Models\SubDistrict;
             Route::apiResource('sub-districts', SubDistrictController::class)->except(['index', 'show']);
 
             Route::delete('/education-levels/{id}', [EducationLevelController::class, 'delete']);
+            Route::post('/school-status', [SchoolStatusController::class, 'store']);
 
 
 

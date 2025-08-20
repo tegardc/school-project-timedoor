@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\SchoolStatusRequest;
 use App\Http\Resources\SchoolStatusResource;
+use App\Models\School;
 use App\Models\SchoolStatus;
 use App\Services\SchoolStatusService;
 use Illuminate\Http\Request;
@@ -48,6 +50,18 @@ class SchoolStatusController extends Controller
         }
 
         //
+    }
+    public function store(SchoolStatusRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $schoolStatus = SchoolStatus::create($validated);
+            return ResponseHelper::success(new SchoolStatusResource($schoolStatus), 'Store Data Success');
+
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops create school status is failed ", $e, "[SCHOOL STATUS STORE]: ");
+            //throw $th;
+        }
     }
 
 }

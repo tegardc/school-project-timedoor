@@ -23,5 +23,10 @@ class StatusSchool extends Seeder
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
+        SchoolStatus::create([
+            'name' => 'SPK',
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ]);
     }
 }
