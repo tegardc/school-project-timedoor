@@ -135,4 +135,98 @@ public function getRecentReview($limit = 5)
         ->limit($limit)
         ->get();
     }
+
+    public function AllReview(array $filters = [], $perPage = 10)
+    {
+        $query =  Review::with([
+            'users:id,username,image',
+            'schoolDetails:id,name',
+            'reviewDetails' => function ($q) {
+                $q->with('question:id,question');
+            }
+        ])->where('status', Review::STATUS_APPROVED);
+
+        $query->when($filters, function ($query) use ($filters) {
+            $this->applyFilters($query, $filters);
+        });
+
+        return $query->paginate($perPage);
+    }
+    private function applyFilters($query, array $filters)
+{
+    if (!empty($filters['search'])) {
+        $query->where(function ($q) use ($filters) {
+            $q->whereHas('schoolDetails', function ($q2) use ($filters) {
+                $q2->where('name', 'like', '%' . $filters['search'] . '%')
+                   ->orWhere('institutionCode', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('users', function ($q3) use ($filters) {
+                $q3->where('username', 'like', '%' . $filters['search'] . '%');
+            });
+        });
+    }
+
+    if (!empty($filters['provinceName'])) {
+        $query->whereHas('schoolDetails.schools.province', function ($q) use ($filters) {
+            $q->where('name', 'like', '%' . $filters['provinceName'] . '%');
+        });
+    }
+
+    if (!empty($filters['districtName'])) {
+        $query->whereHas('schoolDetails.schools.district', function ($q) use ($filters) {
+            $q->where('name', 'like', '%' . $filters['districtName'] . '%');
+        });
+    }
+
+    if (!empty($filters['subDistrictName'])) {
+        $query->whereHas('schoolDetails.schools.subDistrict', function ($q) use ($filters) {
+            $q->where('name', 'like', '%' . $filters['subDistrictName'] . '%');
+        });
+    }
+
+    if (!empty($filters['educationLevelName'])) {
+        $query->whereHas('schoolDetails.educationLevel', function ($q) use ($filters) {
+            $q->where('name', 'like', '%' . $filters['educationLevelName'] . '%');
+        });
+    }
+
+    if (!empty($filters['statusName'])) {
+        $query->whereHas('schoolDetails.status', function ($q) use ($filters) {
+            $q->where('name', 'like', '%' . $filters['statusName'] . '%');
+        });
+    }
+
+    if (!empty($filters['accreditationCode'])) {
+        $query->whereHas('schoolDetails.accreditation', function ($q) use ($filters) {
+            $q->where('code', 'like', '%' . $filters['accreditationCode'] . '%');
+        });
+    }
+
+    if (!empty($filters['minRating'])) {
+        $query->where('rating', '>=', $filters['minRating']);
+    }
+
+    if (!empty($filters['maxRating'])) {
+        $query->where('rating', '<=', $filters['maxRating']);
+    }
+
+    if (!empty($filters['sortBy'])) {
+        $sortField = $filters['sortBy'];
+        $sortDirection = $filters['sortDirection'] ?? 'asc';
+
+        $allowedSortFields = [
+            'rating',
+            'createdAt',
+            'updatedAt'
+        ];
+
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+    } else {
+        $query->orderByDesc('createdAt');
+    }
+
+    return $query;
+}
+
 }

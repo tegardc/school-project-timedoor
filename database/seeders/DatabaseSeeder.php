@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             QuestionsSeeder::class,
             ContactSeeder::class,
+            ReviewSeeder::class
 
         ]);
         $user = User::find(1);

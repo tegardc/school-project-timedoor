@@ -191,5 +191,40 @@ class ReviewController extends Controller
             return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW RECENT]: ");
         }
     }
+    public function getAllReview(Request $request,ReviewService $service) {
+        try {
+            $filters = $request->only([
+                'provinceName',
+                'districtName',
+                'subDistrictName',
+                'educationLevelName',
+                'statusName',
+                'accreditationCode',
+                'search',
+                'sortBy',
+                'sortDirection',
+                'minRating',
+                'maxRating'
+            ]);
+            $perPage = $request->query('perPage', 12);
+
+            $review = $service->AllReview($filters, $perPage);
+            if($review->isEmpty()) {
+                return ResponseHelper::notFound('Reviews not found');
+            }
+            $reviewTransform = ReviewResource::collection($review);
+            return ResponseHelper::success([
+                'datas' => $reviewTransform,
+                'meta' => [
+                    'current_page' => $reviewTransform->currentPage(),
+                    'last_page' => $reviewTransform->lastPage(),
+                    'limit' => $reviewTransform->perPage(),
+                    'total' => $reviewTransform->total(),
+                ]
+                ],'Review Display Success');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW RECENT]: ");
+        }
+    }
 
 }

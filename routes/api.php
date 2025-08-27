@@ -54,6 +54,8 @@ use App\Models\SubDistrict;
             Route::get('/questions/{id}', [QuestionController::class, 'show']);
             Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
             Route::put('/reviews/{id}', [ReviewController::class, 'update']);
+            Route::post('/school-details/save', [SchoolDetailController::class, 'saveSchool']);
+            Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
 
         });
 
@@ -141,6 +143,7 @@ use App\Models\SubDistrict;
     Route::get('/accreditations', [AccreditationController::class, 'index']);
     Route::get('/reviews/recent', [ReviewController::class, 'recent']);
     Route::get('/school-detail/featured', [SchoolDetailController::class, 'featured']);
+    Route::get('/all-reviews', [ReviewController::class, 'getAllReview']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);

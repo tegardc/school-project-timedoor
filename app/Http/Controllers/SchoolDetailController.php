@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\SaveSchoolRequest;
 use App\Http\Requests\SchoolDetailRequest;
 use App\Http\Resources\SchoolDetailResource;
 use App\Models\Review;
+use App\Models\SaveSchool;
 use App\Models\SchoolDetail;
 use App\Models\SchoolGallery;
 use App\Services\SchoolDetailService;
 use Database\Seeders\SchoolDetailSeeder;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +39,7 @@ class SchoolDetailController extends Controller
         // });
         $schools = $service->filter($filters, $perPage);
         if($schools->isEmpty()){
-            return ResponseHelper::notFound('School Detail Not Found');
+            return ResponseHelper::success([], 'Data Not Found');
         }
 
         $schoolDetailsTransform = SchoolDetailResource::collection($schools);
@@ -52,6 +55,8 @@ class SchoolDetailController extends Controller
     } catch (\Exception $e) {
         return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
     }
+
+
 }
 
 
@@ -204,8 +209,49 @@ public function featured(SchoolDetailService $service)
     );
 }
 
+public function saveSchool(SaveSchoolRequest $request)
+{
+    try {
+        $validated = $request->validated();
+        $user = $request->user();
+        $schoolDetailId = $validated['schoolDetailId'];
 
+        $saveSchool = SaveSchool::where([
+            'userId' => $user->id,
+            'schoolDetailId' => $schoolDetailId
+        ])->first();
+        if($saveSchool) {
+            $saveSchool->delete();
+            return ResponseHelper::success('Unsaved School detail successfully');
+        }
+        SaveSchool::create([
+            'userId' => $user->id,
+            'schoolDetailId' => $schoolDetailId
+        ]);
+        $schoolDetail = SchoolDetail::find($schoolDetailId);
+            return ResponseHelper::success(new SchoolDetailResource($schoolDetail), "School detail saved successfully");
 
+    } catch (\Exception $e) {
+        return ResponseHelper::serverError("Oops save school detail is failed ", $e, "[SCHOOL DETAIL SAVE]: ");
+    }
+}
+public function showSaved(Request $request)
+{
+    try {
+        $user = $request->user();
+        if(!$user) {
+            return ResponseHelper::error('Unauthorized', 401);
+        }
+        $savedSchools = SaveSchool::with('schoolDetail')->where('userId', $user->id)->get()->map(function ($save) {
+            return $save->schoolDetail;
+
+        });
+        return ResponseHelper::success(SchoolDetailResource::collection($savedSchools), 'Saved schools retrieved successfully');
+    } catch (\Exception $e) {
+        return ResponseHelper::serverError("Oops display saved school detail is failed ", $e, "[SCHOOL DETAIL SAVED]: ");
+        //throw $th;
+    }
+}
 
 }
 
