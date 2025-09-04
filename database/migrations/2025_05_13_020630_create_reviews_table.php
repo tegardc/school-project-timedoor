@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->text('reviewText');
-            $table->integer('rating');
+            $table->decimal('rating', 2, 1);
             $table->unsignedBigInteger('userId');
             $table->unsignedBigInteger('schoolDetailId');
             $table->timestamp('createdAt')->nullable();
