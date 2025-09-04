@@ -35,17 +35,19 @@ class User extends Authenticatable
         'gender',
         'phoneNo',
         'password',
-        'nis',
-        'schoolDetailId',
+        // 'nis',
+        // 'schoolDetailId',
         'image',
         'createdAt',
         'updatedAt'
     ];
 
-    public function childs()
-    {
-        return $this->hasMany(Child::class, 'userId');
-    }
+   public function childs()
+{
+    return $this->belongsToMany(Child::class, 'user_child_school', 'userId', 'childId')
+                ->withPivot('schoolDetailId')
+                ->withTimestamps();
+}
     public function review()
     {
         return $this->hasMany(Review::class);
@@ -53,7 +55,7 @@ class User extends Authenticatable
     public function childSchoolDetails()
     {
         return $this->belongsToMany(SchoolDetail::class, 'user_child_school', 'userId', 'schoolDetailId')
-            ->withPivot('childId')->withTimestamps();
+            ->withPivot('childId')->withTimestamps('createdAt', 'updatedAt');;
     }
 
 
