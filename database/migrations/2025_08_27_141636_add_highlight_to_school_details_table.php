@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('childs', function (Blueprint $table) {
-            $table->id();
-            $table->string('nis')->nullable();
-            $table->string('name');
-            $table->timestamp('createdAt')->nullable();
-            $table->timestamp('updatedAt')->nullable();
-
+        Schema::table('school_details', function (Blueprint $table) {
+            $table->boolean('isHighlighted')->default(false);
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('childs');
+        Schema::table('school_details', function (Blueprint $table) {
+            //
+        });
     }
 };

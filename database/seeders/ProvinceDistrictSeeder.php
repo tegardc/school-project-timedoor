@@ -20,59 +20,59 @@ class ProvinceDistrictSeeder extends Seeder
 
         // Districts di Bali
         $badung = District::create([
-            'name' => 'Kabupaten Badung',
+            'name' => 'Badung',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
 
         $denpasar = District::create([
-            'name' => 'Kota Denpasar',
+            'name' => 'Denpasar',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
         $bangli = District::create([
-            'name' => 'Kabupaten Bangli',
+            'name' => 'Bangli',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
         $buleleng = District::create([
-            'name' => 'Kabupaten Buleleng',
+            'name' => 'Buleleng',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
         $gianyar = District::create([
-            'name' => 'Kabupaten Gianyar',
+            'name' => 'Gianyar',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
         $jembrana = District::create([
-            'name' => 'Kabupaten Jembrana',
+            'name' => 'Jembrana',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
 
         $karangasem = District::create([
-            'name' => 'Kabupaten Karangasem',
+            'name' => 'Karangasem',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
 
         $klungkung = District::create([
-            'name' => 'Kabupaten Klungkung',
+            'name' => 'Klungkung',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),
         ]);
 
         $tabanan = District::create([
-            'name' => 'Kabupaten Tabanan',
+            'name' => 'Tabanan',
             'provinceId' => $bali->id,
             'createdAt' => now(),
             'updatedAt' => now(),

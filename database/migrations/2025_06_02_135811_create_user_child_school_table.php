@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('user_child_school', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('userId')->constrained('users')->onDelete('cascade');
-            $table->foreignId('childId')->nullable('childs')->onDelete('cascade');
-            $table->foreignId('schoolDetailId')->constrained('school_details')->onDelete('cascade');
+            $table->foreignId('userId')->constrained('users')->onDelete('cascade')->nullable();
+            $table->foreignId('childId')->nullable()->constrained('childs')->onDelete('cascade')->nullable();
+            $table->foreignId('schoolDetailId')->constrained('school_details')->onDelete('cascade')->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
-            $table->unique([
-                'userId',
-                'childId'
-            ]);
+            // $table->unique([
+            //     'userId',
+            //     'childId',
+            //     'schoolDetailId'
+            // ]);
         });
     }
 

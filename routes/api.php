@@ -68,6 +68,7 @@ use App\Models\SubDistrict;
             Route::apiResource('schools', SchoolController::class)->except(['index', 'show']);
             Route::apiResource('school-details', SchoolDetailController::class)->except(['index', 'show']);
             Route::post('/school-details/featured', [SchoolDetailController::class, 'updateFeatured']);
+            Route::post('/school-details/highlight', [SchoolDetailController::class, 'updateHighlight']);
 
 
 
@@ -143,6 +144,7 @@ use App\Models\SubDistrict;
     Route::get('/accreditations', [AccreditationController::class, 'index']);
     Route::get('/reviews/recent', [ReviewController::class, 'recent']);
     Route::get('/school-detail/featured', [SchoolDetailController::class, 'featured']);
+    Route::get('/school-detail/highlighted', [SchoolDetailController::class, 'highlight']);
     Route::get('/all-reviews', [ReviewController::class, 'getAllReview']);
 
     // Wilayah

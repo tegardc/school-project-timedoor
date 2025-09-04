@@ -182,6 +182,31 @@ class SchoolDetailController extends Controller
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
         }
     }
+    public function updateHighlight(Request $request, SchoolDetailService $service)
+    {
+        $validated = $request->validate([
+            'highlight_id' => 'required|Integer|exists:school_details,id',
+        ]);
+
+        try {
+            $result = $service->setHighlightedSchools($validated['highlight_id']);
+            return ResponseHelper::success($result, 'Highlighted schools updated successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops update highlighted school detail is failed", $e, "[SCHOOL DETAIL HIGHLIGHT]: ");
+        }
+    }
+    public function highlight(SchoolDetailService $service)
+    {
+        $data = $service->getHighlightedSchools();
+
+        if ($data->isEmpty()) {
+            return ResponseHelper::error('Data Not Found');
+        }
+        return ResponseHelper::success(
+            SchoolDetailResource::collection($data),
+            'Highlighted schools retrieved successfully'
+        );
+    }
     public function updateFeatured(Request $request, SchoolDetailService $service)
 {
     $validated = $request->validate([
@@ -193,7 +218,7 @@ class SchoolDetailController extends Controller
         $result = $service->setFeaturedSchools($validated['featured_ids']);
         return ResponseHelper::success($result, 'Featured schools updated successfully');
     } catch (\Exception $e) {
-        return ResponseHelper::error($e->getMessage(), 400);
+        return ResponseHelper::serverError("Oops update featured school detail is failed", $e, "[SCHOOL DETAIL FEATURED]: ");
     }
 }
 public function featured(SchoolDetailService $service)

@@ -210,7 +210,7 @@ class ReviewController extends Controller
 
             $review = $service->AllReview($filters, $perPage);
             if($review->isEmpty()) {
-                return ResponseHelper::notFound('Reviews not found');
+                return ResponseHelper::success([],'Reviews not found');
             }
             $reviewTransform = ReviewResource::collection($review);
             return ResponseHelper::success([

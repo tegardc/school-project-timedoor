@@ -17,10 +17,14 @@ class Child extends Model
 
     public function parent()
     {
-        return $this->belongsTo(User::class, 'userId');
+         return $this->belongsToMany(User::class, 'user_child_school', 'childId', 'userId')
+                    ->withPivot('schoolDetailId')
+                    ->withTimestamps();
     }
     public function schoolDetails()
     {
-        return $this->belongsTo(SchoolDetail::class, 'schoolDetailId');
+        return $this->belongsToMany(SchoolDetail::class, 'user_child_school', 'childId', 'schoolDetailId')
+                    ->withPivot('userId')
+                    ->withTimestamps();
     }
 }

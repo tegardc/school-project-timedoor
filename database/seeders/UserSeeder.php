@@ -45,7 +45,6 @@ $child = Child::create([
     'userId' => $parent->id,
     'name' => 'Child Tester',
     'nis' => '654321',
-    'schoolDetailId' => 1,
 ]);
 
 $parent->childSchoolDetails()->attach(1, [
@@ -69,7 +68,6 @@ $child2 = Child::create([
     'userId' => $parent2->id,
     'name' => 'Child Tester',
     'nis' => '6543221',
-    'schoolDetailId' => 2,
 ]);
 
 $parent2->childSchoolDetails()->attach(2, [
