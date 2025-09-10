@@ -21,10 +21,8 @@ class Child extends Model
                     ->withPivot('schoolDetailId')
                     ->withTimestamps();
     }
-    public function schoolDetails()
+ public function schoolDetail()
     {
-        return $this->belongsToMany(SchoolDetail::class, 'user_child_school', 'childId', 'schoolDetailId')
-                    ->withPivot('userId')
-                    ->withTimestamps();
+        return $this->belongsTo(SchoolDetail::class, 'schoolDetailId');
     }
 }

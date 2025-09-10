@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('childs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('userId')->nullable();
             $table->string('nis')->nullable();
+            $table->unsignedBigInteger('schoolDetailId')->nullable();
             $table->string('name');
-            $table->foreignId('userId')->constrained('users')->onDelete('cascade');
+            $table->unique(['nis', 'schoolDetailId'], 'unique_nis_school');
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
+            $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('schoolDetailId')->references('id')->on('school_details')->onDelete('cascade');
 
         });
     }

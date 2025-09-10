@@ -35,19 +35,20 @@ class User extends Authenticatable
         'gender',
         'phoneNo',
         'password',
-        // 'nis',
+        'nis',
         // 'schoolDetailId',
         'image',
         'createdAt',
         'updatedAt'
     ];
 
-   public function childs()
+public function childs()
 {
     return $this->belongsToMany(Child::class, 'user_child_school', 'userId', 'childId')
                 ->withPivot('schoolDetailId')
                 ->withTimestamps();
 }
+
     public function review()
     {
         return $this->hasMany(Review::class);

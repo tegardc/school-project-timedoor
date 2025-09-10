@@ -23,12 +23,12 @@ class UserRequest extends FormRequest
     }
     public function isStudent(): bool
     {
-        return $this->input('role') === 'student';
+        return $this->user()?->hasRole('student');
     }
 
     public function isParent(): bool
     {
-        return $this->input('role') === 'parent';
+        return $this->user()?->hasRole('parent');
     }
 
 
@@ -55,34 +55,48 @@ class UserRequest extends FormRequest
     ];
 
     if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
-        $rules = [
-            'firstName' => ['nullable', 'string'],
-            'lastName'  => ['nullable', 'string'],
-            'username'  => ['nullable', 'string', Rule::unique('users', 'username')->ignore($userId)],
-            'gender'    => ['nullable', 'in:male,female'],
-            'phoneNo'   => ['nullable', 'string'],
-            'image'     => ['nullable', 'string'],
-            'email'     => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
-            'current_password' => ['nullable', 'required_with:new_password'],
-            'new_password' => [
-                'nullable',
-                'confirmed',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
-            ],
-        ];
+    $rules = [
+        'firstName' => ['nullable', 'string'],
+        'lastName'  => ['nullable', 'string'],
+        'username'  => ['nullable', 'string', Rule::unique('users', 'username')->ignore($userId)],
+        'gender'    => ['nullable', 'in:male,female'],
+        'phoneNo'   => ['nullable', 'string'],
+        'image'     => ['nullable', 'string'],
+        'email'     => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
+        'current_password' => ['nullable', 'required_with:new_password'],
+        'new_password' => [
+            'nullable',
+            'confirmed',
+            'min:8',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
+        ],
+    ];
 
-        if ($this->isStudent()) {
-            $rules = array_merge($rules, [
-                'nis'            => ['nullable', 'string', 'unique:childs,nis'],
-                'schoolDetailId' => ['nullable', 'exists:school_details,id'],
-            ]);
-        }
+    if ($this->isStudent()) {
+    $rules = array_merge($rules, [
+        'nis' => [
+            'nullable',
+            'string',
+            Rule::unique('childs')
+                ->where(fn ($q) =>
+                    $q->where('schoolDetailId', $this->input('schoolDetailId'))
+                )
+                ->ignore($this->route('child')), // kalau update
+        ],
+        'schoolDetailId' => ['nullable', 'exists:school_details,id'],
+    ]);
+}
 
         if ($this->isParent()) {
             $rules = array_merge($rules, [
-                'childName'      => ['nullable', 'string'],
-                'nis'            => ['nullable', 'string', 'unique:childs,nis'],
+                'childName' => ['nullable', 'string'],
+                'nis' => [
+                    'nullable',
+                    'string',
+                    Rule::unique('childs')->where(fn ($q) =>
+                        $q->where('schoolDetailId', $this->input('schoolDetailId'))
+                    ),
+                ],
                 'schoolDetailId' => ['nullable', 'exists:school_details,id'],
             ]);
         }

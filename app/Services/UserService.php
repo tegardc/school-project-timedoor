@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Resources\UserResource;
 use App\Models\Child;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 Use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -54,73 +55,60 @@ class UserService extends BaseService
 //     $user->refresh();
 //     return $user;
 // }
- public function updateProfile(User $user, array $data): User
-    {
-        return DB::transaction(function () use ($user, $data) {
+ public function updateProfile(array $data): void
+{
+    $user = Auth::user(); // user yang login
+    $role = $user->getRoleNames()->first(); // pakai Spatie roles
 
-            // update user basic info
-            $user->fill([
-                'firstName' => $data['firstName'] ?? $user->firstName,
-                'lastName'  => $data['lastName'] ?? $user->lastName,
-                'username'  => $data['username'] ?? $user->username,
-                'email'     => $data['email'] ?? $user->email,
-                'phoneNo'   => $data['phoneNo'] ?? $user->phoneNo,
-                'gender'    => $data['gender'] ?? $user->gender,
-                'image'     => $data['image'] ?? $user->image,
-            ]);
+    DB::transaction(function () use ($user, $role, $data) {
+        // 1. Update data dasar user
+        $user->update([
+            'firstName' => $data['firstName'] ?? $user->firstName,
+            'lastName'  => $data['lastName'] ?? $user->lastName,
+            'username'  => $data['username'] ?? $user->username,
+            'email'     => $data['email'] ?? $user->email,
+            'gender'    => $data['gender'] ?? $user->gender,
+            'phoneNo'   => $data['phoneNo'] ?? $user->phoneNo,
+            'image'     => $data['image'] ?? $user->image
+        ]);
 
-            // ganti password kalau diminta
-            if (!empty($data['new_password'])) {
-                if (!Hash::check($data['current_password'], $user->password)) {
-                    throw new \Exception('Current password is incorrect.');
-                }
-                $user->password = Hash::make($data['new_password']);
+      if ($role === 'student') {
+            if (isset($data['nis'])) {
+                $user->update(['nis' => $data['nis']]);
             }
 
-            $user->save();
+            if (isset($data['schoolDetailId'])) {
+                $user->childSchoolDetails()->sync([
+                    $data['schoolDetailId'] => [
+                        'childId' => null,
+                    ],
+                ]);
+            }
+        }
 
-            // kalau student, update NIS dan sekolah
-            if ($user->hasRole('student')) {
-                if (!empty($data['nis']) || !empty($data['schoolDetailId'])) {
-                    // misalnya untuk student kita simpan di tabel childs juga
-                    $child = $user->childs()->first();
-                    if (!$child) {
-                        $child = new Child(['userId' => $user->id]);
-                    }
-                    if (!empty($data['nis'])) {
-                        $child->nis = $data['nis'];
-                    }
-                    if (!empty($data['schoolDetailId'])) {
-                        $child->schoolDetailId = $data['schoolDetailId'];
-                    }
-                    $child->name = $user->firstName . ' ' . $user->lastName;
-                    $child->save();
+        // parent
+        if ($role === 'parent') {
+            if (isset($data['childName']) && isset($data['nis'])) {
+                $child = Child::updateOrCreate(
+                    ['nis' => $data['nis']],
+                    [
+                        'name'   => $data['childName'],
+                        'userId' => $user->id,
+                    ]
+                );
+
+                if (isset($data['schoolDetailId'])) {
+                    $user->childSchoolDetails()->sync([
+                        $data['schoolDetailId'] => [
+                            'childId' => $child->id,
+                        ],
+                    ]);
                 }
             }
+        }
+    });
 
-            // kalau parent, update data anak
-            if ($user->hasRole('parent')) {
-                if (!empty($data['nis']) || !empty($data['childName'])) {
-                    $child = $user->childs()->first();
-                    if (!$child) {
-                        $child = new Child(['userId' => $user->id]);
-                    }
-                    if (!empty($data['childName'])) {
-                        $child->name = $data['childName'];
-                    }
-                    if (!empty($data['nis'])) {
-                        $child->nis = $data['nis'];
-                    }
-                    if (!empty($data['schoolDetailId'])) {
-                        $child->schoolDetailId = $data['schoolDetailId'];
-                    }
-                    $child->save();
-                }
-            }
+    $user->refresh()->load('roles', 'childSchoolDetails');
 
-            return $user;
-        });
-    }
-
-
+}
 }

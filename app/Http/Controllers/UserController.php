@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -104,63 +105,20 @@ class UserController extends Controller
     //         return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
     //     }
     // }
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, UserService $profileService)
     {
-        $request->validate([
-            'firstName'      => 'required|string|max:255',
-            'lastName'       => 'nullable|string|max:255',
-            'username'       => 'required|string|max:255|unique:users,username,' . $id,
-            'email'          => 'required|email|max:255|unique:users,email,' . $id,
-            'gender'         => 'nullable|in:male,female',
-            'phoneNo'        => 'nullable|string|max:20',
-            'image'          => 'nullable|image|max:2048',
-            'childName'      => 'required|string|max:255',
-            'nis'            => 'required|string|max:50',
-            'schoolDetailId' => 'required|integer|exists:school_details,id',
-        ]);
+        $user = Auth::user();
+
+        // Base validation
+
+        $validated = $request->validated();
+        Log::info('[USER UPDATE] Validated data:', $validated);
 
         try {
-            DB::transaction(function () use ($request, $id) {
-                // 1. Update user profile
-                $user = User::findOrFail($id);
-
-                $user->update([
-                    'firstName' => $request->firstName,
-                    'lastName'  => $request->lastName,
-                    'username'  => $request->username,
-                    'email'     => $request->email,
-                    'gender'    => $request->gender,
-                    'phoneNo'   => $request->phoneNo,
-                    // password kalau mau diupdate tinggal tambahkan di sini
-                    // 'password' => bcrypt($request->password),
-                    // image simpan pakai storage kalau ada file upload
-                ]);
-
-                // 2. Update / Buat Child
-                $child = Child::updateOrCreate(
-                    ['nis' => $request->nis],
-                    ['name' => $request->childName]
-                );
-
-                // 3. Update / attach pivot
-                $user->childs()->syncWithoutDetaching([
-                    $child->id => [
-                        'schoolDetailId' => $request->schoolDetailId,
-                    ]
-                ]);
-            });
-
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Profile updated successfully'
-            ]);
-
+            $profileService->updateProfile($validated);
+            return ResponseHelper::success(new UserResource($user), 'Update Success');
         } catch (\Exception $e) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Failed to update profile',
-                'error'   => $e->getMessage()
-            ], 500);
+            return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
         }
     }
 
