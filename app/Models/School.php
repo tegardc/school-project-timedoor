@@ -16,10 +16,7 @@ class School extends Model
     protected $dates = ['deletedAt'];
     protected $fillable = [
         'name',
-        'description',
-        'provinceId',
-        'districtId',
-        'subDistrictId',
+        // 'description',
         'schoolEstablishmentDecree',
         'createdAt',
         'updatedAt'
@@ -31,24 +28,6 @@ class School extends Model
         return $this->hasMany(SchoolDetail::class,'schoolId');
     }
 
-    public function province()
-    {
-        return $this->belongsTo(Province::class,  'provinceId', 'id');
-    }
-    public function district()
-    {
-        return $this->belongsTo(District::class,  'districtId', 'id');
-    }
-    public function subDistrict()
-    {
-        return $this->belongsTo(SubDistrict::class,  'subDistrictId', 'id');
-    }
-    public function schoolGallery()
-    {
-        return $this->hasMany(SchoolGallery::class, 'schoolId');
-    }
-    public function coverImage()
-    {
-        return $this->hasOne(SchoolGallery::class, 'schoolId')->where('isCover', 1);
-    }
+
+
 }

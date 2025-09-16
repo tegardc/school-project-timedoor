@@ -27,6 +27,7 @@ class SchoolDetailRequest extends FormRequest
             'schoolId' => ['required', 'exists:schools,id'],
             'statusId' => ['required', 'exists:school_statuses,id'],
             'educationLevelId' => ['required', 'exists:education_levels,id'],
+            'educationProgramId' => ['nullable', 'exists:education_programs,id'],
             'ownershipStatus' => ['required', 'string'],
             'dateEstablishmentDecree' => ['required', 'string'],
             'operationalLicense' => ['required', 'string'],
@@ -46,7 +47,16 @@ class SchoolDetailRequest extends FormRequest
             'numTeacher' => ['required', 'integer'],
             'imageUrl' => ['required', 'array'],
             'movie' => ['required', 'string'],
-            'examInfo' => ['nullable', 'string']
+            'examInfo' => ['nullable', 'string'],
+
+            'address.provinceId' => ['required', 'exists:provinces,id'],
+            'address.districtId' => ['required', 'exists:districts,id'],
+            'address.subDistrictId' => ['required', 'exists:sub_districts,id'],
+            'address.village' => ['nullable', 'string'],
+            'address.street' => ['nullable', 'string'],
+            'address.postalCode' => ['nullable', 'string'],
+            'address.latitude' => ['nullable', 'string'],
+            'address.longitude' => ['nullable', 'string'],
             //
         ];
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -56,6 +66,7 @@ class SchoolDetailRequest extends FormRequest
                 'schoolId' => ['nullable', 'exists:schools,id'],
                 'statusId' => ['nullable', 'exists:school_statuses,id'],
                 'educationLevelId' => ['nullable', 'exists:education_levels,id'],
+                'educationProgramId' => ['nullable', 'exists:education_programs,id'],
                 'ownershipStatus' => ['nullable', 'string'],
                 'dateEstablishmentDecree' => ['nullable', 'string'],
                 'operationalLicense' => ['nullable', 'string'],
@@ -76,7 +87,16 @@ class SchoolDetailRequest extends FormRequest
                 'numTeacher' => ['nullable', 'integer'],
                 'imageUrl' => ['nullable', 'array'],
                 'movie' => ['nullable', 'string'],
-                'examInfo' => ['nullable', 'string']
+                'examInfo' => ['nullable', 'string'],
+
+                'address.provinceId' => ['nullable', 'exists:provinces,id'],
+                'address.districtId' => ['nullable', 'exists:districts,id'],
+                'address.subDistrictId' => ['nullable', 'exists:sub_districts,id'],
+                'address.village' => ['nullable', 'string'],
+                'address.street' => ['nullable', 'string'],
+                'address.postalCode' => ['nullable', 'string'],
+                'address.latitude' => ['nullable', 'string'],
+                'address.longitude' => ['nullable', 'string'],
             ];
         }
 

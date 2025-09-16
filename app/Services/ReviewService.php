@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Review;
 use App\Models\ReviewDetail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
@@ -68,51 +69,53 @@ class ReviewService extends BaseService
             return $review;
         });
     }
-    public function createOrUpdateReview(array $data, int $userId, int $schoolDetailId):Review
-    {
-    $details = $data['details'];
+    public function createOrUpdate(array $data, int $schoolDetailId): Review
+{
+    $userId     = Auth::id();
+    $details    = $data['details'];
     $reviewText = $data['reviewText'] ?? null;
 
+    // Hitung rating dari details (rata-rata score semua pertanyaan)
     $totalScore = array_sum(array_column($details, 'score'));
-    $rating = round($totalScore / count($details), 2);
+    $rating     = round($totalScore / count($details), 2);
 
-    return DB::transaction(function () use ($userId, $schoolDetailId, $reviewText, $rating, $details) {
-
+    return DB::transaction(function () use ($userId, $schoolDetailId, $reviewText, $details, $rating) {
         $review = Review::where('userId', $userId)
             ->where('schoolDetailId', $schoolDetailId)
             ->first();
 
         if ($review) {
-            // Update
+            // Update review yang sudah ada
             $review->update([
                 'reviewText' => $reviewText,
-                'rating' => $rating,
-                'status' => Review::STATUS_PENDING
+                'rating'     => $rating,  // update rating juga
+                'status'     => Review::STATUS_PENDING
             ]);
             $review->reviewDetails()->delete();
         } else {
-            // Create baru
+            // Buat review baru
             $review = Review::create([
-                'reviewText' => $reviewText,
-                'rating' => $rating,
-                'userId' => $userId,
+                'reviewText'     => $reviewText,
+                'rating'         => $rating,
+                'userId'         => $userId,
                 'schoolDetailId' => $schoolDetailId,
-                'status' => Review::STATUS_PENDING
+                'status'         => Review::STATUS_PENDING
             ]);
         }
+
+        // Simpan detail setiap pertanyaan
         foreach ($details as $detail) {
             ReviewDetail::create([
-                'reviewId' => $review->id,
+                'reviewId'   => $review->id,
                 'questionId' => $detail['questionId'],
-                'score' => $detail['score'],
+                'score'      => $detail['score'],
             ]);
         }
 
         return $review->load(['reviewDetails.question']);
     });
-
-
 }
+
 public function getRecentReview($limit = 5)
     {
         return Review::select([
@@ -228,5 +231,32 @@ public function getRecentReview($limit = 5)
 
     return $query;
 }
+public function getSchoolReviewsWithRating(int $schoolDetailId)
+{
+    // Ambil semua review untuk sekolah tertentu
+    $reviews = Review::with([
+        'users:id,email,image',
+        'reviewDetails:id,reviewId,questionId,score'
+    ])
+        ->where('schoolDetailId', $schoolDetailId)
+        ->where('status', Review::STATUS_APPROVED)
+        ->get();
+
+    // Hitung rata-rata per pertanyaan
+    $questionAverages = ReviewDetail::select('questionId', DB::raw('AVG(score) as avg_score'))
+        ->whereIn('reviewId', $reviews->pluck('id'))
+        ->groupBy('questionId')
+        ->get();
+
+    // Hitung final rating (rata-rata dari semua avg_score)
+    $finalRating = $questionAverages->avg('avg_score');
+
+    return [
+        'reviews' => $reviews,
+        'questionAverages' => $questionAverages,
+        'finalRating' => round($finalRating, 2)
+    ];
+}
+
 
 }

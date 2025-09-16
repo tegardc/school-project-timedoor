@@ -18,11 +18,8 @@ class SchoolResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'provinceId' => $this->provinceId,
-            'districtId' => $this->districtId,
-            'subDistrictId' => $this->subDistrictId,
             'schoolEstablishmentDecree' => $this->schoolEstablishmentDecree,
-            'description' => $this->description,
+            // 'description' => $this->description,
             // 'createdAt' => $this->createdAt,
             // 'updatedAt' => $this->updatedAt,
             // 'imageUrl' => $this->coverImage->imageUrl ?? null

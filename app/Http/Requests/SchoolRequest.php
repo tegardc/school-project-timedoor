@@ -26,9 +26,6 @@ class SchoolRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'provinceId' => ['required', 'exists:provinces,id'],
-            'districtId' => ['required', 'exists:districts,id'],
-            'subDistrictId' => ['required', 'exists:sub_districts,id'],
             'schoolEstablishmentDecree' => ['nullable', 'string', 'max:255'],
             // 'imageUrl' => ['sometimes', 'array'],
             // 'imageUrl.*' => ['url'],
@@ -38,9 +35,6 @@ class SchoolRequest extends FormRequest
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules = [
                 'name' => ['nullable', 'string', 'max:255'],
-                'provinceId' => ['nullable', 'exists:provinces,id'],
-                'districtId' => ['nullable', 'exists:districts,id'],
-                'subDistrictId' => ['nullable', 'exists:sub_districts,id'],
                 'schoolEstablishmentDecree' => ['nullable', 'string', 'max:255'],
             ];
         }

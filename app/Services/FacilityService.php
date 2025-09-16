@@ -34,6 +34,7 @@ class FacilityService extends BaseService
         $facility = Facility::select([
             'id',
             'name',
+            'image'
         ]);
         return $facility->get();
     }

@@ -18,4 +18,9 @@ class EducationLevel extends Model
     {
         return $this->hasMany(SchoolDetail::class);
     }
+    public function experiences()
+{
+    return $this->hasMany(EducationExperience::class, 'educationLevelId');
+}
+
 }

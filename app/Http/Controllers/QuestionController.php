@@ -41,9 +41,13 @@ class QuestionController extends Controller
      */
     public function show(QuestionService $service,$id)
     {
-        $question = $service->show($id);
-        if(!$question) return ResponseHelper::notFound('Data Not Found');
-        return ResponseHelper::success(QuestionResource::make($question), 'Question retrieved');
+        try {
+            $question = $service->show($id);
+            if(!$question) return ResponseHelper::notFound('Data Not Found');
+            return ResponseHelper::success(QuestionResource::make($question), 'Question retrieved');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Failed to fetch question", $e, "[QUESTION SHOW]: ");
+        }
         //
     }
 

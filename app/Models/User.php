@@ -30,7 +30,6 @@ class User extends Authenticatable
     protected $fillable = [
         'firstName',
         'lastName',
-        'username',
         'email',
         'gender',
         'phoneNo',
@@ -38,6 +37,7 @@ class User extends Authenticatable
         'nis',
         // 'schoolDetailId',
         'image',
+        'address',
         'createdAt',
         'updatedAt'
     ];
@@ -58,6 +58,10 @@ public function childs()
         return $this->belongsToMany(SchoolDetail::class, 'user_child_school', 'userId', 'schoolDetailId')
             ->withPivot('childId')->withTimestamps('createdAt', 'updatedAt');;
     }
+    public function educationExperiences()
+{
+    return $this->hasMany(EducationExperience::class, 'userId');
+}
 
 
     /**

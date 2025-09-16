@@ -23,11 +23,13 @@ class FacilityRequest extends FormRequest
     {
          $rules = [
             'name' => ['required', 'string', 'max:255', 'unique:facilities,name'],
+            'image' => ['nullable', 'string', 'max:255'],
         ];
 
         if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules = [
                 'name' => ['nullable', 'string', 'max:255' , 'unique:facilities,name'],
+                'image' => ['nullable', 'string', 'max:255'],
             ];
         }
         return $rules;

@@ -16,7 +16,6 @@ class UserSeeder extends Seeder
         $admin = User::create([
             'firstName' => 'Admin',
             'lastName'  => 'Tester',
-            'username'  => 'admin',
             'email'     => 'admin@example.com',
             'gender'    => 'female',
             'phoneNo'   => '081111111111',
@@ -30,7 +29,6 @@ class UserSeeder extends Seeder
        $parent = User::create([
     'firstName' => 'Parent',
     'lastName'  => 'Tester',
-    'username'  => 'parent01',
     'email'     => 'parent01@example.com',
     'gender'    => 'male',
     'phoneNo'   => '08123456789',
@@ -54,7 +52,6 @@ $parent->childSchoolDetails()->attach(1, [  // 1 = schoolDetailId
         $student = User::create([
             'firstName' => 'Student',
             'lastName'  => 'Tester',
-            'username'  => 'student01',
             'email'     => 'student01@example.com',
             'gender'    => 'female',
             'phoneNo'   => '081444444444',

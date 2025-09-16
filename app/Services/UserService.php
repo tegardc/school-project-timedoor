@@ -30,85 +30,38 @@ class UserService extends BaseService
         ]);
         return $query->paginate($perPage??10);
     }
-//      public function updateUser(User $user, array $validated)
-// {
-//     // === handle password ===
-//     if (!empty($validated['current_password']) && !empty($validated['new_password'])) {
-//         if (!Hash::check($validated['current_password'], $user->password)) {
-//             return ResponseHelper::error("Current password is incorrect", 400);
-//         }
-//         $user->password = Hash::make($validated['new_password']);
-//     }
-
-//     // === update data user biasa ===
-//     $dataUser = collect($validated)->except(['schoolDetailId', 'nis', 'childName'])->toArray();
-//     $user->update($dataUser);
-
-//     // Kalau parent, buat child baru + attach pivot
-//    // Kalau parent
-// if (!empty($validated['schoolDetailId'])) {
-//     $user->childSchoolDetails()->syncWithoutDetaching([$validated['schoolDetailId']]);
-// }
-
-
-
-//     $user->refresh();
-//     return $user;
-// }
+//
  public function updateProfile(array $data): void
 {
-    $user = Auth::user(); // user yang login
-    $role = $user->getRoleNames()->first(); // pakai Spatie roles
+    $user = Auth::user();
 
-    DB::transaction(function () use ($user, $role, $data) {
-        // 1. Update data dasar user
+    DB::transaction(function () use ($user,  $data) {
         $user->update([
             'firstName' => $data['firstName'] ?? $user->firstName,
             'lastName'  => $data['lastName'] ?? $user->lastName,
-            'username'  => $data['username'] ?? $user->username,
             'email'     => $data['email'] ?? $user->email,
             'gender'    => $data['gender'] ?? $user->gender,
             'phoneNo'   => $data['phoneNo'] ?? $user->phoneNo,
-            'image'     => $data['image'] ?? $user->image
+            'image'     => $data['image'] ?? $user->image,
+            'address'   => $data['address'] ?? $user->address,
         ]);
 
-      if ($role === 'student') {
-            if (isset($data['nis'])) {
-                $user->update(['nis' => $data['nis']]);
-            }
-
-            if (isset($data['schoolDetailId'])) {
-                $user->childSchoolDetails()->sync([
-                    $data['schoolDetailId'] => [
-                        'childId' => null,
-                    ],
-                ]);
-            }
-        }
-
-        // parent
-        if ($role === 'parent') {
-            if (isset($data['childName']) && isset($data['nis'])) {
-                $child = Child::updateOrCreate(
-                    ['nis' => $data['nis']],
-                    [
-                        'name'   => $data['childName'],
-                        'userId' => $user->id,
-                    ]
-                );
-
-                if (isset($data['schoolDetailId'])) {
-                    $user->childSchoolDetails()->sync([
-                        $data['schoolDetailId'] => [
-                            'childId' => $child->id,
-                        ],
-                    ]);
-                }
-            }
-        }
     });
 
-    $user->refresh()->load('roles', 'childSchoolDetails');
+    $user->refresh();
 
 }
+    public function showUser(): User
+    {
+        $user = Auth::user();
+
+        // load relasi educationExperiences + relasi2 di dalamnya
+        $user->load([
+            'educationExperiences.educationLevel',
+            'educationExperiences.schoolDetail',
+            'educationExperiences.educationProgram',
+        ]);
+
+        return $user;
+    }
 }

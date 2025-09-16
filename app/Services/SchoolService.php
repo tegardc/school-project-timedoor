@@ -34,15 +34,9 @@ class SchoolService extends BaseService
         $query = School::select([
             'id',
             'name',
-            'provinceId',
-            'districtId',
-            'subDistrictId',
             'schoolEstablishmentDecree',
             'description'
-        ])->with([
-            'province:id,name',
-            'district:id,name',
-            'subDistrict:id,name'
+
         ]);
         return $query->paginate($perPage??10);
     }

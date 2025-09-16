@@ -64,10 +64,10 @@ class UserController extends Controller
      * Display the specified resource.
      */
 
-    public function show(Request $request)
+    public function show(Request $request, UserService $service)
     {
         try {
-            $user = $request->user();
+            $user = $service->showUser();
             return ResponseHelper::success(
                 new UserResource($user),
                 'Show Data Success'

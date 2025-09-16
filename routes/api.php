@@ -5,7 +5,9 @@ use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CSVImportController;
 use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\EducationExperienceController;
 use App\Http\Controllers\EducationLevelController;
+use App\Http\Controllers\EducationProgramController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\QuestionController;
@@ -42,17 +44,20 @@ use App\Models\SubDistrict;
     });
 
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::apiResource('education-experiences', EducationExperienceController::class);
         Route::get('/user', [UserController::class, 'show']);
         Route::put('/user', [UserController::class, 'update']);
         Route::delete('/user', [UserController::class, 'destroy']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/experiences-user', [EducationExperienceController::class, 'getExperienceByUser']);
+         Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
 
             Route::get('/questions', [QuestionController::class, 'index']);
             Route::get('/questions/{id}', [QuestionController::class, 'show']);
-            Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
+
             Route::put('/reviews/{id}', [ReviewController::class, 'update']);
             Route::post('/school-details/save', [SchoolDetailController::class, 'saveSchool']);
             Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
@@ -61,6 +66,7 @@ use App\Models\SubDistrict;
 
         //ROUTE FOR ADMIN ROLE//
         Route::middleware('check.role:admin')->group(function () {
+
             Route::get('/users', [UserController::class, 'index']);
             Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
@@ -76,6 +82,7 @@ use App\Models\SubDistrict;
             Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
             Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
             Route::apiResource('sub-districts', SubDistrictController::class)->except(['index', 'show']);
+            Route::apiResource('education-programs', EducationProgramController::class);
 
             Route::delete('/education-levels/{id}', [EducationLevelController::class, 'delete']);
             Route::post('/school-status', [SchoolStatusController::class, 'store']);
@@ -99,6 +106,8 @@ use App\Models\SubDistrict;
             Route::get('/questions', [QuestionController::class, 'trash']);
             Route::get('/reviews', [ReviewController::class, 'trash']);
             Route::get('/facilities', [FacilityController::class, 'trash']);
+            Route::get('/education-programs', [EducationProgramController::class, 'trash']);
+            Route::get('/education-experiences', [EducationExperienceController::class, 'trash']);
         });
 
         Route::prefix('restore')->group(function () {
@@ -111,6 +120,8 @@ use App\Models\SubDistrict;
             Route::post('/questions/{id}', [QuestionController::class, 'restore']);
             Route::post('/reviews/{id}', [ReviewController::class, 'restore']);
             Route::post('/facilities/{id}', [FacilityController::class, 'restore']);
+            Route::post('/education-programs/{id}', [EducationProgramController::class, 'restore']);
+            Route::post('/education-experiences/{id}', [EducationExperienceController::class, 'restore']);
         });
 
         // Review Approval

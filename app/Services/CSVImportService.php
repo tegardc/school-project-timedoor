@@ -3,7 +3,7 @@ namespace App\Services;
 
 use App\Models\{
     Province, District, SubDistrict, School, SchoolDetail,
-    SchoolStatus, EducationLevel, Accreditation, SchoolGallery
+    SchoolStatus, EducationLevel, Accreditation, Address, SchoolGallery
 };
 use Illuminate\Support\Facades\DB;
 
@@ -39,13 +39,18 @@ class CSVImportService
                 $school = School::updateOrCreate(
                     ['name' => $item['nama_sekolah']],
                     [
-                        'description' => $item['deskripsi'] ?? null,
-                        'provinceId' => $province->id,
-                        'districtId' => $district->id,
-                        'subDistrictId' => $subdistrict->id,
                         'schoolEstablishmentDecree' => $item['sk_pendirian'] ?? null,
                     ]
                 );
+                $address = Address::create([
+                    'provinceId' => $province->id,
+                    'districtId' => $district->id,
+                    'subDistrictId' => $subdistrict->id,
+                    'village' => $item['desa'] ?? null,
+                    'street' => $item['alamat'] ?? null,
+                    'postalCode' => $item['kode_pos'] ?? null,
+                    'latitude' => $item['lintang'] ?? null, 'longitude' => $item['bujur'] ?? null,
+                ]);
 
                 $schoolDetail = SchoolDetail::create([
                     'schoolId' => $school->id,
@@ -66,11 +71,12 @@ class CSVImportService
                     'numStudent' => $item['num_of_students'] ?? null,
                     'numTeacher' => $item['num_of_teacher'] ?? null,
                     'movie' => $item['video'] ?? null,
+                    'addressId' => $address->id
+
                 ]);
 
                 if (!empty($item['gambar'])) {
                     SchoolGallery::create([
-                        'schoolId' => $school->id,
                         'schoolDetailId' => $schoolDetail->id,
                         'imageUrl' => $item['gambar'],
                     ]);

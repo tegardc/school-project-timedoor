@@ -14,27 +14,36 @@ class ReviewController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, ReviewService $service, $schoolDetailId)
+    // public function index(Request $request, ReviewService $service, $schoolDetailId)
+    // {
+    //     try {
+    //         $perPage = $request->query('perPage',10);
+    //         $review = $service->getAll($schoolDetailId,$perPage);
+    //         if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
+    //         $reviewTransform = ReviewResource::collection($review);
+    //         return ResponseHelper::success([
+    //             'datas' => $reviewTransform,
+    //             'meta' => [
+    //                 'current_page' => $reviewTransform->currentPage(),
+    //                 'last_page' => $reviewTransform->lastPage(),
+    //                 'limit' => $reviewTransform->perPage(),
+    //                 'total' => $reviewTransform->total(),
+    //             ]
+    //             ],'Review Display Success');
+
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
+    //     }
+    //     //
+    // }
+        public function index(int $schoolDetailId, ReviewService $service)
     {
         try {
-            $perPage = $request->query('perPage',10);
-            $review = $service->getAll($schoolDetailId,$perPage);
-            if($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
-            $reviewTransform = ReviewResource::collection($review);
-            return ResponseHelper::success([
-                'datas' => $reviewTransform,
-                'meta' => [
-                    'current_page' => $reviewTransform->currentPage(),
-                    'last_page' => $reviewTransform->lastPage(),
-                    'limit' => $reviewTransform->perPage(),
-                    'total' => $reviewTransform->total(),
-                ]
-                ],'Review Display Success');
-
+            $result = $service->getSchoolReviewsWithRating($schoolDetailId);
+            return ResponseHelper::success($result, 'Success get school reviews and rating');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
         }
-        //
     }
     public function approve($id)
     {
@@ -107,21 +116,21 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ReviewService $service, ReviewRequest $request, $schoolDetailId)
-    {
-        $validated = $request->validated();
-        try {
-            // $userId = auth()->id();
-            $review = $service->createOrUpdateReview(
-                $request->only(['reviewText', 'details']),
-                $request->user()->id,
-                $schoolDetailId
-            );
-            $message = $review->wasRecentlyCreated ? 'Review Created Successfully.' : 'Review Updated Successfully';
-            return ResponseHelper::success(new ReviewResource($review), $message);
-        } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
-        }
+    // public function store(ReviewService $service, ReviewRequest $request, $schoolDetailId)
+    // {
+    //     $validated = $request->validated();
+    //     try {
+    //         // $userId = auth()->id();
+    //         $review = $service->createOrUpdateReview(
+    //             $request->only(['reviewText', 'details']),
+    //             $request->user()->id,
+    //             $schoolDetailId
+    //         );
+    //         $message = $review->wasRecentlyCreated ? 'Review Created Successfully.' : 'Review Updated Successfully';
+    //         return ResponseHelper::success(new ReviewResource($review), $message);
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
+    //     }
         //  } catch (\Exception $e) {
         //     return response()->json([
         //         'status' => 500,
@@ -130,6 +139,15 @@ class ReviewController extends Controller
         //     ], 500);
         // }
         //
+    // }
+        public function store(ReviewRequest $request, ReviewService $service, int $schoolDetailId)
+    {
+        try {
+            $review = $service->createOrUpdate($request->validated(), $schoolDetailId);
+            return ResponseHelper::success($review, 'Review saved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops created review is failed ", $e, "[REVIEW STORE]: ");
+        }
     }
 
     /**

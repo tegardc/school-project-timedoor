@@ -12,7 +12,9 @@ class ReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasAnyRole(['parent', 'student']);
+        // return auth()->check() && auth()->user()->hasAnyRole(['parent', 'student']);
+        // return auth()->check();
+        return true;
     }
 
     /**
@@ -32,17 +34,17 @@ class ReviewRequest extends FormRequest
         return $rules;
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $schoolDetailId = $this->route('schoolDetailId');
-            $user = Auth::user();
-            if ($schoolDetailId && $user) {
-                $isStudent = $user->childSchoolDetails()->where('schoolDetailId', $schoolDetailId)->exists();
-                if (!$isStudent) {
-                    $validator->errors()->add('schoolDetailId', 'Youre Not registered in this school');
-                }
-            }
-        });
-    }
+    // public function withValidator($validator)
+    // {
+    //     $validator->after(function ($validator) {
+    //         $schoolDetailId = $this->route('schoolDetailId');
+    //         $user = Auth::user();
+    //         if ($schoolDetailId && $user) {
+    //             $isStudent = $user->childSchoolDetails()->where('schoolDetailId', $schoolDetailId)->exists();
+    //             if (!$isStudent) {
+    //                 $validator->errors()->add('schoolDetailId', 'Youre Not registered in this school');
+    //             }
+    //         }
+    //     });
+    // }
 }

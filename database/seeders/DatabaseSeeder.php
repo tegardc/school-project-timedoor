@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             EducationLevel::class,
             Facility::class,
+            EducationProgram::class,
             Accreditation::class,
             StatusSchool::class,
             SchoolSeeder::class,

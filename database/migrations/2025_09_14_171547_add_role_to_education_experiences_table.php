@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('facilities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('image')->nullable();
-            $table->timestamp('createdAt')->nullable();
-            $table->timestamp('updatedAt')->nullable();
+        Schema::table('education_experiences', function (Blueprint $table) {
+            $table->string('role')->nullable()->after('userId');
+            //
         });
     }
 
@@ -25,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('facilities');
+        Schema::table('education_experiences', function (Blueprint $table) {
+            $table->dropColumn('role');
+            //
+        });
     }
 };

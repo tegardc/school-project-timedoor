@@ -13,15 +13,12 @@ return new class extends Migration
     {
         Schema::create('school_galleries', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('schoolId');
             $table->unsignedBigInteger('schoolDetailId');
             $table->string('imageUrl');
             $table->boolean('isCover')->default(false);
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
 
-
-            $table->foreign('schoolId')->references('id')->on('schools')->onDelete('cascade');
             $table->foreign('schoolDetailId')->references('id')->on('school_details')->onDelete('cascade');
         });
     }

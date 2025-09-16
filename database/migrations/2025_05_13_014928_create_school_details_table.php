@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('schoolId')->nullable();
             $table->unsignedBigInteger('statusId')->nullable();
             $table->unsignedBigInteger('educationLevelId')->nullable();
+            $table->unsignedBigInteger('addressId')->nullable();
             $table->string('ownershipStatus')->nullable();
             $table->date('dateEstablishmentDecree')->nullable();
             $table->string('operationalLicense')->nullable();
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('principal')->nullable();
             $table->string('operator')->nullable();
             $table->unsignedBigInteger('accreditationId');
+            $table->unsignedBigInteger('educationProgramId')->nullable();
             $table->string('curriculum')->nullable();
             // $table->string('telpNo')->nullable();
             $table->decimal('tuitionFee', 10, 2)->nullable();
@@ -39,6 +41,8 @@ return new class extends Migration
             $table->foreign('statusId')->references('id')->on('school_statuses')->onDelete('cascade');
             $table->foreign('educationLevelId')->references('id')->on('education_levels')->onDelete('cascade');
             $table->foreign('accreditationId')->references('id')->on('accreditations')->onDelete('cascade');
+            $table->foreign('educationProgramId')->references('id')->on('education_programs')->onDelete('cascade');
+            $table->foreign('addressId')->references('id')->on('addresses')->onDelete('cascade');
         });
     }
 

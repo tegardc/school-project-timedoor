@@ -40,8 +40,8 @@ class FacilityController extends Controller
     {
         try{
             $validated = $request->validated();
-            $facility = $service->store($validated);
-            return ResponseHelper::created(new FacilityResource($facility), 'Created Data Success');
+                $facility = $service->store($validated);
+                return ResponseHelper::created(new FacilityResource($facility), 'Created Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops create facility is failed ", $e, "[FACILITY STORE]: ");
         }
@@ -55,8 +55,8 @@ class FacilityController extends Controller
     {
         try{
             $facility = Facility::find($id);
-            if (!$facility) return ResponseHelper::notFound('Facility Not Found');
-            return ResponseHelper::success(new FacilityResource($facility), 'Display Data Success');
+                if (!$facility) return ResponseHelper::notFound('Facility Not Found');
+                return ResponseHelper::success(new FacilityResource($facility), 'Display Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display facility by id is failed ", $e, "[FACILITY SHOW]: ");
         }
@@ -79,8 +79,8 @@ class FacilityController extends Controller
         try{
             $validated = $request->validated();
             $facility = $service->update($validated, $id);
-            if (!$facility) return ResponseHelper::notFound('Facility Not Found');
-            return ResponseHelper::success(new FacilityResource($facility), 'Update Data Success');
+                if (!$facility) return ResponseHelper::notFound('Facility Not Found');
+                return ResponseHelper::success(new FacilityResource($facility), 'Update Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops update facility is failed ", $e, "[FACILITY UPDATE]: ");
         }

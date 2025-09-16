@@ -21,6 +21,7 @@ class SchoolDetail extends Model
         'schoolId',
         'statusId',
         'educationLevelId',
+        'addressId',
         'ownershipStatus',
         'dateEstablishmentDecree',
         'operationalLicense',
@@ -28,18 +29,13 @@ class SchoolDetail extends Model
         'principal',
         'operator',
         'accreditationId',
+        'educationProgramId',
         'curriculum',
-        'facilityId',
-        // 'telpNo',
         'tuitionFee',
         'numStudent',
         'numTeacher',
         'movie',
         'examInfo',
-        'isFeatured',
-        'isHighlighted',
-        'createdAt',
-        'updatedAt'
     ];
     public function child()
     {
@@ -71,11 +67,27 @@ class SchoolDetail extends Model
     {
         return $this->hasMany(SchoolGallery::class, 'schoolDetailId');
     }
+        public function coverImage()
+    {
+        return $this->hasOne(SchoolGallery::class, 'schoolDetailId')->where('isCover', 1);
+    }
     public function facilities()
     {
         return $this->belongsToMany(Facility::class,  'school_detail_facility','schoolDetailId', 'facilityId');
     }
     public function contacts(){
         return $this->hasMany(Contact::class, 'schoolDetailId');
+    }
+    public function educationExperiences()
+{
+    return $this->hasMany(EducationExperience::class, 'schoolDetailId');
+}
+   public function address()
+    {
+        return $this->belongsTo(Address::class, 'addressId');
+    }
+        public function educationProgram()
+    {
+        return $this->belongsTo(EducationProgram::class, 'educationProgramId');
     }
 }

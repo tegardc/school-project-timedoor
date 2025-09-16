@@ -65,16 +65,16 @@ class AuthService
     public function register(array $data): User
     {
         return DB::transaction(function () use ($data) {
+            $parts = explode(' ', trim($data['fullName']));
+            $firstName = array_shift($parts);           // ambil kata pertama
+            $lastName  = count($parts) ? implode(' ', $parts) : null; // sisanya jadi lastname
             // Buat user baru
             $user = User::create([
-                'username' => $data['username'],
+                'firstName' => $firstName,
+                'lastName'  => $lastName,
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
             ]);
-            if(isset($data['role'])) {
-                $user->assignRole($data['role']);
-            }
-
             return $user;
         });
     }
@@ -85,13 +85,11 @@ class AuthService
             'email' => 'required',
             'password' => 'required'
         ]);
-        $loginField = str_contains($credentials['email'], '@') ? 'email' : 'username';
-        if (!Auth::attempt([$loginField => $credentials['email'], 'password' => $credentials['password']])) {
+        if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'login' => ['Invalid credential or account disabled.'],
-            ]);
-        }
-
+        ]);
+    }
         $user = Auth::user();
         $user->tokens()->delete();
 

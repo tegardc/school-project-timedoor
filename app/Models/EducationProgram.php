@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Testing\Fluent\Concerns\Has;
+use Spatie\Permission\Traits\HasRoles;
 
-class Facility extends Model
+class EducationProgram extends Model
 {
     use HasFactory, SoftDeletes;
     public $timestamps = true;
@@ -15,12 +15,13 @@ class Facility extends Model
     public const UPDATED_AT = 'updatedAt';
     public const DELETED_AT = 'deletedAt';
     protected $dates = ['deletedAt'];
-    protected $fillable = ['name','image'];
+    protected $fillable = ['name'];
 
-    public function schoolDetails()
-    {
-        return $this->belongsToMany(SchoolDetail::class, 'school_detail_facility', 'facilityId', 'schoolDetailId');
-    }
+    public function experiences()
+{
+    return $this->hasMany(EducationExperience::class, 'educationProgramId');
+}
 
     //
 }
+
