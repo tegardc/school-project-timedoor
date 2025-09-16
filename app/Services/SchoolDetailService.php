@@ -279,12 +279,18 @@ public function ranking(array $filters = [])
         'movie',
     ])
     ->with([
-        'schools:id,name,provinceId,districtId,subDistrictId',
-        'status:id,name',
-        'educationLevel:id,name',
-        'accreditation:id,code',
-        'schoolGallery:id,schoolDetailId,imageUrl,isCover',
-        'reviews'
+    'schools:id,name',
+    'address:id,provinceId,districtId,subDistrictId,village,street,postalCode,latitude,longitude',
+    'address.province:id,name',
+    'address.district:id,name',
+    'address.subDistrict:id,name',
+    'status:id,name',
+    'educationLevel:id,name',
+    'accreditation:id,code',
+    'schoolGallery:id,schoolDetailId,imageUrl,isCover',
+    'facilities:id,name',
+    'contacts',
+    'reviews'
     ])
     ->withCount('reviews')
     ->withAvg('reviews', 'rating')
