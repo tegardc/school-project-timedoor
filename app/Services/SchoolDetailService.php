@@ -298,18 +298,18 @@ public function ranking(array $filters = [])
     ->orderByDesc('reviews_count');
 
     if (!empty($filters['provinceName'])) {
-        $query->whereHas('schools.province', function ($q) use ($filters) {
+        $query->whereHas('address.province', function ($q) use ($filters) {
             $q->where('name', 'like' , '%' . $filters['provinceName'] . '%');
         });
     }
 
     if (!empty($filters['districtName'])) {
-        $query->whereHas('schools.district', function ($q) use ($filters) {
+        $query->whereHas('address.district', function ($q) use ($filters) {
             $q->where('name', 'like', '%' . $filters['districtName'] . '%');
         });
     }
     if(!empty($filters['subDistrictName'])) {
-        $query->whereHas('schools.subDistrict', function ($q) use ($filters) {
+        $query->whereHas('address.subDistrict', function ($q) use ($filters) {
             $q->where('name', 'like', '%' . $filters['subDistrictName'] . '%');
         });
     }
