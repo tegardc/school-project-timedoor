@@ -18,15 +18,12 @@ class ProfileRequest extends FormRequest
             'dateOfBirth'=> ['required', 'date'],
             'nisn'       => ['required', 'string'],
             'schoolDetailId' => ['required', 'exists:school_details,id'],
+            'schoolValidation' => ['required', 'string'],
         ];
 
-        if ($this->user()->hasRole('student')) {
-            $rules['studentValidation'] = ['nullable', 'file', 'mimes:jpg,png,pdf', 'max:2048'];
-        }
 
         if ($this->user()->hasRole('parent')) {
             $rules['relation'] = ['required', 'in:Orang Tua,Wali'];
-            $rules['schoolValidation'] = ['nullable', 'file', 'mimes:jpg,png,pdf', 'max:2048'];
         }
 
         return $rules;

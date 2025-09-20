@@ -73,7 +73,7 @@ class UserService extends BaseService
                 'fullname'         => $data['fullname'],
                 'dateOfBirth'      => $data['dateOfBirth'],
                 'nisn'             => $data['nisn'],
-                'studentValidation'=> $data['studentValidation'] ?? null,
+                'schoolValidation'=> $data['schoolValidation'] ?? null,
             ]);
 
             // relasi ke sekolah

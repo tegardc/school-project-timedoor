@@ -63,62 +63,26 @@ class AuthService
     //     });
     // }
     public function register(array $data): User
-    {
-        return DB::transaction(function () use ($data) {
-            if ($data['role'] === 'student') {
-                // Student disimpan di tabel users
-                $user = User::create([
-                    'fullname'          => $data['fullname'],
-                    'email'             => $data['email'],
-                    'gender'            => $data['gender'] ?? null,
-                    'dateOfBirth'       => $data['dateOfBirth'] ?? null,
-                    'phoneNo'           => $data['phoneNo'] ?? null,
-                    'address'           => $data['address'] ?? null,
-                    'nisn'              => $data['nisn'] ?? null,
-                    'studentValidation' => $data['studentValidation'] ?? null,
-                    'password'          => Hash::make($data['password']),
-                ]);
+{
+    return DB::transaction(function () use ($data) {
+        $parts = explode(' ', trim($data['fullname']));
+        $firstName = array_shift($parts);
+        $lastName  = count($parts) ? implode(' ', $parts) : null;
 
-                if (!empty($data['schoolDetailId'])) {
-                    $user->childSchoolDetails()->attach($data['schoolDetailId'], [
-                        'childId' => null
-                    ]);
-                }
-                return $user;
-            }
+        $user = User::create([
+            'fullname' => $data['fullname'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
 
-            if ($data['role'] === 'parent') {
-                // Parent tetap disimpan di tabel users untuk login
-                $user = User::create([
-                    'fullname'    => $data['fullname'],
-                    'email'       => $data['email'],
-                    'phoneNo'     => $data['phoneNo'] ?? null,
-                    'address'     => $data['address'] ?? null,
-                    'password'    => Hash::make($data['password']),
-                ]);
+        // ✅ Assign role dari request
+        if (!empty($data['role'])) {
+            $user->assignRole($data['role']);
+        }
 
-                // Simpan child
-                $child = Child::create([
-                    'userId'           => $user->id,
-                    'schoolDetailId'   => $data['schoolDetailId'] ?? null,
-                    'nisn'             => $data['nisn'] ?? null,
-                    'name'             => $data['childName'],
-                    'relation'         => $data['relation'] ?? 'Orang Tua',
-                    'schoolValidation' => $data['schoolValidation'] ?? null,
-                ]);
-
-                if (!empty($data['schoolDetailId'])) {
-                    $user->childSchoolDetails()->attach($data['schoolDetailId'], [
-                        'childId' => $child->id
-                    ]);
-                }
-
-                return $user;
-            }
-
-            throw new \Exception("Role tidak valid. Harus 'student' atau 'parent'.");
-        });
-    }
+        return $user;
+    });
+}
 
 
     public function login(Request $request)

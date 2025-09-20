@@ -39,7 +39,7 @@ class UserResource extends JsonResource
                 'educationProgram'  => optional($exp->educationProgram)->name,
             ];
         }),
-        // 'roles'     => $this->getRoleNames(),
+        'roles'     => $this->getRoleNames(),
         'createdAt' => $this->createdAt,
 
         // 'nis'       => $isStudent
