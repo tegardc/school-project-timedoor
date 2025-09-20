@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('childs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('userId')->nullable();
-            $table->string('nis')->nullable();
+            $table->string('nisn')->nullable();
             $table->unsignedBigInteger('schoolDetailId')->nullable();
             $table->string('name');
-            $table->unique(['nis', 'schoolDetailId'], 'unique_nis_school');
+            $table->enum('relation', ['Orang Tua', 'Wali'])->nullable();
+            $table->string('schoolValidation')->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');

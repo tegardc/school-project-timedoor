@@ -65,19 +65,61 @@ class AuthService
     public function register(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            $parts = explode(' ', trim($data['fullName']));
-            $firstName = array_shift($parts);           // ambil kata pertama
-            $lastName  = count($parts) ? implode(' ', $parts) : null; // sisanya jadi lastname
-            // Buat user baru
-            $user = User::create([
-                'firstName' => $firstName,
-                'lastName'  => $lastName,
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-            ]);
-            return $user;
+            if ($data['role'] === 'student') {
+                // Student disimpan di tabel users
+                $user = User::create([
+                    'fullname'          => $data['fullname'],
+                    'email'             => $data['email'],
+                    'gender'            => $data['gender'] ?? null,
+                    'dateOfBirth'       => $data['dateOfBirth'] ?? null,
+                    'phoneNo'           => $data['phoneNo'] ?? null,
+                    'address'           => $data['address'] ?? null,
+                    'nisn'              => $data['nisn'] ?? null,
+                    'studentValidation' => $data['studentValidation'] ?? null,
+                    'password'          => Hash::make($data['password']),
+                ]);
+
+                if (!empty($data['schoolDetailId'])) {
+                    $user->childSchoolDetails()->attach($data['schoolDetailId'], [
+                        'childId' => null
+                    ]);
+                }
+                return $user;
+            }
+
+            if ($data['role'] === 'parent') {
+                // Parent tetap disimpan di tabel users untuk login
+                $user = User::create([
+                    'fullname'    => $data['fullname'],
+                    'email'       => $data['email'],
+                    'phoneNo'     => $data['phoneNo'] ?? null,
+                    'address'     => $data['address'] ?? null,
+                    'password'    => Hash::make($data['password']),
+                ]);
+
+                // Simpan child
+                $child = Child::create([
+                    'userId'           => $user->id,
+                    'schoolDetailId'   => $data['schoolDetailId'] ?? null,
+                    'nisn'             => $data['nisn'] ?? null,
+                    'name'             => $data['childName'],
+                    'relation'         => $data['relation'] ?? 'Orang Tua',
+                    'schoolValidation' => $data['schoolValidation'] ?? null,
+                ]);
+
+                if (!empty($data['schoolDetailId'])) {
+                    $user->childSchoolDetails()->attach($data['schoolDetailId'], [
+                        'childId' => $child->id
+                    ]);
+                }
+
+                return $user;
+            }
+
+            throw new \Exception("Role tidak valid. Harus 'student' atau 'parent'.");
         });
     }
+
 
     public function login(Request $request)
     {
@@ -88,8 +130,8 @@ class AuthService
         if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'login' => ['Invalid credential or account disabled.'],
-        ]);
-    }
+            ]);
+        }
         $user = Auth::user();
         $user->tokens()->delete();
 
@@ -104,5 +146,4 @@ class AuthService
     {
         $request->user()->currentAccessToken()->delete();
     }
-
 }

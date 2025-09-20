@@ -64,4 +64,42 @@ class UserService extends BaseService
 
         return $user;
     }
+     public function storeStudent(array $data, int $userId): User
+    {
+        return DB::transaction(function () use ($data, $userId) {
+            $user = User::findOrFail($userId);
+
+            $user->update([
+                'fullname'         => $data['fullname'],
+                'dateOfBirth'      => $data['dateOfBirth'],
+                'nisn'             => $data['nisn'],
+                'studentValidation'=> $data['studentValidation'] ?? null,
+            ]);
+
+            // relasi ke sekolah
+            if (!empty($data['schoolDetailId'])) {
+                $user->childSchoolDetails()->attach($data['schoolDetailId'], [
+                    'childId' => null
+                ]);
+            }
+
+            return $user->fresh();
+        });
+    }
+
+    public function storeParent(array $data, int $userId): Child
+    {
+        return DB::transaction(function () use ($data, $userId) {
+            $child = Child::create([
+                'userId'           => $userId,
+                'name'             => $data['fullname'],
+                'nisn'             => $data['nisn'],
+                'relation'         => $data['relation'],
+                'schoolValidation' => $data['schoolValidation'] ?? null,
+                'schoolDetailId'   => $data['schoolDetailId'] ?? null,
+            ]);
+
+            return $child;
+        });
+    }
 }

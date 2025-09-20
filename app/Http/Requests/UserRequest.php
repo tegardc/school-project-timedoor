@@ -42,7 +42,7 @@ class UserRequest extends FormRequest
 {
     $userId = $this->route('user');
     $rules = [
-        'fullName'   => ['required', 'string'],
+        'fullname'   => ['required', 'string'],
         // 'username'   => ['required', 'string', 'unique:users,username'],
         'email'      => ['required', 'email', 'unique:users,email'],
         'password'   => [
@@ -52,7 +52,7 @@ class UserRequest extends FormRequest
             'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
         ],
         // 'confirm_password' => ['required', 'string', 'same:password'],
-        // 'role' => ['required', 'in:parent,student'],
+        'role' => ['required', 'in:parent,student'],
     ];
 
     if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {

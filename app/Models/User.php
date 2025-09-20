@@ -28,15 +28,16 @@ class User extends Authenticatable
     public const DELETED_AT = 'deletedAt';
     protected $dates = ['deletedAt'];
     protected $fillable = [
-        'firstName',
-        'lastName',
+        'fullname',
         'email',
         'gender',
+        'dateOfBirth',
         'phoneNo',
         'password',
-        'nis',
+        'nisn',
         // 'schoolDetailId',
         'image',
+        'schoolValidation',
         'address',
         'createdAt',
         'updatedAt'

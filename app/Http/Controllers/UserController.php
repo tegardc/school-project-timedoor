@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -165,6 +166,25 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops restore user is failed ", $e, "[USER RESTORE]: ");
         }
+    }
+    public function profileStore(ProfileRequest $request, UserService $service) {
+        try {
+            $user = Auth::user();
+
+             if ($user->hasRole('student')) {
+                $profile = $service->storeStudent($request->validated(), $user->id);
+            } elseif ($user->hasRole('parent')) {
+                $profile = $service->storeParent($request->validated(), $user->id);
+            } else {
+                return ResponseHelper::error("Role tidak valid untuk melengkapi data diri.");
+            }
+
+            return ResponseHelper::success($profile, 'Data diri berhasil disimpan');
+
+        } catch (\Exception $th) {
+            return ResponseHelper::serverError("Oops store profile is failed ", $th, "[PROFILE STORE]: ");
+        }
+
     }
 
     /**
