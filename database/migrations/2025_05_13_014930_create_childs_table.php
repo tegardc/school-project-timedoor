@@ -16,9 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('userId')->nullable();
             $table->string('nisn')->nullable();
             $table->unsignedBigInteger('schoolDetailId')->nullable();
-            $table->string('name');
-            $table->enum('relation', ['Orang Tua', 'Wali'])->nullable();
+            $table->string('fullname');
+            $table->date('dateOfBirth')->nullable();
             $table->string('schoolValidation')->nullable();
+            $table->string('email')->nullable();
+            $table->string('phoneNo')->nullable();
+            $table->enum('relation', ['Orang Tua', 'Wali'])->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');

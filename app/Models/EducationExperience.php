@@ -17,7 +17,7 @@ class EducationExperience extends Model
     public $dates = ['deletedAt'];
     protected $fillable = [
         'userId',
-        'role',
+        'relation',
         'educationLevelId',
         'schoolDetailId',
         'educationProgramId',

@@ -16,11 +16,11 @@ class EducationExperienceResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'role' => $this->role,
             'educationLevelId' => $this->educationLevelId,
             'schoolDetailId' => $this->schoolDetailId,
             'educationProgramId' => $this->educationProgramId,
             'degree' => $this->degree,
+            'relation' => $this->relation,
             'startDate' => $this->startDate,
             'endDate' => $this->endDate
 

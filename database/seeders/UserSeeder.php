@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
             'gender'     => 'female',
             'phoneNo'    => '081111111111',
             'password'   => Hash::make('Admin#123'), // sesuai rule password
+
             'createdAt'  => now(),
             'updatedAt'  => now(),
         ]);
@@ -38,7 +39,7 @@ class UserSeeder extends Seeder
         // Buat child untuk parent
         $child = Child::create([
             'userId'           => $parent->id,
-            'name'             => 'Child Tester',
+            'fullname'             => 'Child Tester',
             'nisn'             => '654321',
             'relation'         => 'Orang Tua',
             'schoolDetailId'   => 1, // pastikan ada SchoolDetail dengan id=1

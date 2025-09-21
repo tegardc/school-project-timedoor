@@ -23,7 +23,7 @@ class SchoolDetailRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string'],
-            'institutionCode' => ['required', 'string','unique:school_details,institutionCode'],
+            'institutionCode' => ['required', 'string', 'unique:school_details,institutionCode'],
             'schoolId' => ['required', 'exists:schools,id'],
             'statusId' => ['required', 'exists:school_statuses,id'],
             'educationLevelId' => ['required', 'exists:education_levels,id'],

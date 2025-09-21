@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('schoolDetailId');
             $table->unsignedBigInteger('educationProgramId');
             $table->string('degree');
-
+            $table->enum('relation', ['siswa', 'alumni'])->nullable();
             $table->date('startDate');
             $table->date('endDate');
             $table->timestamp('createdAt')->nullable();

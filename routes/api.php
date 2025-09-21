@@ -61,7 +61,7 @@ use App\Models\SubDistrict;
             Route::put('/reviews/{id}', [ReviewController::class, 'update']);
             Route::post('/school-details/save', [SchoolDetailController::class, 'saveSchool']);
             Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
-            Route::post('/profile/complete', [UserController::class, 'profileStore']);
+            Route::put('/profile/complete', [UserController::class, 'profileStore']);
 
         });
 

@@ -27,9 +27,9 @@ class EducationExperienceRequest extends FormRequest
             'schoolDetailId' => 'required|exists:school_details,id',
             'educationProgramId' => 'required|exists:education_programs,id',
             'degree' => 'required|string|max:255',
+            'relation' => 'required|string|max:255',
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
-            'role' => 'required|in:student,parent,alumni,admin',
             //
         ];
         if($this->isMethod('PUT') || $this->isMethod('PATCH')) {
@@ -38,9 +38,9 @@ class EducationExperienceRequest extends FormRequest
                 'schoolDetailId' => 'nullable|exists:school_details,id',
                 'educationProgramId' => 'nullable|exists:education_programs,id',
                 'degree' => 'nullable|string|max:255',
+                'relation' => 'nullable|string|max:255',
                 'startDate' => 'nullable|date',
                 'endDate' => 'nullable|date|after_or_equal:startDate',
-                'role' => 'nullable|in:student,parent,alumni,admin',
                 //
             ];
         }

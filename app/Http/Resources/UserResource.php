@@ -7,56 +7,41 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-   public function toArray(Request $request): array
-{
-    // $isStudent = $this->hasRole('student');
-    // $isParent  = $this->hasRole('parent');
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'          => $this->id,
+            'fullname'    => $this->fullname,
+            'email'       => $this->email,
+            'phoneNo'     => $this->phoneNo,
+            'address'     => $this->address,
+            'image'       => $this->image,
+            'dateOfBirth' => $this->dateOfBirth,
+            'nisn'        => $this->nisn,
+            'roles'       => $this->roles->pluck('name'),
 
-    return [
-        'id'        => $this->id,
-        'firstName' => $this->firstName,
-        'lastName'  => $this->lastName,
-        // 'username'  => $this->username,
-        'email'     => $this->email,
-        'gender'    => $this->gender,
-        'phoneNo'   => $this->phoneNo,
-        'image'     => $this->image,
-        'address'   => $this->address,
-        'educationExperiences' => $this->educationExperiences->map(function ($exp) {
-            return [
-                'id'                => $exp->id,
-                'role'              => $exp->role,
-                'degree'            => $exp->degree,
-                'startDate'         => $exp->startDate,
-                'endDate'           => $exp->endDate,
-                'educationLevel'    => optional($exp->educationLevel)->name,
-                'schoolDetail'      => optional($exp->schoolDetail)->name,
-                'educationProgram'  => optional($exp->educationProgram)->name,
-            ];
-        }),
-        'roles'     => $this->getRoleNames(),
-        'createdAt' => $this->createdAt,
-
-        // 'nis'       => $isStudent
-        //     ? $this->nis
-        //     : optional($this->childs->first())->nis,
-
-        // 'childName' => $isParent
-        //     ? optional($this->childs->first())->name
-        //     : null,
-
-        // 'schoolDetails' => $this->childSchoolDetails->map(function ($detail) {
-        //     return [
-        //         'id'   => $detail->id,
-        //         'name' => $detail->name,
-        //     ];
-        // }),
-    ];
-}
-
+            'child' => $this->when(
+                $this->hasRole('parent'),
+                function () {
+                    return $this->children->map(function ($child) {
+                        return [
+                            'id'              => $child->id,
+                            'fullname'        => $child->fullname,
+                            'dateOfBirth'     => $child->dateOfBirth,
+                            'nisn'            => $child->nisn,
+                            'email'           => $child->email,
+                            'phoneNo'         => $child->phoneNo,
+                            'schoolValidation'=> $child->schoolValidation,
+                            'schoolDetail'    => $child->schoolDetail
+                                ? [
+                                    'id'   => $child->schoolDetail->id,
+                                    'name' => $child->schoolDetail->name,
+                                ]
+                                : null,
+                        ];
+                    });
+                }
+            ),
+        ];
+    }
 }

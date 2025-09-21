@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProfileRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -27,7 +28,7 @@ class UserController extends Controller
     public function index(Request $request, UserService $service)
     {
         try {
-            $perPage = $request->query('perPage',10);
+            $perPage = $request->query('perPage', 10);
             $user = $service->getAll($perPage);
             $userTransform = UserResource::collection($user);
             return ResponseHelper::success([
@@ -37,7 +38,8 @@ class UserController extends Controller
                     'last_page' => $userTransform->lastPage(),
                     'limit' => $userTransform->perPage(),
                     'total' => $userTransform->total(),
-                ],'Display User Success'
+                ],
+                'Display User Success'
             ]);
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
@@ -106,18 +108,14 @@ class UserController extends Controller
     //         return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
     //     }
     // }
-    public function update(UserRequest $request, UserService $profileService)
+    public function update(UpdateProfileRequest $request, UserService $profileService)
     {
-        $user = Auth::user();
-
-        // Base validation
-
-        $validated = $request->validated();
-        Log::info('[USER UPDATE] Validated data:', $validated);
-
         try {
-            $profileService->updateProfile($validated);
-            return ResponseHelper::success(new UserResource($user), 'Update Success');
+            $user = Auth::user();
+            $data = $request->all();
+
+            $updatedUser = $profileService->updateProfile($user, $data);
+            return ResponseHelper::success(new UserResource($updatedUser), 'Update Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
         }
@@ -130,7 +128,7 @@ class UserController extends Controller
             $user = $request->user();
             $service->softDelete($user->id);
             return ResponseHelper::success('User deleted successfully');
-         } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
         }
     }
@@ -145,12 +143,13 @@ class UserController extends Controller
             }
             $service->softDelete($id);
             return ResponseHelper::success('User deleted successfully');
-         } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
         }
     }
 
-    public function trash(UserService $service) {
+    public function trash(UserService $service)
+    {
         try {
             $user = $service->trash();
             return ResponseHelper::success(UserResource::collection($user), 'User trashed items retrieved successfully');
@@ -159,7 +158,8 @@ class UserController extends Controller
         }
     }
 
-    public function restore(UserService $service, $id) {
+    public function restore(UserService $service, $id)
+    {
         try {
             $user = $service->restore($id);
             return ResponseHelper::success(new UserResource($user), 'User restored successfully');
@@ -167,24 +167,23 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops restore user is failed ", $e, "[USER RESTORE]: ");
         }
     }
-    public function profileStore(ProfileRequest $request, UserService $service) {
+    public function profileStore(ProfileRequest $request, UserService $service)
+    {
         try {
             $user = Auth::user();
 
-             if ($user->hasRole('student')) {
-                $profile = $service->storeStudent($request->validated(), $user->id);
+            if ($user->hasRole('student')) {
+                $profile = $service->updateStudent($request->validated(), $user->id);
             } elseif ($user->hasRole('parent')) {
-                $profile = $service->storeParent($request->validated(), $user->id);
+                $profile = $service->updateParent($request->validated(), $user->id);
             } else {
                 return ResponseHelper::error("Role tidak valid untuk melengkapi data diri.");
             }
 
             return ResponseHelper::success($profile, 'Data diri berhasil disimpan');
-
         } catch (\Exception $th) {
             return ResponseHelper::serverError("Oops store profile is failed ", $th, "[PROFILE STORE]: ");
         }
-
     }
 
     /**

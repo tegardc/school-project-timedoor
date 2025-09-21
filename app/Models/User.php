@@ -49,6 +49,15 @@ public function childs()
                 ->withPivot('schoolDetailId')
                 ->withTimestamps();
 }
+public function child()
+{
+    return $this->hasOne(Child::class, 'userId'); // satu user (parent) punya 1 child
+}
+
+public function children()
+{
+    return $this->hasMany(Child::class, 'userId'); // kalau nanti butuh banyak anak
+}
 
     public function review()
     {

@@ -13,20 +13,20 @@ class Child extends Model
     public const CREATED_AT = 'createdAt';
     public const UPDATED_AT = 'updatedAt';
     protected $fillable = [
-        'name',
         'userId',
+        'fullname',
         'nisn',
+        'dateOfBirth',
+        'email',
+        'phoneNo',
         'schoolDetailId',
-        'relation',
-        'schoolValidation'
+        'schoolValidation',
     ];
     public $timestamps = true;
 
     public function parent()
     {
-        return $this->belongsToMany(User::class, 'user_child_school', 'childId', 'userId')
-            ->withPivot('schoolDetailId')
-            ->withTimestamps();
+        return $this->belongsTo(User::class, 'userId');
     }
     public function schoolDetail()
     {
