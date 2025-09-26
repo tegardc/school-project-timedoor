@@ -31,13 +31,24 @@ class UserResource extends JsonResource
                             'nisn'            => $child->nisn,
                             'email'           => $child->email,
                             'phoneNo'         => $child->phoneNo,
-                            'schoolValidation'=> $child->schoolValidation,
+                            'schoolValidation' => $child->schoolValidation,
                             'schoolDetail'    => $child->schoolDetail
                                 ? [
                                     'id'   => $child->schoolDetail->id,
                                     'name' => $child->schoolDetail->name,
                                 ]
                                 : null,
+                        ];
+                    });
+                }
+            ),
+            'schoolDetails' => $this->when(
+                $this->hasRole('student'),
+                function () {
+                    return $this->childSchoolDetails->map(function ($school) {
+                        return [
+                            'id'   => $school->id,
+                            'name' => $school->name,
                         ];
                     });
                 }
