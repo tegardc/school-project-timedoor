@@ -33,6 +33,13 @@ class UpdateProfileRequest extends FormRequest
             $rules['child.schoolDetailId']  = 'nullable|integer|exists:school_details,id';
             $rules['child.schoolValidation']= 'nullable|string|max:255';
         }
+        $rules['current_password'] = ['nullable', 'required_with:new_password'];
+        $rules['new_password'] = [
+            'nullable',
+            'confirmed', // harus ada field new_password_confirmation
+            'min:8',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]+$/'
+        ];
 
         return $rules;
     }

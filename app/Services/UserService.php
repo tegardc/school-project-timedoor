@@ -110,6 +110,12 @@ class UserService extends BaseService
         'nisn'        => $data['nisn'] ?? $user->nisn,
         'dateOfBirth' => $data['dateOfBirth'] ?? $user->dateOfBirth,
     ]);
+      if (!empty($data['password'])) {
+        $user->update([
+            'password' => Hash::make($data['password']),
+        ]);
+    }
+
 
     // kalau role parent & ada child data
     if ($user->hasRole('parent') && isset($data['child'])) {

@@ -113,6 +113,13 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $data = $request->all();
+            if ($request->filled('new_password')) {
+                if (!Hash::check($request->current_password, $user->password)) {
+                    return ResponseHelper::error('Current password is incorrect', 422);
+                }
+
+                $data['password'] = Hash::make($request->new_password);
+            }
 
             $updatedUser = $profileService->updateProfile($user, $data);
             return ResponseHelper::success(new UserResource($updatedUser), 'Update Success');
