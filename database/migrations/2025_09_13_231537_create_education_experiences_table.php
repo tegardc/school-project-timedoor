@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('education_experiences', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('userId');
-            $table->unsignedBigInteger('educationLevelId');
+            $table->unsignedBigInteger('educationLevelId')->nullable();
             $table->unsignedBigInteger('schoolDetailId');
-            $table->unsignedBigInteger('educationProgramId');
-            $table->string('degree');
-            $table->enum('relation', ['siswa', 'alumni'])->nullable();
-            $table->date('startDate');
-            $table->date('endDate');
+            $table->unsignedBigInteger('educationProgramId')->nullable();
+            $table->string('degree')->nullable();
+            $table->enum('status', ['aktif', 'alumni'])->nullable();
+            $table->string('schoolValidation')->nullable();
+            $table->date('startDate')->nullable();
+            $table->date('endDate')->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
 

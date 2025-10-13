@@ -93,21 +93,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    // public function update(UserRequest $request, UserService $service)
-    // {
-    //     try {
-    //         $user = $request->user();
-    //         // $this->authorize('update', $user);
-    //         $validated = $request->validated();
-    //         $user = $service->updateUser($user, $validated);
-    //         return ResponseHelper::success(
-    //             new UserResource($user),
-    //             'Update Success'
-    //         );
-    //     } catch (\Exception $e) {
-    //         return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
-    //     }
-    // }
+
     public function update(UpdateProfileRequest $request, UserService $profileService)
     {
         try {

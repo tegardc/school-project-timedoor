@@ -17,9 +17,10 @@ class EducationExperience extends Model
     public $dates = ['deletedAt'];
     protected $fillable = [
         'userId',
-        'relation',
+        'status',
         'educationLevelId',
         'schoolDetailId',
+        'schoolValidation',
         'educationProgramId',
         'degree',
         'startDate',
@@ -29,6 +30,11 @@ class EducationExperience extends Model
     {
         return $this->belongsTo(User::class, 'userId');
     }
+  public function child()
+    {
+        return $this->belongsTo(Child::class,'userId');
+    }
+
 
     public function educationLevel()
     {

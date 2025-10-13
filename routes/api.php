@@ -50,7 +50,7 @@ use App\Models\SubDistrict;
         Route::delete('/user', [UserController::class, 'destroy']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/experiences-user', [EducationExperienceController::class, 'getExperienceByUser']);
-         Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
+        Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {

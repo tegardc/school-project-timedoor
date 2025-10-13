@@ -21,6 +21,7 @@ class Child extends Model
         'phoneNo',
         'schoolDetailId',
         'schoolValidation',
+        'status'
     ];
     public $timestamps = true;
 
@@ -32,4 +33,8 @@ class Child extends Model
     {
         return $this->belongsTo(SchoolDetail::class, 'schoolDetailId');
     }
+     public function educationExperiences()
+{
+    return $this->hasMany(EducationExperience::class,'userId','userId');
+}
 }

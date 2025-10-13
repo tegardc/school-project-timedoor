@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\EducationExperience;
@@ -11,30 +12,34 @@ class EducationExperienceService extends BaseService
         $this->modelClass = EducationExperience::class;
     }
 
-   public function index()
+    public function index()
     {
         return EducationExperience::with([
-            'educationLevel', 'schoolDetail', 'educationProgram'
+            'educationLevel',
+            'schoolDetail',
+            'educationProgram'
         ])
-        ->where('userId', Auth::id())
-        ->get();
+            ->where('userId', Auth::id())
+            ->get();
     }
 
     public function store(array $data): EducationExperience
     {
-    $user = Auth::user();
-    $data['userId'] = $user->id;
+        $user = Auth::user();
+        $data['userId'] = $user->id;
 
-    return EducationExperience::create($data);
+        return EducationExperience::create($data);
     }
 
     public function show(int $id): EducationExperience
     {
         return EducationExperience::with([
-            'educationLevel', 'schoolDetail', 'educationProgram'
+            'educationLevel',
+            'schoolDetail',
+            'educationProgram'
         ])
-        ->where('userId', Auth::id())
-        ->findOrFail($id);
+            ->where('userId', Auth::id())
+            ->findOrFail($id);
     }
 
     public function update(int $id, array $data): EducationExperience
@@ -49,9 +54,13 @@ class EducationExperienceService extends BaseService
         $experience = EducationExperience::where('userId', Auth::id())->findOrFail($id);
         return $experience->delete();
     }
-    public function getEducationExperienceByUser(){
+    public function getEducationExperienceByUser()
+    {
         $user = Auth::user();
         return EducationExperience::with([
-            'educationLevel', 'schoolDetail', 'educationProgram'])->where('userId', $user->id)->get();
+            'educationLevel',
+            'schoolDetail',
+            'educationProgram'
+        ])->where('userId', $user->id)->get();
     }
 }

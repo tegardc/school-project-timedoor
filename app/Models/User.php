@@ -36,6 +36,7 @@ class User extends Authenticatable
         'password',
         'nisn',
         // 'schoolDetailId',
+        'status',
         'image',
         'schoolValidation',
         'address',

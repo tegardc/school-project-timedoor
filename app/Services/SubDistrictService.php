@@ -37,34 +37,5 @@ class SubDistrictService extends BaseService
         })->get();
 
     }
-//     public function softDelete(int $id): ?SubDistrict
-//     {
-//         return DB::transaction(function () use ($id) {
-//             $subDistrict = SubDistrict::find($id);
-//             if (!$subDistrict) {
-//                 return null;
-//             }
-//             $subDistrict->delete();
-//             return $subDistrict;
-//         });
-//     }
-//    public function trash()
-// {
-//     return SubDistrict::onlyTrashed()
-//         ->orderByDesc('deletedAt')
-//         ->get();
-// }
-
-//     public function restore(int $id): ?SubDistrict
-//     {
-//         return DB::transaction(function () use ($id) {
-//             $subDistrict = SubDistrict::withTrashed()->find($id);
-//             if (!$subDistrict) {
-//                 return null;
-//             }
-//             $subDistrict->restore();
-//             return $subDistrict;
-//         });
-//     }
 
 }

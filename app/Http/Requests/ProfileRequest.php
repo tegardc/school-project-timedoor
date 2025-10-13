@@ -19,6 +19,7 @@ class ProfileRequest extends FormRequest
             'nisn'       => ['required', 'string'],
             'schoolDetailId' => ['required', 'exists:school_details,id'],
             'schoolValidation' => ['required', 'string'],
+            'status'     => ['nullable', 'in:aktif,alumni'],
         ];
 
 
