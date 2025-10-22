@@ -24,40 +24,48 @@ class SchoolDetailController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request, SchoolDetailService $service)
-{
-    try {
-        $filters = $request->only([
-            'provinceName', 'districtName', 'subDistrictName',
-            'educationLevelName', 'statusName', 'accreditationCode', 'search', 'sortBy', 'sortDirection'
-        ]);
-        $perPage = $request->query('perPage',12);
+    {
+        try {
+            $filters = $request->only([
+                'provinceName',
+                'districtName',
+                'subDistrictName',
+                'educationLevelName',
+                'statusName',
+                'accreditationCode',
+                'search',
+                'sortBy',
+                'sortDirection'
+            ]);
+            $perPage = $request->query('perPage', 12);
 
-        // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
+            // $cacheKey = 'school_details_' . md5(json_encode($filters) . "_$perPage");
 
-        // $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
-        //     return $service->filter($filters, $perPage);
-        // });
-        $schools = $service->filter($filters, $perPage);
-        if($schools->isEmpty()){
-            return ResponseHelper::success([], 'Data Not Found');
+            // $schools = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($service, $filters, $perPage) {
+            //     return $service->filter($filters, $perPage);
+            // });
+            $schools = $service->filter($filters, $perPage);
+            if ($schools->isEmpty()) {
+                return ResponseHelper::success([], 'Data Not Found');
+            }
+
+            $schoolDetailsTransform = SchoolDetailResource::collection($schools);
+            return ResponseHelper::success(
+                [
+                    'datas' => $schoolDetailsTransform,
+                    'meta' => [
+                        'current_page' => $schoolDetailsTransform->currentPage(),
+                        'last_page' => $schoolDetailsTransform->lastPage(),
+                        'limit' => $schoolDetailsTransform->perPage(),
+                        'total' => $schoolDetailsTransform->total(),
+                    ]
+                ],
+                'Display Data Success'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
         }
-
-        $schoolDetailsTransform = SchoolDetailResource::collection($schools);
-        return ResponseHelper::success(
-                [ 'datas' => $schoolDetailsTransform,
-                'meta' => [
-                    'current_page' => $schoolDetailsTransform->currentPage(),
-                    'last_page' => $schoolDetailsTransform->lastPage(),
-                    'limit' => $schoolDetailsTransform->perPage(),
-                    'total' => $schoolDetailsTransform->total(),
-                ]
-            ], 'Display Data Success');
-    } catch (\Exception $e) {
-        return ResponseHelper::serverError("Oops displayed school details list is failed", $e, "[SCHOOL DETAIL INDEX]: ");
     }
-
-
-}
 
 
 
@@ -69,7 +77,7 @@ class SchoolDetailController extends Controller
         try {
             $validated = $request->validated();
             $schoolDetail = $service->store($validated);
-            return ResponseHelper::created(new SchoolDetailResource($schoolDetail), 'Created Success');
+            return ResponseHelper::created(null, 'Created Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops created school detail is failed", $e, "[SCHOOL DETAIL STORE]: ");
         }
@@ -80,7 +88,7 @@ class SchoolDetailController extends Controller
     public function show($id)
     {
         try {
-            $schools = SchoolDetail::with(['schools', 'status', 'educationLevel', 'accreditation', 'schoolGallery', 'reviews','facilities','contacts'])->find($id);
+            $schools = SchoolDetail::with(['schools', 'status', 'educationLevel', 'accreditation', 'schoolGallery', 'reviews', 'facilities', 'contacts'])->find($id);
             if (!$schools) {
                 return ResponseHelper::notFound('Data Not Found');
             }
@@ -104,13 +112,19 @@ class SchoolDetailController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             return ResponseHelper::success(
-                new SchoolDetailResource($school),
+                null,
                 'Update Data Success'
             );
+            // return ResponseHelper::success(
+            //     new SchoolDetailResource($school),
+            //     'Update Data Success'
+            // );
         } catch (\Exception $e) {
-             return ResponseHelper::serverError("Oops update school detail is failed", $e, "[SCHOOL DETAIL UPDATE]: ");
+            return ResponseHelper::serverError("Oops update school detail is failed", $e, "[SCHOOL DETAIL UPDATE]: ");
         }
     }
+
+
 
     public function destroy(SchoolDetailService $service, $id)
     {
@@ -120,16 +134,17 @@ class SchoolDetailController extends Controller
                 return ResponseHelper::notFound('Data Not Found');
             }
             $service->softDelete($id);
-            return ResponseHelper::success(null,'School Detail moved to trash successfully');
+            return ResponseHelper::success(null, 'School Detail moved to trash successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted school detail is failed ", $e, "[SCHOOL DETAIL DESTROY]: ");
         }
     }
 
-    public function trash(SchoolDetailService $service) {
+    public function trash(SchoolDetailService $service)
+    {
         try {
             $schools = $service->trash();
-            if($schools->isEmpty()) {
+            if ($schools->isEmpty()) {
                 return ResponseHelper::notFound('Schools not found');
             }
             return ResponseHelper::success(SchoolDetailResource::collection($schools), 'School detail trashed items retrieved successfully');
@@ -138,7 +153,8 @@ class SchoolDetailController extends Controller
         }
     }
 
-    public function restore(SchoolDetailService $service, $id) {
+    public function restore(SchoolDetailService $service, $id)
+    {
         try {
             $schools = $service->restore($id);
             if (!$schools) {
@@ -151,32 +167,32 @@ class SchoolDetailController extends Controller
     }
 
     //Ranking School with filter
-     public function ranking(Request $request, SchoolDetailService $service)
-{
-    try {
-        $filters = $request->only([
-            'provinceName',
-            'districtName',
-            'subDistrictName',
-            'educationLevelName',
-            'statusName',
-            'accreditationCode'
-        ]);
+    public function ranking(Request $request, SchoolDetailService $service)
+    {
+        try {
+            $filters = $request->only([
+                'provinceName',
+                'districtName',
+                'subDistrictName',
+                'educationLevelName',
+                'statusName',
+                'accreditationCode'
+            ]);
 
-        $schools = $service->ranking($filters);
-        if ($schools->isEmpty()) {
-            return ResponseHelper::notFound('No ranking data found.');
+            $schools = $service->ranking($filters);
+            if ($schools->isEmpty()) {
+                return ResponseHelper::notFound('No ranking data found.');
+            }
+            return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display ranking school detail failed", $e, "[SCHOOL DETAIL RANKING]: ");
         }
-        return ResponseHelper::success(SchoolDetailResource::collection($schools), 'Ranking By Rating & Reviewers');
-    } catch (\Exception $e) {
-        return ResponseHelper::serverError("Oops display ranking school detail failed", $e, "[SCHOOL DETAIL RANKING]: ");
     }
-}
     public function getSchoolDetailBySchoolId(SchoolDetailService $service, $schoolId)
     {
         try {
             $schools = $service->getSchoolDetailBySchoolId($schoolId);
-            if($schools->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
+            if ($schools->isEmpty()) return ResponseHelper::notFound('School Detail Not Found');
             return ResponseHelper::success(SchoolDetailResource::collection($schools)->values(), 'School details by school retrieved');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display school detail by school is failed", $e, "[SCHOOL DETAIL GETBYSCHOOL]: ");
@@ -208,76 +224,82 @@ class SchoolDetailController extends Controller
         );
     }
     public function updateFeatured(Request $request, SchoolDetailService $service)
-{
-    $validated = $request->validate([
-        'featured_ids' => 'required|array|max:4',
-        'featured_ids.*' => 'integer|exists:school_details,id',
-    ]);
-
-    try {
-        $result = $service->setFeaturedSchools($validated['featured_ids']);
-        return ResponseHelper::success($result, 'Featured schools updated successfully');
-    } catch (\Exception $e) {
-        return ResponseHelper::serverError("Oops update featured school detail is failed", $e, "[SCHOOL DETAIL FEATURED]: ");
-    }
-}
-public function featured(SchoolDetailService $service)
-{
-    $data = $service->getFeaturedSchools();
-
-    if ($data->isEmpty()) {
-        return ResponseHelper::error('Data Not Found');
-    }
-    return ResponseHelper::success(
-        SchoolDetailResource::collection($data),
-        'Featured schools retrieved successfully'
-    );
-}
-
-public function saveSchool(SaveSchoolRequest $request)
-{
-    try {
-        $validated = $request->validated();
-        $user = $request->user();
-        $schoolDetailId = $validated['schoolDetailId'];
-
-        $saveSchool = SaveSchool::where([
-            'userId' => $user->id,
-            'schoolDetailId' => $schoolDetailId
-        ])->first();
-        if($saveSchool) {
-            $saveSchool->delete();
-            return ResponseHelper::success('Unsaved School detail successfully');
-        }
-        SaveSchool::create([
-            'userId' => $user->id,
-            'schoolDetailId' => $schoolDetailId
+    {
+        $validated = $request->validate([
+            'featured_ids' => 'required|array|max:4',
+            'featured_ids.*' => 'integer|exists:school_details,id',
         ]);
-        $schoolDetail = SchoolDetail::find($schoolDetailId);
-            return ResponseHelper::success(new SchoolDetailResource($schoolDetail), "School detail saved successfully");
 
-    } catch (\Exception $e) {
-        return ResponseHelper::serverError("Oops save school detail is failed ", $e, "[SCHOOL DETAIL SAVE]: ");
-    }
-}
-public function showSaved(Request $request)
-{
-    try {
-        $user = $request->user();
-        if(!$user) {
-            return ResponseHelper::error('Unauthorized', 401);
+        try {
+            $result = $service->setFeaturedSchools($validated['featured_ids']);
+            return ResponseHelper::success($result, 'Featured schools updated successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops update featured school detail is failed", $e, "[SCHOOL DETAIL FEATURED]: ");
         }
-        $savedSchools = SaveSchool::with('schoolDetail')->where('userId', $user->id)->get()->map(function ($save) {
-            return $save->schoolDetail;
-
-        });
-        return ResponseHelper::success(SchoolDetailResource::collection($savedSchools), 'Saved schools retrieved successfully');
-    } catch (\Exception $e) {
-        return ResponseHelper::serverError("Oops display saved school detail is failed ", $e, "[SCHOOL DETAIL SAVED]: ");
-        //throw $th;
     }
+    public function featured(SchoolDetailService $service)
+    {
+        $data = $service->getFeaturedSchools();
+
+        if ($data->isEmpty()) {
+            return ResponseHelper::error('Data Not Found');
+        }
+        return ResponseHelper::success(
+            SchoolDetailResource::collection($data),
+            'Featured schools retrieved successfully'
+        );
+    }
+
+    public function saveSchool(SaveSchoolRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $user = $request->user();
+            $schoolDetailId = $validated['schoolDetailId'];
+
+            $saveSchool = SaveSchool::where([
+                'userId' => $user->id,
+                'schoolDetailId' => $schoolDetailId
+            ])->first();
+            if ($saveSchool) {
+                $saveSchool->delete();
+                return ResponseHelper::success('Unsaved School detail successfully');
+            }
+            SaveSchool::create([
+                'userId' => $user->id,
+                'schoolDetailId' => $schoolDetailId
+            ]);
+            $schoolDetail = SchoolDetail::find($schoolDetailId);
+            return ResponseHelper::success(new SchoolDetailResource($schoolDetail), "School detail saved successfully");
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops save school detail is failed ", $e, "[SCHOOL DETAIL SAVE]: ");
+        }
+    }
+    public function showSaved(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if (!$user) {
+                return ResponseHelper::error('Unauthorized', 401);
+            }
+            $savedSchools = SaveSchool::with('schoolDetail')->where('userId', $user->id)->get()->map(function ($save) {
+                return $save->schoolDetail;
+            });
+            return ResponseHelper::success(SchoolDetailResource::collection($savedSchools), 'Saved schools retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops display saved school detail is failed ", $e, "[SCHOOL DETAIL SAVED]: ");
+            //throw $th;
+        }
+    }
+    public function topSchools(SchoolDetailService $service)
+    {
+        $schools = $service->getTopSchools(5);
+        return SchoolDetailResource::collection($schools);
+    }
+    public function recommendedSchools(Request $request, SchoolDetailService $service)
+{
+    $criteria = $request->only(['provinceId', 'districtId', 'educationLevelId']);
+    $schools = $service->getRecommendedSchools($criteria, 5);
+    return SchoolDetailResource::collection($schools);
 }
-
 }
-
-

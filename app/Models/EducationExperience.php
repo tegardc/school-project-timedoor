@@ -32,7 +32,7 @@ class EducationExperience extends Model
     }
   public function child()
     {
-        return $this->belongsTo(Child::class,'userId');
+        return $this->belongsTo(Child::class,'childId');
     }
 
 

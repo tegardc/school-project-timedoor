@@ -158,6 +158,8 @@ use App\Models\SubDistrict;
     Route::get('/school-detail/featured', [SchoolDetailController::class, 'featured']);
     Route::get('/school-detail/highlighted', [SchoolDetailController::class, 'highlight']);
     Route::get('/all-reviews', [ReviewController::class, 'getAllReview']);
+    Route::get('/schools/top', [SchoolDetailController::class, 'topSchools']);
+    Route::get('/schools/recommendations', [SchoolDetailController::class, 'recommendedSchools']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);

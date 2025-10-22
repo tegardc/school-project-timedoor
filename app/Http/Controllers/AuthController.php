@@ -35,7 +35,7 @@ class AuthController extends Controller
     {
         try {
             $this->authService->register($request->validated());
-            return ResponseHelper::success([], 'User registered success');
+            return ResponseHelper::success(null, 'User registered success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to register user', $e, '[REGISTER]');
         }
@@ -59,7 +59,7 @@ class AuthController extends Controller
     {
         try {
             $service->logout($request);
-            return ResponseHelper::success([],'Logged out successfully.');
+            return ResponseHelper::success(null,'Logged out successfully.');
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to logout user', $e, '[LOGOUT]');
         }

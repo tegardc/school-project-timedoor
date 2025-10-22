@@ -53,6 +53,20 @@ class SchoolDetailResource extends JsonResource
             'galleryImages' => $this->schoolGallery->pluck('imageUrl') ?? [],
             // 'facilities' => FacilityResource::collection($this->whenLoaded('facilities')),
             'facilities' => $this->facilities->pluck('name') ?? [],
+             'relatedSchools' => $this->schools && $this->schools->schoolDetails
+            ? $this->schools->schoolDetails
+                ->where('id', '<>', $this->id)
+                ->map(fn($detail) => [
+                    'id' => $detail->id,
+                    'name' => $detail->name,
+                    'institutionCode' => $detail->institutionCode,
+                    'educationLevelName' => $detail->educationLevel->name ?? null,
+                    'statusName' => $detail->status->name ?? null,
+                    'principal' => $detail->principal,
+                    'numStudent' => $detail->numStudent,
+                    'coverImage' => $detail->coverImage?->imageUrl,
+                ])->values()
+            : [],
             // 'createdAt' => $this->createdAt,
             // 'updatedAt' => $this->updatedAt,
 

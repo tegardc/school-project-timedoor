@@ -23,7 +23,7 @@ class School extends Model
 
     ];
 
-    public function schoolDetais()
+    public function schoolDetails()
     {
         return $this->hasMany(SchoolDetail::class,'schoolId');
     }
