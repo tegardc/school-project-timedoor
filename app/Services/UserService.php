@@ -21,12 +21,10 @@ class UserService extends BaseService
     {
         $query = User::select([
             'id',
-            'firstName',
-            'lastName',
-            'username',
+            'fullname',
             'email',
             'phoneNo',
-            'nis',
+            'nisn',
             'gender',
             'image'
         ]);
