@@ -63,8 +63,6 @@ use App\Models\SubDistrict;
             Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
             Route::put('/profile/complete', [UserController::class, 'profileStore']);
 
-                        Route::post('/restore/users/{id}', [UserController::class, 'restore']);
-                                    Route::get('/trash/users', [UserController::class, 'trash']);
         });
 
         //ROUTE FOR ADMIN ROLE//
@@ -100,7 +98,7 @@ use App\Models\SubDistrict;
 
             //Trash and Restore Route
             Route::prefix('trash')->group(function () {
-
+            Route::get('/users', [UserController::class, 'trash']);
             Route::get('/schools', [SchoolController::class, 'trash']);
             Route::get('/school-details', [SchoolDetailController::class, 'trash']);
             Route::get('/districts', [DistrictController::class, 'trash']);
@@ -114,7 +112,7 @@ use App\Models\SubDistrict;
         });
 
         Route::prefix('restore')->group(function () {
-
+            Route::post('/users/{id}', [UserController::class, 'restore']);
             Route::post('/schools/{id}', [SchoolController::class, 'restore']);
             Route::post('/school-details/{id}', [SchoolDetailController::class, 'restore']);
             Route::post('/districts/{id}', [DistrictController::class, 'restore']);
