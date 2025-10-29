@@ -63,8 +63,8 @@ use App\Models\SubDistrict;
             Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
             Route::put('/profile/complete', [UserController::class, 'profileStore']);
 
-                        Route::post('/users/{id}', [UserController::class, 'restore']);
-                                    Route::get('/users', [UserController::class, 'trash']);
+                        Route::post('/restore/users/{id}', [UserController::class, 'restore']);
+                                    Route::get('/trash/users', [UserController::class, 'trash']);
         });
 
         //ROUTE FOR ADMIN ROLE//
