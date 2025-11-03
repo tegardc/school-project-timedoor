@@ -29,18 +29,21 @@ class UserController extends Controller
     {
         try {
             $perPage = $request->query('perPage', 10);
-            $user = $service->getAll($perPage);
+            $keyword = $request->query('search');
+            $user = $service->getAll($perPage, $keyword);
             $userTransform = UserResource::collection($user);
             return ResponseHelper::success([
-                'datas' => $userTransform,
-                'meta' => [
-                    'current_page' => $userTransform->currentPage(),
-                    'last_page' => $userTransform->lastPage(),
-                    'limit' => $userTransform->perPage(),
-                    'total' => $userTransform->total(),
-                ],
-                'Display User Success'
-            ]);
+            'datas' => $userTransform,
+            'meta' => [
+                'current_page' => $userTransform->currentPage(),
+                'last_page' => $userTransform->lastPage(),
+                'limit' => $userTransform->perPage(),
+                'total' => $userTransform->total(),
+            ],
+        ], $keyword
+            ? "Display search results for '{$keyword}' successfully"
+            : "Display user success"
+        );
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
         }
@@ -79,6 +82,16 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
         }
     }
+    public function search(Request $request, UserService $userService)
+{
+    $keyword = $request->query('search');
+    $perPage = $request->query('perPage', 10);
+
+    $users = $userService->searchUsers($keyword, $perPage);
+
+    return ResponseHelper::success($users, 'Search Success');
+}
+
     //
 
 
@@ -125,6 +138,7 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops deleted user is failed ", $e, "[USER DELETED]: ");
         }
     }
+
 
     //Admin Delete Akun User
     public function deleteUser(UserService $service, $id)

@@ -44,21 +44,21 @@ class User extends Authenticatable
         'updatedAt'
     ];
 
-public function childs()
-{
-    return $this->belongsToMany(Child::class, 'user_child_school', 'userId', 'childId')
-                ->withPivot('schoolDetailId')
-                ->withTimestamps();
-}
-public function child()
-{
-    return $this->hasOne(Child::class, 'userId'); // satu user (parent) punya 1 child
-}
+    public function childs()
+    {
+        return $this->belongsToMany(Child::class, 'user_child_school', 'userId', 'childId')
+            ->withPivot('schoolDetailId')
+            ->withTimestamps();
+    }
+    public function child()
+    {
+        return $this->hasOne(Child::class, 'userId'); // satu user (parent) punya 1 child
+    }
 
-public function children()
-{
-    return $this->hasMany(Child::class, 'userId'); // kalau nanti butuh banyak anak
-}
+    public function children()
+    {
+        return $this->hasMany(Child::class, 'userId'); // kalau nanti butuh banyak anak
+    }
 
     public function review()
     {
@@ -70,9 +70,13 @@ public function children()
             ->withPivot('childId')->withTimestamps('createdAt', 'updatedAt');;
     }
     public function educationExperiences()
-{
-    return $this->hasMany(EducationExperience::class, 'userId');
-}
+    {
+        return $this->hasMany(EducationExperience::class, 'userId');
+    }
+    public function schoolValidations()
+    {
+        return $this->hasMany(SchoolValidation::class, 'userId');
+    }
 
 
     /**

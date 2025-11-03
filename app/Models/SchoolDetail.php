@@ -96,4 +96,8 @@ class SchoolDetail extends Model
         return $this->hasMany(SchoolDetail::class, 'schoolId', 'schoolId')
             ->where('id', '<>', $this->id); // biar gak masuk dirinya sendiri
     }
+    public function schoolValidations()
+    {
+        return $this->hasMany(SchoolValidation::class, 'schoolDetailId');
+    }
 }

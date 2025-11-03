@@ -17,7 +17,7 @@ class UserService extends BaseService
     {
         $this->modelClass = User::class;
     }
-    public function getAll($perPage = null)
+    public function getAll($perPage = null,?string $keyword = null)
     {
         $query = User::select([
             'id',
@@ -28,6 +28,14 @@ class UserService extends BaseService
             'gender',
             'image'
         ]);
+        if ($keyword) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('fullname', 'like', "%{$keyword}%")
+                ->orWhere('email', 'like', "%{$keyword}%")
+                ->orWhere('phoneNo', 'like', "%{$keyword}%")
+                ->orWhere('nisn', 'like', "%{$keyword}%");
+        });
+    }
         return $query->paginate($perPage ?? 10);
     }
 
@@ -170,4 +178,28 @@ class UserService extends BaseService
             'roles',
         ]);
     }
+    public function searchUsers(?string $keyword = null, $perPage = null)
+{
+    $query = User::select([
+        'id',
+        'fullname',
+        'email',
+        'phoneNo',
+        'nisn',
+        'gender',
+        'image',
+    ]);
+
+    if ($keyword) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('fullname', 'like', "%{$keyword}%")
+                ->orWhere('email', 'like', "%{$keyword}%")
+                ->orWhere('phoneNo', 'like', "%{$keyword}%")
+                ->orWhere('nisn', 'like', "%{$keyword}%");
+        });
+    }
+
+    return $query->paginate($perPage ?? 10);
+}
+
 }

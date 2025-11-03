@@ -51,6 +51,7 @@ use App\Models\SubDistrict;
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/experiences-user', [EducationExperienceController::class, 'getExperienceByUser']);
         Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
+        Route::post('/review/submit', [ReviewController::class, 'submitReview']);
 
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
