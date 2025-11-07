@@ -32,18 +32,20 @@ class UserController extends Controller
             $keyword = $request->query('search');
             $user = $service->getAll($perPage, $keyword);
             $userTransform = UserResource::collection($user);
-            return ResponseHelper::success([
-            'datas' => $userTransform,
-            'meta' => [
-                'current_page' => $userTransform->currentPage(),
-                'last_page' => $userTransform->lastPage(),
-                'limit' => $userTransform->perPage(),
-                'total' => $userTransform->total(),
-            ],
-        ], $keyword
-            ? "Display search results for '{$keyword}' successfully"
-            : "Display user success"
-        );
+            return ResponseHelper::success(
+                [
+                    'datas' => $userTransform,
+                    'meta' => [
+                        'current_page' => $userTransform->currentPage(),
+                        'last_page' => $userTransform->lastPage(),
+                        'limit' => $userTransform->perPage(),
+                        'total' => $userTransform->total(),
+                    ],
+                ],
+                $keyword
+                    ? "Display search results for '{$keyword}' successfully"
+                    : "Display user success"
+            );
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all user is failed ", $e, "[USER INDEX]: ");
         }
@@ -83,14 +85,14 @@ class UserController extends Controller
         }
     }
     public function search(Request $request, UserService $userService)
-{
-    $keyword = $request->query('search');
-    $perPage = $request->query('perPage', 10);
+    {
+        $keyword = $request->query('search');
+        $perPage = $request->query('perPage', 10);
 
-    $users = $userService->searchUsers($keyword, $perPage);
+        $users = $userService->searchUsers($keyword, $perPage);
 
-    return ResponseHelper::success($users, 'Search Success');
-}
+        return ResponseHelper::success($users, 'Search Success');
+    }
 
     //
 
@@ -111,21 +113,25 @@ class UserController extends Controller
     {
         try {
             $user = Auth::user();
-            $data = $request->all();
+            $data = $request->validated();
+
+            // handle password update
             if ($request->filled('new_password')) {
                 if (!Hash::check($request->current_password, $user->password)) {
-                    return ResponseHelper::error('Current password is incorrect', 422);
+                    return ResponseHelper::error('Password saat ini salah', 422);
                 }
 
                 $data['password'] = Hash::make($request->new_password);
             }
 
             $updatedUser = $profileService->updateProfile($user, $data);
-            return ResponseHelper::success(new UserResource($updatedUser), 'Update Success');
+
+            return ResponseHelper::success(new UserResource($updatedUser), 'Profil berhasil diperbarui');
         } catch (\Exception $e) {
-            return ResponseHelper::serverError("Oops update user is failed ", $e, "[USER UPDATE]: ");
+            return ResponseHelper::serverError("Oops update profile failed", $e, "[PROFILE UPDATE]: ");
         }
     }
+
 
     //User Delete Akun Sendiri
     public function destroy(UserService $service, Request $request)
@@ -174,24 +180,44 @@ class UserController extends Controller
             return ResponseHelper::serverError("Oops restore user is failed ", $e, "[USER RESTORE]: ");
         }
     }
+    // public function profileStore(ProfileRequest $request, UserService $service)
+    // {
+    //     try {
+    //         $user = Auth::user();
+
+    //         if ($user->hasRole('student')) {
+    //             $profile = $service->updateStudent($request->validated(), $user->id);
+    //         } elseif ($user->hasRole('parent')) {
+    //             $profile = $service->updateParent($request->validated(), $user->id);
+    //         } else {
+    //             return ResponseHelper::error("Role tidak valid untuk melengkapi data diri.");
+    //         }
+
+    //         return ResponseHelper::success($profile, 'Data diri berhasil disimpan');
+    //     } catch (\Exception $th) {
+    //         return ResponseHelper::serverError("Oops store profile is failed ", $th, "[PROFILE STORE]: ");
+    //     }
+    // }
     public function profileStore(ProfileRequest $request, UserService $service)
     {
         try {
             $user = Auth::user();
+            $data = $request->validated();
 
             if ($user->hasRole('student')) {
-                $profile = $service->updateStudent($request->validated(), $user->id);
+                $profile = $service->completeStudentProfile($data, $user->id);
             } elseif ($user->hasRole('parent')) {
-                $profile = $service->updateParent($request->validated(), $user->id);
+                $profile = $service->completeParentProfile($data, $user->id);
             } else {
-                return ResponseHelper::error("Role tidak valid untuk melengkapi data diri.");
+                return ResponseHelper::error('Role tidak valid.');
             }
 
-            return ResponseHelper::success($profile, 'Data diri berhasil disimpan');
-        } catch (\Exception $th) {
-            return ResponseHelper::serverError("Oops store profile is failed ", $th, "[PROFILE STORE]: ");
+            return ResponseHelper::success($profile, 'Profil berhasil disimpan.');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError('Gagal menyimpan profil.', $e, '[PROFILE STORE]');
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

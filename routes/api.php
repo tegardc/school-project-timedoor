@@ -1,28 +1,28 @@
     <?php
 
-use App\Helpers\ResponseHelper;
-use App\Http\Controllers\AccreditationController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CSVImportController;
-use App\Http\Controllers\DistrictController;
-use App\Http\Controllers\EducationExperienceController;
-use App\Http\Controllers\EducationLevelController;
-use App\Http\Controllers\EducationProgramController;
-use App\Http\Controllers\FacilityController;
-use App\Http\Controllers\ProvinceController;
-use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\ReviewController;
+    use App\Helpers\ResponseHelper;
+    use App\Http\Controllers\AccreditationController;
+    use App\Http\Controllers\AuthController;
+    use App\Http\Controllers\CSVImportController;
+    use App\Http\Controllers\DistrictController;
+    use App\Http\Controllers\EducationExperienceController;
+    use App\Http\Controllers\EducationLevelController;
+    use App\Http\Controllers\EducationProgramController;
+    use App\Http\Controllers\FacilityController;
+    use App\Http\Controllers\ProvinceController;
+    use App\Http\Controllers\QuestionController;
+    use App\Http\Controllers\ReviewController;
     use App\Http\Controllers\SchoolController;
     use App\Http\Controllers\SchoolDetailController;
     use App\Http\Controllers\SchoolGalleryController;
     use App\Http\Controllers\SchoolImageController;
-use App\Http\Controllers\SchoolStatusController;
-use App\Http\Controllers\SubdistrictController;
+    use App\Http\Controllers\SchoolStatusController;
+    use App\Http\Controllers\SubdistrictController;
     use App\Http\Controllers\UserController;
     use App\Http\Requests\ReviewRequest;
     use App\Models\Province;
-use App\Models\Review;
-use App\Models\SubDistrict;
+    use App\Models\Review;
+    use App\Models\SubDistrict;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
     use Spatie\Permission\Contracts\Role;
@@ -37,7 +37,8 @@ use App\Models\SubDistrict;
     | be assigned to the "api" middleware group. Make something great!
     |
     */
-    Route::get('/health', function(){
+
+    Route::get('/health', function () {
         return ResponseHelper::success([
             'status' => 'ok'
         ], "PRABOWO SAID: HIDUP JOKOWII!!!");
@@ -64,6 +65,7 @@ use App\Models\SubDistrict;
             Route::get('/school-details/saved', [SchoolDetailController::class, 'showSaved']);
             Route::put('/profile/complete', [UserController::class, 'profileStore']);
 
+            Route::get('/reviews/user', [ReviewController::class, 'getUserReviews']);
         });
 
         //ROUTE FOR ADMIN ROLE//
@@ -72,11 +74,16 @@ use App\Models\SubDistrict;
             Route::get('/users', [UserController::class, 'index']);
             Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
-                // School & Detail
+            // School & Detail
             Route::apiResource('schools', SchoolController::class)->except(['index', 'show']);
             Route::apiResource('school-details', SchoolDetailController::class)->except(['index', 'show']);
             Route::post('/school-details/featured', [SchoolDetailController::class, 'updateFeatured']);
             Route::post('/school-details/highlight', [SchoolDetailController::class, 'updateHighlight']);
+            Route::post('reviews/{id}/toggle-pin', [ReviewController::class, 'togglePin']);
+
+            Route::post('/schools/set-recommendation', [SchoolDetailController::class, 'setRecommendation']);
+            Route::get('/schools/recommendation', [SchoolDetailController::class, 'getRecommendation']);
+
 
 
 
@@ -95,51 +102,49 @@ use App\Models\SubDistrict;
             Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
 
             // Questions
-            Route::apiResource('questions', QuestionController::class)->only(['store', 'update', 'destroy','trash', 'restore']);
+            Route::apiResource('questions', QuestionController::class)->only(['store', 'update', 'destroy', 'trash', 'restore']);
 
             //Trash and Restore Route
             Route::prefix('trash')->group(function () {
-            Route::get('/users', [UserController::class, 'trash']);
-            Route::get('/schools', [SchoolController::class, 'trash']);
-            Route::get('/school-details', [SchoolDetailController::class, 'trash']);
-            Route::get('/districts', [DistrictController::class, 'trash']);
-            Route::get('/sub-districts', [SubdistrictController::class, 'trash']);
-            Route::get('/provinces', [ProvinceController::class, 'trash']);
-            Route::get('/questions', [QuestionController::class, 'trash']);
-            Route::get('/reviews', [ReviewController::class, 'trash']);
-            Route::get('/facilities', [FacilityController::class, 'trash']);
-            Route::get('/education-programs', [EducationProgramController::class, 'trash']);
-            Route::get('/education-experiences', [EducationExperienceController::class, 'trash']);
-        });
+                Route::get('/users', [UserController::class, 'trash']);
+                Route::get('/schools', [SchoolController::class, 'trash']);
+                Route::get('/school-details', [SchoolDetailController::class, 'trash']);
+                Route::get('/districts', [DistrictController::class, 'trash']);
+                Route::get('/sub-districts', [SubdistrictController::class, 'trash']);
+                Route::get('/provinces', [ProvinceController::class, 'trash']);
+                Route::get('/questions', [QuestionController::class, 'trash']);
+                Route::get('/reviews', [ReviewController::class, 'trash']);
+                Route::get('/facilities', [FacilityController::class, 'trash']);
+                Route::get('/education-programs', [EducationProgramController::class, 'trash']);
+                Route::get('/education-experiences', [EducationExperienceController::class, 'trash']);
+            });
 
-        Route::prefix('restore')->group(function () {
-            Route::post('/users/{id}', [UserController::class, 'restore']);
-            Route::post('/schools/{id}', [SchoolController::class, 'restore']);
-            Route::post('/school-details/{id}', [SchoolDetailController::class, 'restore']);
-            Route::post('/districts/{id}', [DistrictController::class, 'restore']);
-            Route::post('/sub-districts/{id}', [SubdistrictController::class, 'restore']);
-            Route::post('/provinces/{id}', [ProvinceController::class, 'restore']);
-            Route::post('/questions/{id}', [QuestionController::class, 'restore']);
-            Route::post('/reviews/{id}', [ReviewController::class, 'restore']);
-            Route::post('/facilities/{id}', [FacilityController::class, 'restore']);
-            Route::post('/education-programs/{id}', [EducationProgramController::class, 'restore']);
-            Route::post('/education-experiences/{id}', [EducationExperienceController::class, 'restore']);
-        });
+            Route::prefix('restore')->group(function () {
+                Route::post('/users/{id}', [UserController::class, 'restore']);
+                Route::post('/schools/{id}', [SchoolController::class, 'restore']);
+                Route::post('/school-details/{id}', [SchoolDetailController::class, 'restore']);
+                Route::post('/districts/{id}', [DistrictController::class, 'restore']);
+                Route::post('/sub-districts/{id}', [SubdistrictController::class, 'restore']);
+                Route::post('/provinces/{id}', [ProvinceController::class, 'restore']);
+                Route::post('/questions/{id}', [QuestionController::class, 'restore']);
+                Route::post('/reviews/{id}', [ReviewController::class, 'restore']);
+                Route::post('/facilities/{id}', [FacilityController::class, 'restore']);
+                Route::post('/education-programs/{id}', [EducationProgramController::class, 'restore']);
+                Route::post('/education-experiences/{id}', [EducationExperienceController::class, 'restore']);
+            });
 
-        // Review Approval
+            // Review Approval
             Route::get('/reviews/pending', [ReviewController::class, 'pendingReviews']);
             Route::get('/reviews/approved', [ReviewController::class, 'approvedReviews']);
             Route::get('/reviews/rejected', [ReviewController::class, 'rejectedReviews']);
             Route::put('/reviews/{id}/approve', [ReviewController::class, 'approve']);
             Route::put('/reviews/{id}/reject', [ReviewController::class, 'reject']);
             Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
-
-
         });
-            });
+    });
 
     //ROUTE FOR EVERYONE//
-   // Auth
+    // Auth
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -161,6 +166,7 @@ use App\Models\SubDistrict;
     Route::get('/all-reviews', [ReviewController::class, 'getAllReview']);
     Route::get('/schools/top', [SchoolDetailController::class, 'topSchools']);
     Route::get('/schools/recommendations', [SchoolDetailController::class, 'recommendedSchools']);
+    Route::get('/search-schools', [SchoolDetailController::class, 'searchByName']);
 
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);
@@ -173,19 +179,19 @@ use App\Models\SubDistrict;
 
 
     Route::prefix('facilities')->group(function () {
-    Route::get('/', [FacilityController::class, 'index']);
-    Route::post('/', [FacilityController::class, 'store']);
-    Route::get('/{id}', [FacilityController::class, 'show']);
-    Route::put('/{id}', [FacilityController::class, 'update']);
-    Route::delete('/{id}', [FacilityController::class, 'destroy']);
-//     Route::get('/trash/all', [FacilityController::class, 'trash']);
-//     Route::patch('/restore/{id}', [FacilityController::class, 'restore']);
-// });
-});
+        Route::get('/', [FacilityController::class, 'index']);
+        Route::post('/', [FacilityController::class, 'store']);
+        Route::get('/{id}', [FacilityController::class, 'show']);
+        Route::put('/{id}', [FacilityController::class, 'update']);
+        Route::delete('/{id}', [FacilityController::class, 'destroy']);
+        //     Route::get('/trash/all', [FacilityController::class, 'trash']);
+        //     Route::patch('/restore/{id}', [FacilityController::class, 'restore']);
+        // });
+    });
 
     //IMPORT CSV
 
-   Route::prefix('csv')->group(function () {
-    Route::post('/preview', [CSVImportController::class, 'previews']);
-    Route::post('/import', [CsvImportController::class, 'imports']);
+    Route::prefix('csv')->group(function () {
+        Route::post('/preview', [CSVImportController::class, 'previews']);
+        Route::post('/import', [CsvImportController::class, 'imports']);
     });

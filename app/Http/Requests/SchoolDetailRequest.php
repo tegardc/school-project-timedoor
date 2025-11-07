@@ -88,6 +88,10 @@ class SchoolDetailRequest extends FormRequest
                 'imageUrl' => ['nullable', 'array'],
                 'movie' => ['nullable', 'string'],
                 'examInfo' => ['nullable', 'string'],
+                'isFeatured'     => 'nullable|boolean',
+                'isHighlighted'  => 'nullable|boolean',
+                'isRecommended'  => 'nullable|boolean',
+
 
                 'address.provinceId' => ['nullable', 'exists:provinces,id'],
                 'address.districtId' => ['nullable', 'exists:districts,id'],

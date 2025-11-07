@@ -28,6 +28,9 @@ class ReviewSubmitRequest extends FormRequest
             'phoneNo' => 'nullable|string|max:20',
             'schoolDetailId' => 'nullable|integer|exists:school_details,id',
             'schoolValidation' => 'nullable|string|max:255',
+            'liked'    => 'nullable|string|max:500',
+            'improved' => 'nullable|string|max:500',
+
 
             'reviewText' => 'nullable|string|max:5000',
             'liked' => 'nullable|string|max:2000',

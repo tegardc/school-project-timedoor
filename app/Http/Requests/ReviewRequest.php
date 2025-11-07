@@ -26,6 +26,8 @@ class ReviewRequest extends FormRequest
     {
         $rules = [
             'reviewText' => ['required', 'string'],
+            'liked' => ['nullable','string','max:2000'],
+            'improved' => ['nullable','string','max:2000'],
             'details' => ['required', 'array', 'min:1'],
             'details.*.questionId' => ['required', 'exists:questions,id'],
             'details.*.score' => ['required', 'integer', 'between:1,5'],

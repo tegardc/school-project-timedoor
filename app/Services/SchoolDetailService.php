@@ -360,6 +360,29 @@ class SchoolDetailService extends BaseService
 
         return SchoolDetail::where('isFeatured', true)->get();
     }
+    public function setRecommendedSchools(array $recommendedIds)
+    {
+        // Batasi maksimal 6 misalnya (bisa kamu ubah sesuai kebutuhan)
+        if (count($recommendedIds) > 6) {
+            throw new \Exception('Maksimal hanya bisa memilih 6 sekolah sebagai rekomendasi.');
+        }
+
+        // Reset semua sekolah jadi false
+        SchoolDetail::query()->update(['isRecommended' => false]);
+
+        // Set yang dipilih jadi true
+        if (!empty($recommendedIds)) {
+            SchoolDetail::whereIn('id', $recommendedIds)->update(['isRecommended' => true]);
+        }
+
+        return SchoolDetail::where('isRecommended', true)->get();
+    }
+
+    public function getRecommendedSchoolsManual()
+    {
+        return SchoolDetail::where('isRecommended', true)->get();
+    }
+
     public function getTopSchools(int $limit = 5)
     {
         return SchoolDetail::with([
@@ -408,5 +431,29 @@ class SchoolDetailService extends BaseService
             ->orderByDesc('reviews_count');
 
         return $query->take($limit)->get();
+    }
+    public function searchSchoolByName(string $keyword, int $limit = 3)
+    {
+        return SchoolDetail::select([
+            'id',
+            'name',
+            'institutionCode',
+            'educationLevelId',
+            'accreditationId',
+            'addressId'
+        ])
+            ->with([
+                'educationLevel:id,name',
+                'accreditation:id,code',
+                'address:id,provinceId,districtId,subDistrictId,village,street',
+                'address.province:id,name',
+                'address.district:id,name',
+                'address.subDistrict:id,name',
+                'schoolGallery:id,schoolDetailId,imageUrl,isCover'
+            ])
+            ->where('name', 'like', '%' . $keyword . '%')
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
     }
 }

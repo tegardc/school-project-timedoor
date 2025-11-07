@@ -43,7 +43,9 @@ class ReviewService extends BaseService
                 'reviewDetails' => function ($q) {
                     $q->with('question:id,question');
                 }
-            ]);
+            ])
+            ->orderByDesc('isPinned') // ✅ pinned review tampil duluan
+            ->orderByDesc('createdAt'); // baru urut waktu
 
         return $review->paginate($perPage ?? 10);
     }
@@ -75,12 +77,14 @@ class ReviewService extends BaseService
         $userId     = Auth::id();
         $details    = $data['details'];
         $reviewText = $data['reviewText'] ?? null;
+        $liked       = $data['liked'] ?? null;
+        $improved    = $data['improved'] ?? null;
 
         // Hitung rating dari details (rata-rata score semua pertanyaan)
         $totalScore = array_sum(array_column($details, 'score'));
         $rating     = round($totalScore / count($details), 2);
 
-        return DB::transaction(function () use ($userId, $schoolDetailId, $reviewText, $details, $rating) {
+        return DB::transaction(function () use ($userId, $schoolDetailId, $reviewText, $liked, $improved, $details, $rating) {
             $review = Review::where('userId', $userId)
                 ->where('schoolDetailId', $schoolDetailId)
                 ->first();
@@ -89,7 +93,9 @@ class ReviewService extends BaseService
                 // Update review yang sudah ada
                 $review->update([
                     'reviewText' => $reviewText,
-                    'rating'     => $rating,  // update rating juga
+                    'rating'     => $rating,
+                    'liked'      => $liked,
+                    'improved'   => $improved,
                     'status'     => Review::STATUS_PENDING
                 ]);
                 $review->reviewDetails()->delete();
@@ -97,6 +103,8 @@ class ReviewService extends BaseService
                 // Buat review baru
                 $review = Review::create([
                     'reviewText'     => $reviewText,
+                    'liked'          => $liked,
+                    'improved'       => $improved,
                     'rating'         => $rating,
                     'userId'         => $userId,
                     'schoolDetailId' => $schoolDetailId,
@@ -258,67 +266,113 @@ class ReviewService extends BaseService
             'finalRating' => round($finalRating, 2)
         ];
     }
-   public function submitFullReview(array $data): Review
-{
-    $user = Auth::user();
-    $userId = $user->id;
+    public function submitFullReview(array $data): Review
+    {
+        $user = Auth::user();
+        $userId = $user->id;
 
-    $details = $data['details'];
-    $totalScore = array_sum(array_column($details, 'score'));
-    $rating = round($totalScore / count($details), 2);
+        $details = $data['details'];
+        $totalScore = array_sum(array_column($details, 'score'));
+        $rating = round($totalScore / count($details), 2);
 
-    return DB::transaction(function () use ($user, $userId, $data, $rating, $details) {
-        // 1️⃣ Update data user
-        $user->update([
-            'fullname' => $data['fullname'],
-            'email'    => $data['email'] ?? $user->email,
-            'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
-        ]);
-
-        // 2️⃣ Buat atau update SchoolValidation
-        $schoolValidation = null;
-        if (!empty($data['schoolValidation'])) {
-            $schoolValidation = \App\Models\SchoolValidation::updateOrCreate(
-                [
-                    'userId'         => $user->id,
-                    'schoolDetailId' => $data['schoolDetailId'],
-                ],
-                [
-                    'fileUrl'        => $data['schoolValidation'],
-                ]
-            );
-        }
-
-        // 3️⃣ Buat review utama
-        $review = Review::create([
-            'userId'          => $user->id,
-            'schoolDetailId'  => $data['schoolDetailId'],
-            'reviewText'      => $data['reviewText'] ?? null,
-            'liked'           => $data['liked'] ?? null,
-            'improved'        => $data['improved'] ?? null,
-            'rating'          => $rating,
-            'status'          => Review::STATUS_PENDING,
-        ]);
-
-        // 4️⃣ Simpan detail pertanyaan
-        foreach ($details as $d) {
-            ReviewDetail::create([
-                'reviewId'   => $review->id,
-                'questionId' => $d['questionId'],
-                'score'      => $d['score'],
+        return DB::transaction(function () use ($user, $userId, $data, $rating, $details) {
+            // 1️⃣ Update data user
+            $user->update([
+                'fullname' => $data['fullname'],
+                'email'    => $data['email'] ?? $user->email,
+                'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
             ]);
+
+            // 2️⃣ Buat atau update SchoolValidation
+            $schoolValidation = null;
+            if (!empty($data['schoolValidation'])) {
+                $schoolValidation = \App\Models\SchoolValidation::updateOrCreate(
+                    [
+                        'userId'         => $user->id,
+                        'schoolDetailId' => $data['schoolDetailId'],
+                    ],
+                    [
+                        'fileUrl'        => $data['schoolValidation'],
+                    ]
+                );
+            }
+
+            // 3️⃣ Buat review utama
+            $review = Review::create([
+                'userId'          => $user->id,
+                'schoolDetailId'  => $data['schoolDetailId'],
+                'reviewText'      => $data['reviewText'] ?? null,
+                'liked'           => $data['liked'] ?? null,
+                'improved'        => $data['improved'] ?? null,
+                'rating'          => $rating,
+                'status'          => Review::STATUS_PENDING,
+            ]);
+
+            // 4️⃣ Simpan detail pertanyaan
+            foreach ($details as $d) {
+                ReviewDetail::create([
+                    'reviewId'   => $review->id,
+                    'questionId' => $d['questionId'],
+                    'score'      => $d['score'],
+                ]);
+            }
+
+            // 5️⃣ Load relasi termasuk file bukti sekolah
+            return $review->load([
+                'reviewDetails.question',
+                'schoolValidation' => function ($q) use ($schoolValidation) {
+                    $q->where('id', $schoolValidation?->id);
+                }
+            ]);
+        });
+    }
+    public function togglePin(int $id): Review
+    {
+        $review = Review::find($id);
+
+        if (!$review) {
+            throw new \Exception('Review tidak ditemukan.');
         }
 
-        // 5️⃣ Load relasi termasuk file bukti sekolah
-        return $review->load([
-            'reviewDetails.question',
-            'schoolValidation' => function ($q) use ($schoolValidation) {
-                $q->where('id', $schoolValidation?->id);
-            }
-        ]);
-    });
-}
+        // Toggle status
+        $newStatus = !$review->isPinned;
 
+        $review->update(['isPinned' => $newStatus]);
 
+        return $review->refresh();
+    }
+    public function getUserReviews(int $userId = null, $perPage = 10)
+    {
+        $userId = $userId ?? Auth::id();
 
+        $query = Review::select([
+            'id',
+            'reviewText',
+            'rating',
+            'schoolDetailId',
+            'createdAt',
+            'status',
+            'isPinned',
+        ])
+            ->where('userId', $userId)
+            ->with([
+                'schoolDetails:id,name',
+                'reviewDetails' => function ($q) {
+                    $q->with('question:id,question');
+                }
+            ])
+            ->orderByDesc('isPinned')
+            ->orderByDesc('createdAt');
+
+        // Hitung total review user
+        $totalReviews = (clone $query)->count();
+
+        // Ambil data paginasi
+        $reviews = $query->paginate($perPage);
+
+        return [
+            'totalReviews' => $totalReviews,
+            'reviews' => $reviews,
+        ];
+    }
 }

@@ -260,4 +260,31 @@ class ReviewController extends Controller
             'Review berhasil dikirim dan menunggu verifikasi admin.'
         );
     }
+    public function togglePin($id, ReviewService $reviewService)
+    {
+        try {
+            $review = $reviewService->togglePin($id);
+
+            $message = $review->isPinned
+                ? 'Review berhasil di-pin.'
+                : 'Review berhasil di-unpin.';
+
+            return ResponseHelper::success($review, $message);
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage(), 404);
+        }
+    }
+    public function getUserReviews(ReviewService $reviewService, Request $request)
+    {
+        $perPage = $request->get('perPage', 10);
+        $userId = $request->get('userId'); // optional, untuk admin melihat user lain
+
+        $result = $reviewService->getUserReviews($userId, $perPage);
+
+        return response()->json([
+            'message' => 'Daftar review pengguna.',
+            'totalReviews' => $result['totalReviews'],
+            'data' => ReviewResource::collection($result['reviews'])
+        ]);
+    }
 }

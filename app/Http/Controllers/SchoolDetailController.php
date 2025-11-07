@@ -8,6 +8,7 @@ use App\Http\Requests\SchoolDetailRequest;
 use App\Http\Resources\SchoolDetailResource;
 use App\Models\Review;
 use App\Models\SaveSchool;
+use App\Models\School;
 use App\Models\SchoolDetail;
 use App\Models\SchoolGallery;
 use App\Services\SchoolDetailService;
@@ -297,9 +298,47 @@ class SchoolDetailController extends Controller
         return SchoolDetailResource::collection($schools);
     }
     public function recommendedSchools(Request $request, SchoolDetailService $service)
-{
-    $criteria = $request->only(['provinceId', 'districtId', 'educationLevelId']);
-    $schools = $service->getRecommendedSchools($criteria, 5);
-    return SchoolDetailResource::collection($schools);
-}
+    {
+        $criteria = $request->only(['provinceId', 'districtId', 'educationLevelId']);
+        $schools = $service->getRecommendedSchools($criteria, 5);
+        return SchoolDetailResource::collection($schools);
+    }
+    public function searchByName(Request $request, SchoolDetailService $schoolDetailService)
+    {
+        $request->validate([
+            'keyword' => 'required|string|min:2'
+        ]);
+
+        $schools = $schoolDetailService->searchSchoolByName($request->keyword, 3);
+
+        return ResponseHelper::success($schools, 'Pencarian sekolah berhasil');
+    }
+    public function setRecommendation(Request $request, SchoolDetailService $schoolService)
+    {
+        $validated = $request->validate([
+            'recommendationIds' => 'required|array',
+            'recommendationIds.*' => 'integer|exists:school_details,id',
+        ]);
+
+        try {
+            $schools = $schoolService->setRecommendedSchools($validated['recommendationIds']);
+            return response()->json([
+                'message' => 'Sekolah rekomendasi berhasil diperbarui.',
+                'data' => $schools
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getRecommendation(SchoolDetailService $schoolService)
+    {
+        $schools = $schoolService->getRecommendedSchools();
+        return response()->json([
+            'message' => 'Daftar sekolah rekomendasi.',
+            'data' => $schools
+        ]);
+    }
 }

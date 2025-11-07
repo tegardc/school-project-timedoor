@@ -36,6 +36,9 @@ class SchoolDetail extends Model
         'numTeacher',
         'movie',
         'examInfo',
+        'isFeatured',
+        'isHighlighted',
+        'isRecommended',
     ];
     public function child()
     {

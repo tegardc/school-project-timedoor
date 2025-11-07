@@ -26,6 +26,7 @@ class Review extends Model
         'improved',
         // 'approved',
         'status',
+        'isPinned',
         'createdAt',
         'updatedAt'
     ];
@@ -41,12 +42,9 @@ class Review extends Model
     {
         return $this->hasMany(ReviewDetail::class, 'reviewId', 'id');
     }
-public function schoolValidation()
-{
-    return $this->hasOne(SchoolValidation::class, 'schoolDetailId', 'schoolDetailId')
-                ->whereColumn('userId', 'userId');
-}
-
-
-
+    public function schoolValidation()
+    {
+        return $this->hasOne(SchoolValidation::class, 'schoolDetailId', 'schoolDetailId')
+            ->whereColumn('userId', 'userId');
+    }
 }
