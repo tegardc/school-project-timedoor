@@ -137,7 +137,7 @@ class ReviewService extends BaseService
         ])
             ->where('status', Review::STATUS_APPROVED)
             ->with([
-                'users:id,username,image',
+                'users:id,fullname,image',
                 'schoolDetails:id,name',
                 'reviewDetails' => function ($q) {
                     $q->with('question:id,question');
@@ -151,7 +151,7 @@ class ReviewService extends BaseService
     public function AllReview(array $filters = [], $perPage = 10)
     {
         $query =  Review::with([
-            'users:id,username,image',
+            'users:id,fullname,image',
             'schoolDetails:id,name',
             'reviewDetails' => function ($q) {
                 $q->with('question:id,question');
@@ -177,23 +177,27 @@ class ReviewService extends BaseService
             });
         }
 
+        // Province
         if (!empty($filters['provinceName'])) {
-            $query->whereHas('schoolDetails.schools.province', function ($q) use ($filters) {
+            $query->whereHas('schoolDetails.address.province', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['provinceName'] . '%');
             });
         }
 
+        // District
         if (!empty($filters['districtName'])) {
-            $query->whereHas('schoolDetails.schools.district', function ($q) use ($filters) {
+            $query->whereHas('schoolDetails.address.district', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['districtName'] . '%');
             });
         }
 
+        // Sub-district
         if (!empty($filters['subDistrictName'])) {
-            $query->whereHas('schoolDetails.schools.subDistrict', function ($q) use ($filters) {
+            $query->whereHas('schoolDetails.address.subdistrict', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['subDistrictName'] . '%');
             });
         }
+
 
         if (!empty($filters['educationLevelName'])) {
             $query->whereHas('schoolDetails.educationLevel', function ($q) use ($filters) {

@@ -9,66 +9,67 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return [
-            'id'          => $this->id,
-            'fullname'    => $this->fullname,
-            'email'       => $this->email,
-            'phoneNo'     => $this->phoneNo,
-            'address'     => $this->address,
-            'image'       => $this->image,
-            'dateOfBirth' => $this->dateOfBirth,
-            'nisn'        => $this->nisn,
-            'roles'       => $this->roles->pluck('name'),
+        // ambil role pertama (karena user hanya punya satu role aktif dalam flow ini)
+        $role = $this->roles->pluck('name')->first();
 
-            // === Jika user adalah parent ===
-            'child' => $this->when(
-                $this->hasRole('parent'),
-                fn() => $this->children->map(function ($child) {
+        // === Untuk Role STUDENT ===
+        if ($role === 'student') {
+            return [
+                'image'     => $this->image,
+                'fullname'  => $this->fullname,
+                'nisn'      => $this->nisn,
+                'status'    => 'aktif', // default aktif
+                'schoolDetail' => optional($this->educationExperiences->last()?->schoolDetail)->name,
+                'email'     => $this->email,
+                'birthdate' => $this->dateOfBirth,
+                'phoneNo'   => $this->phoneNo,
+                'address'   => $this->address,
+
+                'riwayatPendidikan' => $this->educationExperiences->map(function ($edu) {
                     return [
-                        'id'              => $child->id,
-                        'fullname'        => $child->fullname,
-                        'dateOfBirth'     => $child->dateOfBirth,
-                        'nisn'            => $child->nisn,
-                        'email'           => $child->email,
-                        'phoneNo'         => $child->phoneNo,
-                        'schoolValidation' => $child->schoolValidation,
-                        'schoolDetail'    => $child->schoolDetail
-                            ? [
-                                'id'     => $child->schoolDetail->id,
-                                'name'   => $child->schoolDetail->name,
-                            ]
-                            : null,
-                        'riwayatPendidikan' => optional($child->educationExperiences)->map(function ($edu) {
+                        'id'           => $edu->id,
+                        'schoolDetail' => optional($edu->schoolDetail)->name,
+                        'status'       => $edu->status,
+                    ];
+                }),
+            ];
+        }
+
+        // === Untuk Role PARENT ===
+        if ($role === 'parent') {
+            return [
+                'image'     => $this->image,
+                'fullname'  => $this->fullname,
+                'relation'  => optional($this->children->first())->relation,
+                'email'     => $this->email,
+                'phoneNo'   => $this->phoneNo,
+                'address'   => $this->address,
+
+                'child' => $this->children->map(function ($child) {
+                    return [
+                        'fullname'   => $child->fullname,
+                        'nisn'       => $child->nisn,
+                        'status'     => $child->status,
+                        'birthdate'  => $child->dateOfBirth,
+                        'schoolDetail' => optional($child->schoolDetail)->name,
+
+                        'riwayatPendidikan' => $child->educationExperiences->map(function ($edu) {
                             return [
-                                'id'     => $edu->schoolDetail->id ?? null,
-                                'name'   => $edu->schoolDetail->name ?? null,
-                                'status' => $edu->status ?? null,
+                                'id'           => $edu->id,
+                                'schoolDetail' => optional($edu->schoolDetail)->name,
+                                'status'       => $edu->status,
                             ];
                         }),
                     ];
-                })
-            ),
+                }),
+            ];
+        }
 
-            'schoolDetails' => $this->when(
-                $this->hasRole('student'),
-                fn() => $this->childSchoolDetails->map(function ($school) {
-                    return [
-                        'id'     => $school->id,
-                        'name'   => $school->name,
-                    ];
-                })
-            ),
-
-            'riwayatPendidikan' => $this->when(
-                $this->hasRole('student'),
-                fn() => $this->educationExperiences->map(function ($edu) {
-                    return [
-                        'id'     => $edu->schoolDetail->id ?? null,
-                        'name'   => $edu->schoolDetail->name ?? null,
-                        'status' => $edu->status,
-                    ];
-                })
-            ),
+        // === Default (kalau tidak ada role) ===
+        return [
+            'fullname' => $this->fullname,
+            'email' => $this->email,
+            'role' => $role,
         ];
     }
 }

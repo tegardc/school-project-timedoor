@@ -224,7 +224,7 @@ class UserService extends BaseService
                         'nisn'        => $childData['nisn'] ?? null,
                         'email'       => $childData['email'] ?? null,
                         'phoneNo'     => $childData['phoneNo'] ?? null,
-                        'schoolDetailId' => $childData['schoolDetailId'] ?? null,
+                        'schoolDetailId' => $childData['schoolDetailId'] ?? $user->child->schoolDetailId ?? null,
                         'schoolValidation' => $childData['schoolValidation'] ?? null,
                         'status'      => $childData['status'] ?? 'aktif',
                     ]
@@ -324,7 +324,6 @@ class UserService extends BaseService
                     'dateOfBirth'      => $data['dateOfBirth'],
                     'nisn'             => $data['nisn'],
                     'relation'         => $data['relation'],
-                    'status'           => 'aktif',
                     'schoolDetailId'   => $data['schoolDetailId'],
                     'schoolValidation' => $data['schoolValidation'] ?? null,
                 ]
@@ -340,13 +339,14 @@ class UserService extends BaseService
                     EducationExperience::create([
                         'userId'          => $userId,
                         'schoolDetailId'  => $data['schoolDetailId'],
-                        'status'          => 'aktif',
                         'document'        => $data['schoolValidation'] ?? null,
                     ]);
                 }
             }
 
-            return $child->fresh(['schoolDetail']);
+            return Child::with(['schoolDetail', 'parent'])
+                ->where('id', $child->id)
+                ->first();
         });
     }
 

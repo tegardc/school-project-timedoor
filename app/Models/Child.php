@@ -20,6 +20,7 @@ class Child extends Model
         'email',
         'phoneNo',
         'schoolDetailId',
+        'relation',
         'schoolValidation',
         'status'
     ];

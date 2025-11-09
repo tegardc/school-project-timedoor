@@ -168,6 +168,7 @@
     Route::get('/schools/recommendations', [SchoolDetailController::class, 'recommendedSchools']);
     Route::get('/search-schools', [SchoolDetailController::class, 'searchByName']);
 
+
     // Wilayah
     Route::get('/provinces', [ProvinceController::class, 'index']);
     Route::get('/districts', [DistrictController::class, 'index']);
@@ -188,6 +189,8 @@
         //     Route::patch('/restore/{id}', [FacilityController::class, 'restore']);
         // });
     });
+
+    Route::get('/education-programs', [EducationProgramController::class, 'index']);
 
     //IMPORT CSV
 

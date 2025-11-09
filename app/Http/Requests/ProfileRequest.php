@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,7 +13,7 @@ class ProfileRequest extends FormRequest
         return true; // sudah diamankan pakai sanctum middleware
     }
 
-     public function rules(): array
+    public function rules(): array
     {
         $user = Auth::user();
 
@@ -52,6 +53,8 @@ class ProfileRequest extends FormRequest
             'fullname.required' => 'Nama lengkap wajib diisi.',
             'dateOfBirth.required' => 'Tanggal lahir wajib diisi.',
             'nisn.required' => 'NISN wajib diisi.',
+            'nisn.unique' => 'NISN ini sudah terdaftar, silakan periksa kembali.',
+            'email.unique' => 'Email ini sudah digunakan, gunakan email lain.',
             'schoolDetailId.required' => 'Sekolah wajib dipilih.',
             'schoolDetailId.exists' => 'Sekolah tidak ditemukan di database.',
 

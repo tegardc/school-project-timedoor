@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\SaveSchoolRequest;
 use App\Http\Requests\SchoolDetailRequest;
 use App\Http\Resources\SchoolDetailResource;
+use App\Http\Resources\SchoolTemplateResource;
 use App\Models\Review;
 use App\Models\SaveSchool;
 use App\Models\School;
@@ -50,7 +51,7 @@ class SchoolDetailController extends Controller
                 return ResponseHelper::success([], 'Data Not Found');
             }
 
-            $schoolDetailsTransform = SchoolDetailResource::collection($schools);
+            $schoolDetailsTransform = SchoolTemplateResource::collection($schools);
             return ResponseHelper::success(
                 [
                     'datas' => $schoolDetailsTransform,
@@ -220,7 +221,7 @@ class SchoolDetailController extends Controller
             return ResponseHelper::error('Data Not Found');
         }
         return ResponseHelper::success(
-            SchoolDetailResource::collection($data),
+            SchoolTemplateResource::collection($data),
             'Highlighted schools retrieved successfully'
         );
     }
@@ -246,7 +247,7 @@ class SchoolDetailController extends Controller
             return ResponseHelper::error('Data Not Found');
         }
         return ResponseHelper::success(
-            SchoolDetailResource::collection($data),
+            SchoolTemplateResource::collection($data),
             'Featured schools retrieved successfully'
         );
     }
@@ -271,7 +272,7 @@ class SchoolDetailController extends Controller
                 'schoolDetailId' => $schoolDetailId
             ]);
             $schoolDetail = SchoolDetail::find($schoolDetailId);
-            return ResponseHelper::success(new SchoolDetailResource($schoolDetail), "School detail saved successfully");
+            return ResponseHelper::success(new SchoolTemplateResource($schoolDetail), "School detail saved successfully");
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops save school detail is failed ", $e, "[SCHOOL DETAIL SAVE]: ");
         }
@@ -286,7 +287,7 @@ class SchoolDetailController extends Controller
             $savedSchools = SaveSchool::with('schoolDetail')->where('userId', $user->id)->get()->map(function ($save) {
                 return $save->schoolDetail;
             });
-            return ResponseHelper::success(SchoolDetailResource::collection($savedSchools), 'Saved schools retrieved successfully');
+            return ResponseHelper::success(SchoolTemplateResource::collection($savedSchools), 'Saved schools retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display saved school detail is failed ", $e, "[SCHOOL DETAIL SAVED]: ");
             //throw $th;
@@ -295,13 +296,13 @@ class SchoolDetailController extends Controller
     public function topSchools(SchoolDetailService $service)
     {
         $schools = $service->getTopSchools(5);
-        return SchoolDetailResource::collection($schools);
+        return SchoolTemplateResource::collection($schools);
     }
     public function recommendedSchools(Request $request, SchoolDetailService $service)
     {
         $criteria = $request->only(['provinceId', 'districtId', 'educationLevelId']);
         $schools = $service->getRecommendedSchools($criteria, 5);
-        return SchoolDetailResource::collection($schools);
+        return SchoolTemplateResource::collection($schools);
     }
     public function searchByName(Request $request, SchoolDetailService $schoolDetailService)
     {
@@ -338,7 +339,8 @@ class SchoolDetailController extends Controller
         $schools = $schoolService->getRecommendedSchools();
         return response()->json([
             'message' => 'Daftar sekolah rekomendasi.',
-            'data' => $schools
+            'data' => SchoolTemplateResource::collection($schools)
         ]);
     }
+
 }

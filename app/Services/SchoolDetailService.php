@@ -456,4 +456,5 @@ class SchoolDetailService extends BaseService
             ->limit($limit)
             ->get();
     }
+
 }

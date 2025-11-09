@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Child;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class UserController extends Controller
 {
@@ -212,7 +214,7 @@ class UserController extends Controller
                 return ResponseHelper::error('Role tidak valid.');
             }
 
-            return ResponseHelper::success($profile, 'Profil berhasil disimpan.');
+            return ResponseHelper::success(new ProfileResource($profile->fresh()), 'Profil berhasil disimpan.');
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Gagal menyimpan profil.', $e, '[PROFILE STORE]');
         }

@@ -24,7 +24,7 @@ class EducationExperienceController extends Controller
     public function index()
     {
         $experiences = $this->service->index();
-        return ResponseHelper::success($experiences, 'Display Data Successfully');
+        return ResponseHelper::success(EducationExperienceResource::collection($experiences),  'Display Data Successfully');
     }
 
     public function store(EducationExperienceRequest $request)
@@ -42,7 +42,7 @@ class EducationExperienceController extends Controller
     {
         try {
             $experience = $this->service->show($id);
-            return ResponseHelper::success($experience, 'Detail Data Success');
+            return ResponseHelper::success(new EducationExperienceResource($experience), 'Detail Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display experience is failed ", $e, "[EXPERIENCE SHOW]: ");
         }

@@ -21,8 +21,7 @@ class UpdateProfileRequest extends FormRequest
             'phoneNo'     => 'nullable|string|max:20',
             'address'     => 'nullable|string|max:500',
             'image'       => 'nullable|string|max:255',
-            'nisn'        => 'nullable|string|max:20',
-            'dateOfBirth' => 'nullable|date',
+            'relation'    => 'nullable|string|max:50',
         ];
 
         // kalau ada child
@@ -34,7 +33,8 @@ class UpdateProfileRequest extends FormRequest
             $rules['child.nisn']            = 'nullable|string|max:20';
             $rules['child.email']           = 'nullable|email|max:255';
             $rules['child.phoneNo']         = 'nullable|string|max:20';
-            $rules['child.address']         = 'nullable|string|max:500';
+            $rules['child.status']          = 'nullable|in:aktif,alumni';
+            $rules['child.schoolDetailId']  = 'nullable|exists:school_details,id';
         }
 
         // Validasi password (opsional)
