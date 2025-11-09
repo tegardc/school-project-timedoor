@@ -282,7 +282,7 @@ class ReviewService extends BaseService
         return DB::transaction(function () use ($user, $userId, $data, $rating, $details) {
             // 1️⃣ Update data user
             $user->update([
-                'fullname' => $data['fullname'],
+                'fullname' => $data['fullname'] ?? $user->fullname,
                 'email'    => $data['email'] ?? $user->email,
                 'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
             ]);
