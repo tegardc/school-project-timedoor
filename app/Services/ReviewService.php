@@ -260,7 +260,13 @@ class ReviewService extends BaseService
     {
         // Ambil semua review untuk sekolah tertentu
         $reviews = Review::with([
-            'users:id,email,image',
+            'users' => function ($q) {
+                $q->select('id', 'fullname', 'email', 'image','status')  // tambahkan fullname
+                    ->with([
+                        'educationExperiences.schoolDetail:id,name'
+
+                    ]);
+            },
             'reviewDetails:id,reviewId,questionId,score'
         ])
             ->where('schoolDetailId', $schoolDetailId)

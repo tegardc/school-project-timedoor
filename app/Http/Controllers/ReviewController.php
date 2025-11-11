@@ -41,7 +41,7 @@ class ReviewController extends Controller
     {
         try {
             $result = $service->getSchoolReviewsWithRating($schoolDetailId);
-            return ResponseHelper::success($result, 'Success get school reviews and rating');
+            return ResponseHelper::success(ReviewResource::collection($result['reviews']), 'Success get school reviews and rating');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
         }
