@@ -37,10 +37,24 @@ class ReviewController extends Controller
     //     }
     //     //
     // }
-    public function index(int $schoolDetailId, ReviewService $service)
+    public function index(int $schoolDetailId, Request $request,ReviewService $service)
     {
         try {
-            $result = $service->getSchoolReviewsWithRating($schoolDetailId);
+            $filters = $request->only([
+                'provinceName',
+                'districtName',
+                'subDistrictName',
+                'educationLevelName',
+                'statusName',
+                'accreditationCode',
+                'search',
+                'sortBy',
+                'sortDirection',
+                'minRating',
+                'maxRating',
+                'starRating'
+            ]);
+            $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters);
             return ResponseHelper::success(ReviewResource::collection($result['reviews']), 'Success get school reviews and rating');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");

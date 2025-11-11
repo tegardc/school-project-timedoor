@@ -256,22 +256,29 @@ class ReviewService extends BaseService
     }
 
 
-    public function getSchoolReviewsWithRating(int $schoolDetailId)
+    public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [])
     {
         // Ambil semua review untuk sekolah tertentu
-        $reviews = Review::with([
+        $query = Review::with([
             'users' => function ($q) {
-                $q->select('id', 'fullname', 'email', 'image','status')  // tambahkan fullname
+                $q->select('id', 'fullname', 'email', 'image', 'status')
                     ->with([
                         'educationExperiences.schoolDetail:id,name'
-
                     ]);
             },
-            'reviewDetails:id,reviewId,questionId,score'
+            'schoolDetails:id,name',
+            'reviewDetails:id,reviewId,questionId,score,questionId'
         ])
             ->where('schoolDetailId', $schoolDetailId)
-            ->where('status', Review::STATUS_APPROVED)
-            ->get();
+            ->where('status', Review::STATUS_APPROVED);
+
+        // Terapkan filter seperti AllReview
+        if (!empty($filters)) {
+            $this->applyFilters($query, $filters);
+        }
+
+        // Eksekusi query
+        $reviews = $query->get();
 
         // Hitung rata-rata per pertanyaan
         $questionAverages = ReviewDetail::select('questionId', DB::raw('AVG(score) as avg_score'))
@@ -288,6 +295,7 @@ class ReviewService extends BaseService
             'finalRating' => round($finalRating, 2)
         ];
     }
+
     public function submitFullReview(array $data): Review
     {
         $user = Auth::user();
