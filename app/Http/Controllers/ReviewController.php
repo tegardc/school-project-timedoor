@@ -228,7 +228,8 @@ class ReviewController extends Controller
                 'sortBy',
                 'sortDirection',
                 'minRating',
-                'maxRating'
+                'maxRating',
+                'starRating'
             ]);
             $perPage = $request->query('perPage', 12);
 

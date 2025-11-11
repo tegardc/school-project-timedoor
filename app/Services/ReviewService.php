@@ -150,8 +150,10 @@ class ReviewService extends BaseService
 
     public function AllReview(array $filters = [], $perPage = 10)
     {
-        $query =  Review::with([
-            'users:id,fullname,image',
+        $query = Review::with([
+            'users.roles',
+            'users.children.schoolDetail.educationExperiences',
+            'users.educationExperiences.schoolDetail',
             'schoolDetails:id,name',
             'reviewDetails' => function ($q) {
                 $q->with('question:id,question');
@@ -164,6 +166,7 @@ class ReviewService extends BaseService
 
         return $query->paginate($perPage);
     }
+
     private function applyFilters($query, array $filters)
     {
         if (!empty($filters['search'])) {
@@ -172,7 +175,7 @@ class ReviewService extends BaseService
                     $q2->where('name', 'like', '%' . $filters['search'] . '%')
                         ->orWhere('institutionCode', 'like', '%' . $filters['search'] . '%');
                 })->orWhereHas('users', function ($q3) use ($filters) {
-                    $q3->where('username', 'like', '%' . $filters['search'] . '%');
+                    $q3->where('fullname', 'like', '%' . $filters['search'] . '%');
                 });
             });
         }
@@ -198,7 +201,6 @@ class ReviewService extends BaseService
             });
         }
 
-
         if (!empty($filters['educationLevelName'])) {
             $query->whereHas('schoolDetails.educationLevel', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['educationLevelName'] . '%');
@@ -217,23 +219,31 @@ class ReviewService extends BaseService
             });
         }
 
+        // ⭐ Filter berdasarkan rentang rating
         if (!empty($filters['minRating'])) {
             $query->where('rating', '>=', $filters['minRating']);
         }
-
         if (!empty($filters['maxRating'])) {
             $query->where('rating', '<=', $filters['maxRating']);
         }
 
+        // ⭐⭐ Filter berdasarkan rating bintang tertentu (misal: 1–5)
+        if (!empty($filters['starRating'])) {
+            $star = (int) $filters['starRating'];
+
+            // Contoh: bintang 4 berarti rating antara 3.5 sampai < 4.5
+            $lower = max(0, $star - 0.5);
+            $upper = min(5, $star + 0.5);
+
+            $query->whereBetween('rating', [$lower, $upper]);
+        }
+
+        // Sorting
         if (!empty($filters['sortBy'])) {
             $sortField = $filters['sortBy'];
             $sortDirection = $filters['sortDirection'] ?? 'asc';
 
-            $allowedSortFields = [
-                'rating',
-                'createdAt',
-                'updatedAt'
-            ];
+            $allowedSortFields = ['rating', 'createdAt', 'updatedAt'];
 
             if (in_array($sortField, $allowedSortFields)) {
                 $query->orderBy($sortField, $sortDirection);
@@ -244,6 +254,8 @@ class ReviewService extends BaseService
 
         return $query;
     }
+
+
     public function getSchoolReviewsWithRating(int $schoolDetailId)
     {
         // Ambil semua review untuk sekolah tertentu

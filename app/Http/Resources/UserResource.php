@@ -15,6 +15,7 @@ class UserResource extends JsonResource
         // === Untuk Role STUDENT ===
         if ($role === 'student') {
             return [
+                'id'        => $this->id,
                 'image'     => $this->image,
                 'fullname'  => $this->fullname,
                 'nisn'      => $this->nisn,
@@ -24,7 +25,7 @@ class UserResource extends JsonResource
                 'birthdate' => $this->dateOfBirth,
                 'phoneNo'   => $this->phoneNo,
                 'address'   => $this->address,
-
+                'role'      => $role,
                 'riwayatPendidikan' => $this->educationExperiences->map(function ($edu) {
                     return [
                         'id'           => $edu->id,
@@ -38,13 +39,14 @@ class UserResource extends JsonResource
         // === Untuk Role PARENT ===
         if ($role === 'parent') {
             return [
+                'id'        => $this->id,
                 'image'     => $this->image,
                 'fullname'  => $this->fullname,
                 'relation'  => optional($this->children->first())->relation,
                 'email'     => $this->email,
                 'phoneNo'   => $this->phoneNo,
                 'address'   => $this->address,
-
+                'role'      => $role,
                 'child' => $this->children->map(function ($child) {
                     return [
                         'fullname'   => $child->fullname,
