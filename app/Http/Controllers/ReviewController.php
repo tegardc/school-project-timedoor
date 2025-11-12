@@ -37,7 +37,7 @@ class ReviewController extends Controller
     //     }
     //     //
     // }
-    public function index(int $schoolDetailId, Request $request,ReviewService $service)
+    public function index(int $schoolDetailId, Request $request, ReviewService $service)
     {
         try {
             $filters = $request->only([
@@ -55,7 +55,14 @@ class ReviewController extends Controller
                 'starRating'
             ]);
             $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters);
-            return ResponseHelper::success(ReviewResource::collection($result['reviews']), 'Success get school reviews and rating');
+            return ResponseHelper::success([
+                'reviews' => ReviewResource::collection($result['reviews']),
+                'meta' => [
+                    'finalRating'   => $result['finalRating'],
+                    'totalRating'   => $result['totalRating'],
+                    'questionStats' => $result['questionStats'],
+                ],
+            ], 'Success get school reviews and rating');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
         }
