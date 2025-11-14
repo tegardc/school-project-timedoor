@@ -8,6 +8,7 @@ use App\Http\Requests\ReviewSubmitRequest;
 use App\Http\Resources\ReviewResource;
 use App\Models\Review;
 use App\Services\ReviewService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -55,6 +56,9 @@ class ReviewController extends Controller
                 'starRating'
             ]);
             $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters);
+            if (empty($result['reviews']) || count($result['reviews']) === 0) {
+                return ResponseHelper::notFound("Review untuk sekolah ini belum tersedia.");
+            }
             return ResponseHelper::success([
                 'reviews' => ReviewResource::collection($result['reviews']),
                 'meta' => [
@@ -64,6 +68,7 @@ class ReviewController extends Controller
                 ],
             ], 'Success get school reviews and rating');
         } catch (\Exception $e) {
+            // Error lain tetap ke 500
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
         }
     }

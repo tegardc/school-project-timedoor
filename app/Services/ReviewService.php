@@ -256,55 +256,56 @@ class ReviewService extends BaseService
     }
 
 
-   public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [])
-{
-    $query = Review::with([
-        'users' => function ($q) {
-            $q->select('id', 'fullname', 'email', 'image', 'status')
-                ->with(['educationExperiences.schoolDetail:id,name']);
-        },
-        'schoolDetails:id,name',
-        'reviewDetails:id,reviewId,questionId,score'
-    ])
-        ->where('schoolDetailId', $schoolDetailId)
-        ->where('status', Review::STATUS_APPROVED);
+    public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [])
+    {
+        $query = Review::with([
+            'users' => function ($q) {
+                $q->select('id', 'fullname', 'email', 'image', 'status')
+                    ->with(['educationExperiences.schoolDetail:id,name']);
+            },
+            'schoolDetails:id,name',
+            'reviewDetails:id,reviewId,questionId,score'
+        ])
+            ->where('schoolDetailId', $schoolDetailId)
+            ->where('status', Review::STATUS_APPROVED);
 
-    if (!empty($filters)) {
-        $this->applyFilters($query, $filters);
-    }
+        if (!empty($filters)) {
+            $this->applyFilters($query, $filters);
+        }
 
-    $reviews = $query->get();
+        $reviews = $query->get();
 
-    if ($reviews->isEmpty()) {
+        if ($reviews->isEmpty()) {
+            return [
+                'reviews' => [],
+                'questionStats' => [], // ini yang hilang kemarin
+                'finalRating' => 0,
+                'totalRating' => 0
+            ];
+        }
+
+
+        // Hitung rata-rata dan total per pertanyaan
+        $questionStats = ReviewDetail::select(
+            'questionId',
+            DB::raw('AVG(score) as avg_score'),
+            DB::raw('SUM(score) as total_score')
+        )
+            ->whereIn('reviewId', $reviews->pluck('id'))
+            ->groupBy('questionId')
+            ->get();
+
+        // Hitung total rating dan rata-rata akhir
+        $totalRating = $reviews->sum('rating');
+        $finalRating = $questionStats->avg('avg_score');
+
         return [
-            'reviews' => [],
-            'questionAverages' => [],
-            'finalRating' => 0,
-            'totalRating' => 0
+            'reviews' => $reviews,
+            'questionStats' => $questionStats,
+            'finalRating' => round($finalRating, 2),
+            'totalRating' => round($totalRating, 2),
         ];
     }
-
-    // Hitung rata-rata dan total per pertanyaan
-    $questionStats = ReviewDetail::select(
-        'questionId',
-        DB::raw('AVG(score) as avg_score'),
-        DB::raw('SUM(score) as total_score')
-    )
-        ->whereIn('reviewId', $reviews->pluck('id'))
-        ->groupBy('questionId')
-        ->get();
-
-    // Hitung total rating dan rata-rata akhir
-    $totalRating = $reviews->sum('rating');
-    $finalRating = $questionStats->avg('avg_score');
-
-    return [
-        'reviews' => $reviews,
-        'questionStats' => $questionStats,
-        'finalRating' => round($finalRating, 2),
-        'totalRating' => round($totalRating, 2),
-    ];
-}
 
 
     public function submitFullReview(array $data): Review

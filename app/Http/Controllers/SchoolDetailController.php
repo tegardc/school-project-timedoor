@@ -221,7 +221,7 @@ class SchoolDetailController extends Controller
             return ResponseHelper::error('Data Not Found');
         }
         return ResponseHelper::success(
-            SchoolTemplateResource::collection($data),
+            SchoolDetailResource::collection($data),
             'Highlighted schools retrieved successfully'
         );
     }
