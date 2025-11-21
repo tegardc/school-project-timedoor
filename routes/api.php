@@ -66,6 +66,8 @@
             Route::put('/profile/complete', [UserController::class, 'profileStore']);
 
             Route::get('/reviews/user', [ReviewController::class, 'getUserReviews']);
+            Route::put('/reviews-user/{id}', [ReviewController::class, 'update']);
+            Route::delete('/reviews-user/{id}', [ReviewController::class, 'deleteReviewForUser']);
         });
 
         //ROUTE FOR ADMIN ROLE//

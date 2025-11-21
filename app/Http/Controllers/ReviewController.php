@@ -53,7 +53,9 @@ class ReviewController extends Controller
                 'sortDirection',
                 'minRating',
                 'maxRating',
-                'starRating'
+                'starRating',
+                'role',
+                'sort'
             ]);
             $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters);
             if (empty($result['reviews']) || count($result['reviews']) === 0) {
@@ -68,7 +70,6 @@ class ReviewController extends Controller
                 ],
             ], 'Success get school reviews and rating');
         } catch (\Exception $e) {
-            // Error lain tetap ke 500
             return ResponseHelper::serverError("Oops display all review is failed ", $e, "[REVIEW INDEX]: ");
         }
     }
@@ -201,7 +202,6 @@ class ReviewController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
         }
-        //
     }
 
     public function trash(ReviewService $service)
@@ -304,7 +304,7 @@ class ReviewController extends Controller
     public function getUserReviews(ReviewService $reviewService, Request $request)
     {
         $perPage = $request->get('perPage', 10);
-        $userId = $request->get('userId'); // optional, untuk admin melihat user lain
+        $userId = $request->get('userId');
 
         $result = $reviewService->getUserReviews($userId, $perPage);
 
@@ -313,5 +313,41 @@ class ReviewController extends Controller
             'totalReviews' => $result['totalReviews'],
             'data' => ReviewResource::collection($result['reviews'])
         ]);
+    }
+    public function update(Request $request, int $id, ReviewService $service)
+    {
+        try {
+            $data = $request->validate([
+                'reviewText' => 'nullable|string',
+                'liked'      => 'nullable|string',
+                'improved'   => 'nullable|string',
+                'details'    => 'required|array',
+                'details.*.questionId' => 'required|integer',
+                'details.*.score'      => 'required|integer|min:1|max:5',
+            ]);
+
+            $review = $service->updateUserReview($id, $data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Review berhasil diperbarui. Menunggu approval admin.',
+                'data' => $review
+            ]);
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops update review is failed ", $e, "[REVIEW UPDATE]: ");
+        }
+    }
+    public function deleteReviewForUser(int $id, ReviewService $service)
+    {
+        try {
+            $deleted = $service->deleteUserReview($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Review berhasil dihapus.',
+            ]);
+    } catch (\Exception $e) {
+            return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
+        }
     }
 }

@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Validator;
 
 class DistrictController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request, DistrictService $service)
     {
         try {
@@ -61,9 +58,6 @@ class DistrictController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(DistrictRequest $request, DistrictService $service)
     {
         try {
@@ -80,25 +74,16 @@ class DistrictController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(District $district)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(District $district)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(DistrictRequest $request, DistrictService $service, $id)
     {
         try {
@@ -114,13 +99,9 @@ class DistrictController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(DistrictService $service, $id)
     {
         try {
-            //code...
             $district = District::find($id);
             if (!$district) {
                 return ResponseHelper::notFound('District not found');

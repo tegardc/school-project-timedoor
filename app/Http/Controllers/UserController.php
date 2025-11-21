@@ -116,8 +116,6 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $data = $request->validated();
-
-            // handle password update
             if ($request->filled('new_password')) {
                 if (!Hash::check($request->current_password, $user->password)) {
                     return ResponseHelper::error('Password saat ini salah', 422);

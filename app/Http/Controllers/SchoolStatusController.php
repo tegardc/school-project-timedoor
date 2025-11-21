@@ -18,7 +18,6 @@ class SchoolStatusController extends Controller
     public function index(SchoolStatusService $service)
     {
         try {
-            //code...
             $schoolStatus = $service->getAll();
             if($schoolStatus->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(SchoolStatusResource::collection($schoolStatus), 'Display Data Success');
@@ -39,7 +38,6 @@ class SchoolStatusController extends Controller
     public function show(SchoolStatusService $service,$id)
     {
         try {
-            //code...
             $schoolStatus = $service->getById($id);
             if (!$schoolStatus) {
                 return ResponseHelper::notFound('Data Not Found');
@@ -60,7 +58,6 @@ class SchoolStatusController extends Controller
 
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops create school status is failed ", $e, "[SCHOOL STATUS STORE]: ");
-            //throw $th;
         }
     }
 

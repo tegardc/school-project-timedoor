@@ -83,7 +83,6 @@ class SchoolDetailController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops created school detail is failed", $e, "[SCHOOL DETAIL STORE]: ");
         }
-        //
     }
 
 
@@ -168,7 +167,6 @@ class SchoolDetailController extends Controller
         }
     }
 
-    //Ranking School with filter
     public function ranking(Request $request, SchoolDetailService $service)
     {
         try {

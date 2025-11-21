@@ -12,11 +12,8 @@ class CSVImportService
     private function parseDate($date)
 {
     if (empty($date)) return null;
-
-    // Deteksi dan ubah dari d/m/Y ke Y-m-d
     $parsed = \DateTime::createFromFormat('d/m/Y', $date);
     if (!$parsed) {
-        // Coba format lain jika perlu
         $parsed = \DateTime::createFromFormat('m/d/Y', $date);
     }
 

@@ -9,7 +9,6 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // ambil role pertama (karena user hanya punya satu role aktif dalam flow ini)
         $role = $this->roles->pluck('name')->first();
 
         // === Untuk Role STUDENT ===
@@ -19,7 +18,7 @@ class UserResource extends JsonResource
                 'image'     => $this->image,
                 'fullname'  => $this->fullname,
                 'nisn'      => $this->nisn,
-                'status'    => 'aktif', // default aktif
+                'status'    => 'aktif',
                 'schoolDetail' => optional($this->educationExperiences->last()?->schoolDetail)->name,
                 'email'     => $this->email,
                 'birthdate' => $this->dateOfBirth,
@@ -66,8 +65,6 @@ class UserResource extends JsonResource
                 }),
             ];
         }
-
-        // === Default (kalau tidak ada role) ===
         return [
             'fullname' => $this->fullname,
             'email' => $this->email,

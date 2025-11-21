@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ProvinceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request, ProvinceService $service)
     {
         try {
@@ -31,9 +28,6 @@ class ProvinceController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ProvinceRequest $request, ProvinceService $service)
     {
         try {
@@ -44,16 +38,12 @@ class ProvinceController extends Controller
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops create province is failed ", $e, "[PROVINCE STORE]: ");
         }
-        
+
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         try {
-            //code...
             $province = Province::find($id);
             if (!$province) {
                 return ResponseHelper::notFound('Province Not Found');
@@ -64,9 +54,6 @@ class ProvinceController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(ProvinceRequest $request, ProvinceService $service, $id)
     {
         try {
@@ -82,9 +69,6 @@ class ProvinceController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(ProvinceService $service, $id)
     {
         try {
@@ -99,6 +83,7 @@ class ProvinceController extends Controller
             return ResponseHelper::serverError("Oops delete province is failed ", $e, "[PROVINCE DESTROY]: ");
         }
     }
+
     public function trash(ProvinceService $service) {
         try {
             $province = $service->trash();
@@ -110,6 +95,7 @@ class ProvinceController extends Controller
             return ResponseHelper::serverError("Oops display province is failed ", $e, "[PROVINCE TRASH]: ");
         }
     }
+
     public function restore(ProvinceService $service, $id) {
         try {
             $province = $service->restore($id);

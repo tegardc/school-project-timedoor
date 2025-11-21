@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 
 class EducationLevelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(EducationLevelService $service)
     {
         try {
@@ -20,12 +17,8 @@ class EducationLevelController extends Controller
             return ResponseHelper::success(EducationLevelResource::collection($educationLevels), 'Display Data Success');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display all education level is failed ", $e, "[EDUCATION LEVEL INDEX]: ");
-            //throw $th;
         }
-
-        //
     }
-
 
     public function show(EducationLevelService $service, $id)
     {
@@ -39,6 +32,7 @@ class EducationLevelController extends Controller
             return ResponseHelper::serverError("Oops display education level by id is failed ", $e, "[EDUCATION LEVEL SHOW]: ");
         }
     }
+
     public function showByName(EducationLevelService $service, $name)
     {
         try {
@@ -51,7 +45,8 @@ class EducationLevelController extends Controller
             return ResponseHelper::serverError("Oops display education level by name is failed ", $e, "[EDUCATION LEVEL SHOW]: ");
         }
     }
-    public function delete($id){
+    public function delete($id)
+    {
         try {
             $educationLevel = EducationLevel::find($id);
             if (!$educationLevel) {
@@ -63,5 +58,4 @@ class EducationLevelController extends Controller
             return ResponseHelper::serverError("Oops delete education level by id is failed ", $e, "[EDUCATION LEVEL DELETE]: ");
         }
     }
-
 }

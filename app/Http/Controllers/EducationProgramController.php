@@ -17,9 +17,7 @@ class EducationProgramController extends Controller
     {
         $this->service = $service;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         try {
@@ -31,17 +29,11 @@ class EducationProgramController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
        public function store(EducationProgramRequest $request)
     {
         try {
@@ -53,25 +45,16 @@ class EducationProgramController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(EducationProgram $educationProgram)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(EducationProgram $educationProgram)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
      public function update(EducationProgramRequest $request, int $id)
     {
         try {

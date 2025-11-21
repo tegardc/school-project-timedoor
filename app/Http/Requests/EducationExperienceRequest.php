@@ -25,7 +25,7 @@ class EducationExperienceRequest extends FormRequest
 
             'educationLevelId' => 'required|exists:education_levels,id',
             'schoolDetailId' => 'required|exists:school_details,id',
-            'educationProgramId' => 'required|exists:education_programs,id',
+            'educationProgramId' => 'nullable|exists:education_programs,id',
             // 'degree' => 'required|string|max:255',
             'status' => 'required|string|max:255',
             'startDate' => 'required|date',

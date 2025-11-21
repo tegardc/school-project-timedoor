@@ -11,9 +11,6 @@ use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(QuestionService $service)
     {
         try {
@@ -36,9 +33,6 @@ class QuestionController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(QuestionService $service,$id)
     {
         try {
@@ -65,9 +59,6 @@ class QuestionController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(QuestionService $service, $id)
     {
         try {

@@ -97,7 +97,7 @@ class SchoolDetail extends Model
     public function siblingDetails()
     {
         return $this->hasMany(SchoolDetail::class, 'schoolId', 'schoolId')
-            ->where('id', '<>', $this->id); // biar gak masuk dirinya sendiri
+            ->where('id', '<>', $this->id); 
     }
     public function schoolValidations()
     {

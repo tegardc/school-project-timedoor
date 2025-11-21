@@ -27,7 +27,6 @@ class SubdistrictController extends Controller
             $subdistrict = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($service, $districtName) {
                 return $service->getByDistrict($districtName);
             });
-            // $subdistrict = $service->getByDistrict($districtName);
             if($subdistrict->isEmpty()) return ResponseHelper::notFound('Data Not Found');
             return ResponseHelper::success(SubDistrictResource::collection($subdistrict), 'Successfully Display Data');
         } catch (\Exception $e) {
