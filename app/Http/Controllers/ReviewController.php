@@ -57,16 +57,29 @@ class ReviewController extends Controller
                 'role',
                 'sort'
             ]);
-            $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters);
-            if (empty($result['reviews']) || count($result['reviews']) === 0) {
+
+            // ambil limit / perPage
+            $perPage = $request->query('perPage', 10);
+
+            // ambil result dari service (HARUS return paginator)
+            $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters, $perPage);
+
+            // cek kalau kosong
+            if ($result['reviews']->isEmpty()) {
                 return ResponseHelper::notFound("Review untuk sekolah ini belum tersedia.");
             }
+
+            // response
             return ResponseHelper::success([
                 'reviews' => ReviewResource::collection($result['reviews']),
                 'meta' => [
-                    'finalRating'   => $result['finalRating'],
-                    'totalRating'   => $result['totalRating'],
-                    'questionStats' => $result['questionStats'],
+                    'current_page'   => $result['reviews']->currentPage(),
+                    'last_page'      => $result['reviews']->lastPage(),
+                    'limit'          => $result['reviews']->perPage(),
+                    'total'          => $result['reviews']->total(),
+                    'finalRating'    => $result['finalRating'],
+                    'totalRating'    => $result['totalRating'],
+                    'questionStats'  => $result['questionStats'],
                 ],
             ], 'Success get school reviews and rating');
         } catch (\Exception $e) {
@@ -346,7 +359,7 @@ class ReviewController extends Controller
                 'success' => true,
                 'message' => 'Review berhasil dihapus.',
             ]);
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
         }
     }

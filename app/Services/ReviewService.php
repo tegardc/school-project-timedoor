@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Review;
 use App\Models\ReviewDetail;
 use App\Models\SchoolValidation;
@@ -254,8 +255,9 @@ class ReviewService extends BaseService
     }
 
 
-    public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [])
+    public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [], int $perPage = 10)
     {
+        // Query utama dengan eager load
         $query = Review::with([
             'users' => function ($q) {
                 $q->select('id', 'fullname', 'email', 'image', 'status')
@@ -271,22 +273,27 @@ class ReviewService extends BaseService
             $this->applyFilters($query, $filters);
         }
 
-        $reviews = $query->get();
+        // PAGINATION di sini
+        $reviews = $query->paginate($perPage);
+
         if ($reviews->isEmpty()) {
             return [
-                'reviews' => [],
+                'reviews' => $reviews,
                 'questionStats' => [],
                 'finalRating' => 0,
                 'totalRating' => 0
             ];
         }
 
+        // Hitung berdasarkan semua review dalam page ini
+        $reviewIds = $reviews->pluck('id');
+
         $questionStats = ReviewDetail::select(
             'questionId',
             DB::raw('AVG(score) as avg_score'),
             DB::raw('SUM(score) as total_score')
         )
-            ->whereIn('reviewId', $reviews->pluck('id'))
+            ->whereIn('reviewId', $reviewIds)
             ->groupBy('questionId')
             ->get();
 
@@ -300,7 +307,6 @@ class ReviewService extends BaseService
             'totalRating' => round($totalRating, 2),
         ];
     }
-
 
     public function submitFullReview(array $data): Review
     {

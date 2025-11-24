@@ -18,7 +18,7 @@ class EducationExperienceResource extends JsonResource
             'id' => $this->id,
             'educationLevelId' => $this->educationLevelId,
             'schoolDetailId' => $this->schoolDetailId,
-            'educationProgramId' => $this->educationProgramId,
+            // 'educationProgramId' => $this->educationProgramId,
             'status' => $this->status,
             'startDate' => $this->startDate,
             'endDate' => $this->endDate
