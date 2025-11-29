@@ -54,6 +54,9 @@
         Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
         Route::post('/review/submit', [ReviewController::class, 'submitReview']);
 
+        // Upload image
+        Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
+
         //ROUTE FOR USER ROLE//
         Route::middleware(['check.role:student,parent'])->group(function () {
 
@@ -100,8 +103,7 @@
 
 
 
-            // Upload image
-            Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
+
 
             // Questions
             Route::apiResource('questions', QuestionController::class)->only(['store', 'update', 'destroy', 'trash', 'restore']);
