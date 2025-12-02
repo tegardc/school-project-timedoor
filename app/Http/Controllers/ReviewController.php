@@ -118,7 +118,7 @@ class ReviewController extends Controller
     public function pendingReviews()
     {
         try {
-            $review = Review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails'])->get();
+            $review = Review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails', 'schoolValidation'])->get();
             if ($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
             return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
         } catch (\Exception $e) {
