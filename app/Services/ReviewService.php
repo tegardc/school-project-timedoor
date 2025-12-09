@@ -379,7 +379,10 @@ class ReviewService extends BaseService
 
         $query = Review::select([
             'id',
+            'userId',
             'reviewText',
+            'liked',
+            'improved',
             'rating',
             'schoolDetailId',
             'createdAt',
@@ -388,6 +391,7 @@ class ReviewService extends BaseService
         ])
             ->where('userId', $userId)
             ->with([
+                'users:id,fullname,image,status',
                 'schoolDetails:id,name',
                 'reviewDetails' => function ($q) {
                     $q->with('question:id,question');

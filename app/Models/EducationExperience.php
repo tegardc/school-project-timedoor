@@ -21,8 +21,8 @@ class EducationExperience extends Model
         'educationLevelId',
         'schoolDetailId',
         'schoolValidation',
-        'educationProgramId',
-        'degree',
+        // 'educationProgramId',
+        // 'degree',
         'startDate',
         'endDate',
     ];
