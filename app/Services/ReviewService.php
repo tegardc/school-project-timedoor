@@ -7,6 +7,7 @@ use App\Models\ReviewDetail;
 use App\Models\SchoolValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class ReviewService extends BaseService
@@ -308,34 +309,106 @@ class ReviewService extends BaseService
         ];
     }
 
-    public function submitFullReview(array $data): Review
+    // public function submitFullReview(array $data)
+    // {
+    //     $user = Auth::user();
+
+    //     Log::info($data);
+
+    //     $details = $data['details'];
+    //     $totalScore = array_sum(array_column($details, 'score'));
+    //     $rating = round($totalScore / count($details), 2);
+
+    //     return DB::transaction(function () use ($user, $data, $rating, $details) {
+    //         $user->update([
+    //             'fullname' => $data['fullname'] ?? $user->fullname,
+    //             'email'    => $data['email'] ?? $user->email,
+    //             'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
+    //         ]);
+
+    //         $schoolValidation = null;
+
+    //         if (!empty($data['schoolValidationFile'])) {
+    //             $schoolValidation = SchoolValidation::create(
+    //                 [
+    //                     'userId'         => $user->id,
+    //                     'schoolDetailId' => $data['schoolDetailId'],
+    //                     'fileUrl'        => $data['schoolValidationFile'] ?? null,
+    //                     'status'         => $data['userStatus'] ?? null,
+    //                     // 'status'         => 'aktif',
+    //                 ]
+    //             );
+    //         }
+
+    //         $review = Review::create([
+    //             'userId'          => $user->id,
+    //             'schoolDetailId'  => $data['schoolDetailId'],
+    //             'reviewText'      => $data['reviewText'] ?? null,
+    //             'liked'           => $data['liked'] ?? null,
+    //             'improved'        => $data['improved'] ?? null,
+    //             'rating'          => $rating,
+    //             'status'          => Review::STATUS_PENDING,
+    //         ]);
+
+
+    //         $detailReviews = [];
+    //         foreach ($details as $d) {
+    //             $detailReviews[] = [
+    //                 'reviewId'   => $review->id,
+    //                 'questionId' => $d['questionId'],
+    //                 'score'      => $d['score'],
+    //                 'createdAt'  => now(),
+    //                 'updatedAt'  => now(),
+    //             ];
+    //         }
+
+    //         ReviewDetail::insert($detailReviews);
+
+    //         // return $review->load([
+    //         //     'reviewDetails.question',
+    //         //     'schoolValidation',
+    //         // ]);
+
+    //         $review->load('reviewDetails.question');
+
+    //         return [
+    //             'review'           => $review->toArray(),
+    //             'schoolValidation' => $schoolValidation?->toArray(),
+    //             'reviewDetails'    => $review->reviewDetails->toArray(),
+    //         ];
+    //     });
+    // }
+    public function submitFullReview(array $data)
     {
         $user = Auth::user();
-        $userId = $user->id;
+
+        Log::info($data);
 
         $details = $data['details'];
         $totalScore = array_sum(array_column($details, 'score'));
         $rating = round($totalScore / count($details), 2);
 
-        return DB::transaction(function () use ($user, $userId, $data, $rating, $details) {
+        return DB::transaction(function () use ($user, $data, $rating, $details) {
+
             $user->update([
                 'fullname' => $data['fullname'] ?? $user->fullname,
                 'email'    => $data['email'] ?? $user->email,
                 'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
             ]);
+
             $schoolValidation = null;
-            if (!empty($data['schoolValidation'])) {
-                $schoolValidation = \App\Models\SchoolValidation::updateOrCreate(
-                    [
-                        'userId'         => $user->id,
-                        'schoolDetailId' => $data['schoolDetailId'],
-                    ],
-                    [
-                        'fileUrl'        => $data['schoolValidation'],
-                    ]
-                );
+
+            // 1️⃣ BUAT VALIDATION DULU
+            if (!empty($data['schoolValidationFile'])) {
+                $schoolValidation = SchoolValidation::create([
+                    'userId'         => $user->id,
+                    'schoolDetailId' => $data['schoolDetailId'],
+                    'fileUrl'        => $data['schoolValidationFile'] ?? null,
+                    'status'         => $data['userStatus'] ?? null,
+                ]);
             }
 
+            // 2️⃣ LALU BUAT REVIEW
             $review = Review::create([
                 'userId'          => $user->id,
                 'schoolDetailId'  => $data['schoolDetailId'],
@@ -345,21 +418,40 @@ class ReviewService extends BaseService
                 'rating'          => $rating,
                 'status'          => Review::STATUS_PENDING,
             ]);
+
+            // 🔥 3️⃣ UPDATE schoolValidation -> reviewId (FIX PENTING)
+            if ($schoolValidation) {
+                $schoolValidation->update([
+                    'reviewId' => $review->id
+                ]);
+            }
+
+            // 4️⃣ INSERT REVIEW DETAILS
+            $detailReviews = [];
             foreach ($details as $d) {
-                ReviewDetail::create([
+                $detailReviews[] = [
                     'reviewId'   => $review->id,
                     'questionId' => $d['questionId'],
                     'score'      => $d['score'],
-                ]);
+                    'createdAt'  => now(),
+                    'updatedAt'  => now(),
+                ];
             }
-            return $review->load([
-                'reviewDetails.question',
-                'schoolValidation' => function ($q) use ($schoolValidation) {
-                    $q->where('id', $schoolValidation?->id);
-                }
-            ]);
+
+            ReviewDetail::insert($detailReviews);
+
+            // Load relations
+            $review->load('reviewDetails.question', 'schoolValidation');
+
+            return [
+                'review'           => $review->toArray(),
+                'schoolValidation' => $schoolValidation?->toArray(),
+                'reviewDetails'    => $review->reviewDetails->toArray(),
+            ];
         });
     }
+
+
     public function togglePin(int $id): Review
     {
         $review = Review::find($id);
@@ -373,41 +465,59 @@ class ReviewService extends BaseService
 
         return $review->refresh();
     }
+    //    public function getUserReviews(int $userId = null, $perPage = 10)
+    //     {
+    //         $userId = $userId ?? Auth::id();
+
+    //         $query = Review::select([
+    //             'id', 'userId', 'reviewText', 'liked', 'improved', 'rating',
+    //             'schoolDetailId', 'createdAt', 'status', 'isPinned',
+    //         ])
+    //             ->where('userId', $userId)
+    //             ->with([
+    //                 'schoolValidation' => function($query) use ($userId) {
+    //                     $query->where('userId', $userId);
+    //                 },
+    //                 'reviewDetails.question',
+    //                 'schoolDetails:id,name',
+    //                 'users:id,fullname,image'
+    //             ])
+    //             ->orderByDesc('isPinned')
+    //             ->orderByDesc('createdAt');
+
+    //         // Log::info($query->get()); // Boleh dihapus jika sudah fix
+
+    //         $totalReviews = (clone $query)->count();
+    //         $reviews = $query->paginate($perPage);
+
+    //         return [
+    //             'totalReviews' => $totalReviews,
+    //             'reviews' => $reviews,
+    //         ];
+    //     }
     public function getUserReviews(int $userId = null, $perPage = 10)
     {
         $userId = $userId ?? Auth::id();
-
-        $query = Review::select([
-            'id',
-            'userId',
-            'reviewText',
-            'liked',
-            'improved',
-            'rating',
-            'schoolDetailId',
-            'createdAt',
-            'status',
-            'isPinned',
-        ])
-            ->where('userId', $userId)
+        $query = Review::where('userId', $userId)
             ->with([
-                'users:id,fullname,image,status',
-                'schoolDetails:id,name',
-                'reviewDetails' => function ($q) {
-                    $q->with('question:id,question');
-                }
+                'users.schoolValidations' => function ($q) use ($userId) {
+                    $q
+                        ->where('userId', $userId)
+                        ->orderBy('id', 'desc');
+                },
+                'schoolDetails',
+                'reviewDetails.question'
             ])
-            ->orderByDesc('isPinned')
-            ->orderByDesc('createdAt');
+            ->orderBy('createdAt', 'desc');
 
         $totalReviews = (clone $query)->count();
         $reviews = $query->paginate($perPage);
-
         return [
             'totalReviews' => $totalReviews,
-            'reviews' => $reviews,
+            'reviews'      => $reviews,
         ];
     }
+
     public function updateUserReview(int $reviewId, array $data)
     {
         $userId = Auth::id();
@@ -472,5 +582,50 @@ class ReviewService extends BaseService
             $review->delete();
             return true;
         });
+    }
+    /**
+     * Mengambil semua review dengan status pending
+     */
+    public function getPendingReviews()
+    {
+        return Review::where('status', Review::STATUS_PENDING)
+            ->with([
+                'users.schoolValidations',
+                'schoolDetails:id,name',
+                'reviewDetails.question'
+            ])
+            ->orderByDesc('createdAt')
+            ->get();
+    }
+    /**
+     * Mengambil review yang ditolak (Rejected)
+     */
+    public function getRejectedReviews()
+    {
+        return Review::where('status', Review::STATUS_REJECTED)
+            ->with([
+                'users.schoolValidations',
+                'schoolDetails:id,name',
+                'reviewDetails.question'
+            ])
+            ->orderByDesc('updatedAt')
+            ->get();
+    }
+
+    public function getApprovedReviews()
+    {
+        return Review::where('status', Review::STATUS_APPROVED)
+            ->with([
+                // Load validasi via user agar Resource tidak null
+                'users.schoolValidations',
+                'schoolDetails:id,name',
+                'reviewDetails.question'
+            ])
+            ->orderByDesc('updatedAt') // Sorting berdasarkan kapan diapprove
+            ->get();
+    }
+    public function checkSchoolValidation($schoolDetailId, $userId)
+    {
+        return Review::where('userId', $userId)->where('schoolDetailId', $schoolDetailId)->exists();
     }
 }

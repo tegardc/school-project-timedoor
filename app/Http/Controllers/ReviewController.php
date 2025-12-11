@@ -6,10 +6,13 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\ReviewSubmitRequest;
 use App\Http\Resources\ReviewResource;
+use App\Http\Resources\ReviewUserResource;
 use App\Models\Review;
 use App\Services\ReviewService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
@@ -115,37 +118,58 @@ class ReviewController extends Controller
             return ResponseHelper::serverError("Oops rejected review is failed ", $e, "[REVIEW REJECTED]: ");
         }
     }
-    public function pendingReviews()
+    public function pendingReviews(ReviewService $service)
     {
         try {
-            $review = Review::where('status', review::STATUS_PENDING)->with(['users', 'schoolDetails', 'schoolValidation'])->get();
-            if ($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
-            return ResponseHelper::success(ReviewResource::collection($review), 'List Review For Approved Or Reject');
+            $reviews = $service->getPendingReviews();
+
+            if ($reviews->isEmpty()) {
+                return ResponseHelper::notFound('Review Not Found');
+            }
+
+            return ResponseHelper::success(
+                ReviewUserResource::collection($reviews),
+                'List Review For Approved Or Reject'
+            );
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display pending review is failed ", $e, "[REVIEW PENDINGREVIEWS]: ");
         }
     }
-    public function rejectedReviews()
+    public function rejectedReviews(ReviewService $service)
     {
         try {
-            $review = Review::where('status', review::STATUS_REJECTED)->with(['users', 'schoolDetails'])->get();
-            if ($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
-            return ResponseHelper::success(ReviewResource::collection($review), 'List Review Reject');
+            $reviews = $service->getRejectedReviews();
+
+            if ($reviews->isEmpty()) {
+                return ResponseHelper::notFound('Review Not Found');
+            }
+
+            return ResponseHelper::success(
+                ReviewUserResource::collection($reviews),
+                'List Review Rejected'
+            );
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display rejected review is failed ", $e, "[REVIEW REJECTEDREVIEWS]: ");
         }
     }
-    public function approvedReviews()
+
+    public function approvedReviews(ReviewService $service)
     {
         try {
-            $review = Review::where('status', review::STATUS_APPROVED)->with(['users', 'schoolDetails'])->get();
-            if ($review->isEmpty()) return ResponseHelper::notFound('Review Not Found');
-            return ResponseHelper::success(ReviewResource::collection($review), 'List Review Approved');
+            $reviews = $service->getApprovedReviews();
+
+            if ($reviews->isEmpty()) {
+                return ResponseHelper::notFound('Review Not Found');
+            }
+
+            return ResponseHelper::success(
+                ReviewUserResource::collection($reviews),
+                'List Review Approved'
+            );
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display approved review is failed ", $e, "[REVIEW APPROVEREVIEWS]: ");
         }
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -292,14 +316,23 @@ class ReviewController extends Controller
     }
     public function submitReview(ReviewService $service, ReviewSubmitRequest $request)
     {
-        $review = $service->submitFullReview($request->validated())
-            ->load(['reviewDetails.question', 'schoolValidation']);
+        $user = Auth::user();
+        if ($service->checkSchoolValidation($request->schoolDetailId, $user->id))
+            return ResponseHelper::badRequest('Review Anda Masih Belum Divalidasi');
+
+        $review = $service->submitFullReview($request->validated());
+
+        $datas = [
+            'user' => $user,
+            'review' => $review
+        ];
 
         return ResponseHelper::success(
-            new ReviewResource($review),
+            new ReviewResource($datas),
             'Review berhasil dikirim dan menunggu verifikasi admin.'
         );
     }
+
     public function togglePin($id, ReviewService $reviewService)
     {
         try {
@@ -324,9 +357,34 @@ class ReviewController extends Controller
         return response()->json([
             'message' => 'Daftar review pengguna.',
             'totalReviews' => $result['totalReviews'],
-            'data' => ReviewResource::collection($result['reviews'])
+            'data' => ReviewUserResource::collection($result['reviews'])
         ]);
     }
+    // public function getUserReviews(ReviewService $reviewService)
+    // {
+    //     try {
+    //         $user = Auth::user();
+
+    //         // Panggil service
+    //         $data = $reviewService->getUserReviews($user->id);
+
+    //         return response()->json([
+    //             'status'  => 'success',
+    //             'message' => 'Data review berhasil diambil',
+    //             'data'    => $data
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         Log::error('Error fetching user reviews: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'status'  => 'error',
+    //             'message' => 'Gagal mengambil data review',
+    //             'error'   => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function update(Request $request, int $id, ReviewService $service)
     {
         try {

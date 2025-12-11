@@ -42,9 +42,8 @@ class Review extends Model
     {
         return $this->hasMany(ReviewDetail::class, 'reviewId', 'id');
     }
-    public function schoolValidation()
-    {
-        return $this->hasOne(SchoolValidation::class, 'schoolDetailId', 'schoolDetailId')
-            ->whereColumn('userId', 'userId');
-    }
+  public function schoolValidation()
+{
+    return $this->hasOne(SchoolValidation::class, 'reviewId', 'id');
+}
 }

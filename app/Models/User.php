@@ -36,7 +36,7 @@ class User extends Authenticatable
         'password',
         'nisn',
         // 'schoolDetailId',
-        'status',
+        // 'status',
         'image',
         'schoolValidation',
         'address',
@@ -60,9 +60,15 @@ class User extends Authenticatable
         return $this->hasMany(Child::class, 'userId'); // kalau nanti butuh banyak anak
     }
 
-    public function review()
+
+/**
+ * Get all reviews.
+ *
+ * @return \Illuminate\Database\Eloquent\Collection
+ */
+    public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class, 'userId', 'id');
     }
     public function childSchoolDetails()
     {
@@ -73,9 +79,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(EducationExperience::class, 'userId');
     }
+    // Di App\Models\User.php
     public function schoolValidations()
     {
-        return $this->hasMany(SchoolValidation::class, 'userId');
+        return $this->hasMany(SchoolValidation::class, 'userId', 'id');
     }
 
 

@@ -26,8 +26,9 @@ class ReviewSubmitRequest extends FormRequest
             'fullname' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phoneNo' => 'nullable|string|max:20',
+            'userStatus' => 'required|in:aktif,alumni',
             'schoolDetailId' => 'nullable|integer|exists:school_details,id',
-            'schoolValidation' => 'nullable|string|max:255',
+            'schoolValidationFile' => 'nullable|string|max:255|url',
             'liked'    => 'nullable|string|max:500',
             'improved' => 'nullable|string|max:500',
 

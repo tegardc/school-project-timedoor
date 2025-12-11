@@ -14,8 +14,9 @@ class SchoolValidation extends Model
 
     protected $fillable = [
         'userId',
-        'schoolDetailId',
-        'fileUrl'
+        'reviewId',
+        'fileUrl',
+        'status',
     ];
 
     // Relasi ke User
@@ -31,9 +32,8 @@ class SchoolValidation extends Model
     }
 
     // Relasi opsional ke Review
-   public function review()
-{
-    return $this->belongsTo(Review::class, 'schoolDetailId', 'schoolDetailId');
-}
-
+    public function review()
+    {
+        return $this->belongsTo(Review::class, 'reviewId');
+    }
 }

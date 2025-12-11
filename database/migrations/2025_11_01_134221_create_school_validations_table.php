@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('school_validations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('userId');
-            $table->unsignedBigInteger('schoolDetailId');
+            $table->unsignedBigInteger('reviewId')->nullable();
             $table->string('fileUrl');
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
 
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('schoolDetailId')->references('id')->on('school_details')->onDelete('cascade');
+            $table->foreign('reviewId')->references('id')->on('reviews')->onDelete('cascade');
         });
     }
 
