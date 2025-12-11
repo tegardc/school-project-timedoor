@@ -33,7 +33,7 @@ class ReviewSubmitRequest extends FormRequest
             'improved' => 'nullable|string|max:500',
 
 
-            'reviewText' => 'nullable|string|max:5000',
+            // 'reviewText' => 'nullable|string|max:5000',
             'liked' => 'nullable|string|max:2000',
             'improved' => 'nullable|string|max:2000',
 

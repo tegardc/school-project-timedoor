@@ -378,78 +378,78 @@ class ReviewService extends BaseService
     //         ];
     //     });
     // }
-    public function submitFullReview(array $data)
-    {
-        $user = Auth::user();
+        public function submitFullReview(array $data)
+        {
+            $user = Auth::user();
 
-        Log::info($data);
+            Log::info($data);
 
-        $details = $data['details'];
-        $totalScore = array_sum(array_column($details, 'score'));
-        $rating = round($totalScore / count($details), 2);
+            $details = $data['details'];
+            $totalScore = array_sum(array_column($details, 'score'));
+            $rating = round($totalScore / count($details), 2);
 
-        return DB::transaction(function () use ($user, $data, $rating, $details) {
+            return DB::transaction(function () use ($user, $data, $rating, $details) {
 
-            $user->update([
-                'fullname' => $data['fullname'] ?? $user->fullname,
-                'email'    => $data['email'] ?? $user->email,
-                'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
-            ]);
-
-            $schoolValidation = null;
-
-            // 1️⃣ BUAT VALIDATION DULU
-            if (!empty($data['schoolValidationFile'])) {
-                $schoolValidation = SchoolValidation::create([
-                    'userId'         => $user->id,
-                    'schoolDetailId' => $data['schoolDetailId'],
-                    'fileUrl'        => $data['schoolValidationFile'] ?? null,
-                    'status'         => $data['userStatus'] ?? null,
+                $user->update([
+                    'fullname' => $data['fullname'] ?? $user->fullname,
+                    'email'    => $data['email'] ?? $user->email,
+                    'phoneNo'  => $data['phoneNo'] ?? $user->phoneNo,
                 ]);
-            }
 
-            // 2️⃣ LALU BUAT REVIEW
-            $review = Review::create([
-                'userId'          => $user->id,
-                'schoolDetailId'  => $data['schoolDetailId'],
-                'reviewText'      => $data['reviewText'] ?? null,
-                'liked'           => $data['liked'] ?? null,
-                'improved'        => $data['improved'] ?? null,
-                'rating'          => $rating,
-                'status'          => Review::STATUS_PENDING,
-            ]);
+                $schoolValidation = null;
 
-            // 🔥 3️⃣ UPDATE schoolValidation -> reviewId (FIX PENTING)
-            if ($schoolValidation) {
-                $schoolValidation->update([
-                    'reviewId' => $review->id
+                // 1️⃣ BUAT VALIDATION DULU
+                if (!empty($data['schoolValidationFile'])) {
+                    $schoolValidation = SchoolValidation::create([
+                        'userId'         => $user->id,
+                        'schoolDetailId' => $data['schoolDetailId'],
+                        'fileUrl'        => $data['schoolValidationFile'] ?? null,
+                        'status'         => $data['userStatus'] ?? null,
+                    ]);
+                }
+
+                // 2️⃣ LALU BUAT REVIEW
+                $review = Review::create([
+                    'userId'          => $user->id,
+                    'schoolDetailId'  => $data['schoolDetailId'],
+                    // 'reviewText'      => $data['reviewText'] ?? null,
+                    'liked'           => $data['liked'] ?? null,
+                    'improved'        => $data['improved'] ?? null,
+                    'rating'          => $rating,
+                    'status'          => Review::STATUS_PENDING,
                 ]);
-            }
 
-            // 4️⃣ INSERT REVIEW DETAILS
-            $detailReviews = [];
-            foreach ($details as $d) {
-                $detailReviews[] = [
-                    'reviewId'   => $review->id,
-                    'questionId' => $d['questionId'],
-                    'score'      => $d['score'],
-                    'createdAt'  => now(),
-                    'updatedAt'  => now(),
+                // 🔥 3️⃣ UPDATE schoolValidation -> reviewId (FIX PENTING)
+                if ($schoolValidation) {
+                    $schoolValidation->update([
+                        'reviewId' => $review->id
+                    ]);
+                }
+
+                // 4️⃣ INSERT REVIEW DETAILS
+                $detailReviews = [];
+                foreach ($details as $d) {
+                    $detailReviews[] = [
+                        'reviewId'   => $review->id,
+                        'questionId' => $d['questionId'],
+                        'score'      => $d['score'],
+                        'createdAt'  => now(),
+                        'updatedAt'  => now(),
+                    ];
+                }
+
+                ReviewDetail::insert($detailReviews);
+
+                // Load relations
+                $review->load('reviewDetails.question', 'schoolValidation');
+
+                return [
+                    'review'           => $review->toArray(),
+                    'schoolValidation' => $schoolValidation?->toArray(),
+                    'reviewDetails'    => $review->reviewDetails->toArray(),
                 ];
-            }
-
-            ReviewDetail::insert($detailReviews);
-
-            // Load relations
-            $review->load('reviewDetails.question', 'schoolValidation');
-
-            return [
-                'review'           => $review->toArray(),
-                'schoolValidation' => $schoolValidation?->toArray(),
-                'reviewDetails'    => $review->reviewDetails->toArray(),
-            ];
-        });
-    }
+            });
+        }
 
 
     public function togglePin(int $id): Review
