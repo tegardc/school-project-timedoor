@@ -16,7 +16,7 @@ class ReviewUserResource extends JsonResource
     {
 
         return [
-            'id'           => $this->id,
+            'id'           => $this->id ?? '-',
             // 'reviewText'   => $this->reviewText,
             'rating'       => $this->rating,
             'userId'       => $this->userId,
