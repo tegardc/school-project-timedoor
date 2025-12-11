@@ -328,7 +328,7 @@ class ReviewController extends Controller
         ];
 
         return ResponseHelper::success(
-            new ReviewUserResource($datas),
+            new ReviewResource($datas),
             'Review berhasil dikirim dan menunggu verifikasi admin.'
         );
     }

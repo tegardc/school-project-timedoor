@@ -81,7 +81,7 @@ class ReviewResource extends JsonResource
             'schoolDetailId'   => $reviewData['schoolDetailId'] ?? null,
             'schoolDetailName' => $schoolDetailName,
 
-            'reviewText'     => $reviewData['reviewText'] ?? null,
+            // 'reviewText'     => $reviewData['reviewText'] ?? null,
             'liked'          => $reviewData['liked'] ?? null,
             'improved'       => $reviewData['improved'] ?? null,
             'rating'         => isset($reviewData['rating']) ? (float) $reviewData['rating'] : 0,
