@@ -58,23 +58,23 @@ class ReviewController extends Controller
                 'maxRating',
                 'starRating',
                 'role',
-                'sort'
+                'sort',
             ]);
 
-            // ambil limit / perPage
+            // Ambil limit / perPage
             $perPage = $request->query('perPage', 10);
 
-            // ambil result dari service (HARUS return paginator)
+            // Ambil result dari service (HARUS return paginator)
             $result = $service->getSchoolReviewsWithRating($schoolDetailId, $filters, $perPage);
 
-            // cek kalau kosong
+            // Cek kalau kosong
             if ($result['reviews']->isEmpty()) {
                 return ResponseHelper::notFound("Review untuk sekolah ini belum tersedia.");
             }
 
-            // response
+            // Response dengan data likes
             return ResponseHelper::success([
-                'reviews' => ReviewResource::collection($result['reviews']),
+                'reviews' => ReviewUserResource::collection($result['reviews']),
                 'meta' => [
                     'current_page'   => $result['reviews']->currentPage(),
                     'last_page'      => $result['reviews']->lastPage(),
@@ -83,6 +83,13 @@ class ReviewController extends Controller
                     'finalRating'    => $result['finalRating'],
                     'totalRating'    => $result['totalRating'],
                     'questionStats'  => $result['questionStats'],
+
+                    'likesStats' => [
+                        'totalLikes' => $result['reviews']->sum('likes_count'),
+                        'reviewsWithLikes' => $result['reviews']->filter(function ($review) {
+                            return $review->likes_count > 0;
+                        })->count(),
+                    ],
                 ],
             ], 'Success get school reviews and rating');
         } catch (\Exception $e) {
@@ -419,6 +426,114 @@ class ReviewController extends Controller
             ]);
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops deleted review is failed ", $e, "[REVIEW DELETED]: ");
+        }
+    }
+    public function toggleLike(ReviewService $reviewLikeService, $reviewId)
+    {
+        try {
+            $result = $reviewLikeService->toggleLike($reviewId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Mendapatkan jumlah likes untuk review
+     * GET /api/reviews/{reviewId}/likes/count
+     */
+    public function getLikesCount(ReviewService $reviewLikeService, $reviewId)
+    {
+        try {
+            $count = $reviewLikeService->getLikesCount($reviewId);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'review_id' => $reviewId,
+                    'likes_count' => $count
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Cek apakah user sudah like review
+     * GET /api/reviews/{reviewId}/likes/check
+     */
+    public function checkIfLiked(ReviewService $reviewLikeService, $reviewId)
+    {
+        try {
+            $isLiked = $reviewLikeService->isLikedByUser($reviewId);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'review_id' => $reviewId,
+                    'is_liked' => $isLiked
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Mendapatkan list user yang like review
+     * GET /api/reviews/{reviewId}/likes/users
+     */
+    public function getUsersWhoLiked(ReviewService $reviewLikeService, $reviewId, Request $request)
+    {
+        try {
+            $limit = $request->input('limit', 10);
+            $users = $reviewLikeService->getUsersWhoLiked($reviewId, $limit);
+
+            return response()->json([
+                'success' => true,
+                'data' => $users
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Mendapatkan review dengan likes terbanyak
+     * GET /api/reviews/most-liked
+     */
+    public function getMostLiked(ReviewService $reviewLikeService, Request $request)
+    {
+        try {
+            $limit = $request->input('limit', 10);
+            $reviews = $reviewLikeService->getMostLikedReviews($limit);
+
+            return response()->json([
+                'success' => true,
+                'data' => $reviews
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 }

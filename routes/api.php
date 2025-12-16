@@ -53,6 +53,11 @@
         Route::get('/experiences-user', [EducationExperienceController::class, 'getExperienceByUser']);
         Route::post('/reviews/{schoolDetailId}', [ReviewController::class, 'store']);
         Route::post('/review/submit', [ReviewController::class, 'submitReview']);
+        // Route::post('/reviews/{id}/like', [ReviewController::class, 'toggleLike']);
+        Route::post('reviews/{reviewId}/like', [ReviewController::class, 'toggleLike']);
+
+        // Cek apakah user sudah like review
+        Route::get('reviews/{reviewId}/likes/check', [ReviewController::class, 'checkIfLiked']);
 
         // Upload image
         Route::post('/upload', [SchoolGalleryController::class, 'uploadFile']);
@@ -202,3 +207,11 @@
         Route::post('/preview', [CSVImportController::class, 'previews']);
         Route::post('/import', [CsvImportController::class, 'imports']);
     });
+
+    Route::get('reviews/{reviewId}/likes/count', [ReviewController::class, 'getLikesCount']);
+
+    // Get list user yang like
+    Route::get('reviews/{reviewId}/likes/users', [ReviewController::class, 'getUsersWhoLiked']);
+
+    // Get review dengan likes terbanyak
+    Route::get('reviews/most-liked', [ReviewController::class, 'getMostLiked']);

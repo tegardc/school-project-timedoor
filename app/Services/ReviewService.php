@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Review;
 use App\Models\ReviewDetail;
+use App\Models\ReviewLike;
 use App\Models\SchoolValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -258,7 +259,9 @@ class ReviewService extends BaseService
 
     public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [], int $perPage = 10)
     {
-        // Query utama dengan eager load
+        $userId = Auth::id();
+
+        // Query utama dengan eager load + likes count
         $query = Review::with([
             'users' => function ($q) {
                 $q->select('id', 'fullname', 'email', 'image', 'status')
@@ -267,16 +270,19 @@ class ReviewService extends BaseService
             'schoolDetails:id,name',
             'reviewDetails:id,reviewId,questionId,score'
         ])
+            ->withCount('likes') // Hitung total likes per review
             ->where('schoolDetailId', $schoolDetailId)
             ->where('status', Review::STATUS_APPROVED);
 
+        // Apply filters jika ada
         if (!empty($filters)) {
             $this->applyFilters($query, $filters);
         }
 
-        // PAGINATION di sini
+        // PAGINATION
         $reviews = $query->paginate($perPage);
 
+        // Return early jika tidak ada review
         if ($reviews->isEmpty()) {
             return [
                 'reviews' => $reviews,
@@ -286,7 +292,34 @@ class ReviewService extends BaseService
             ];
         }
 
-        // Hitung berdasarkan semua review dalam page ini
+        /**
+         * Tambahkan flag is_liked untuk setiap review
+         * Menggunakan single query untuk efisiensi
+         */
+        if ($userId) {
+            $reviewIds = $reviews->getCollection()->pluck('id')->toArray();
+
+            // Get semua review yang sudah di-like oleh user ini dalam satu query
+            $likedReviewIds = DB::table('review_likes')
+                ->where('userId', $userId)
+                ->whereIn('reviewId', $reviewIds)
+                ->pluck('reviewId')
+                ->toArray();
+
+            // Transform collection dan tambahkan flag is_liked
+            $reviews->getCollection()->transform(function ($review) use ($likedReviewIds) {
+                $review->is_liked = in_array($review->id, $likedReviewIds);
+                return $review;
+            });
+        } else {
+            // User belum login, set semua is_liked = false
+            $reviews->getCollection()->transform(function ($review) {
+                $review->is_liked = false;
+                return $review;
+            });
+        }
+
+        // Hitung statistik rating per question
         $reviewIds = $reviews->pluck('id');
 
         $questionStats = ReviewDetail::select(
@@ -622,5 +655,98 @@ class ReviewService extends BaseService
     public function checkSchoolValidation($schoolDetailId, $userId)
     {
         return Review::where('userId', $userId)->where('schoolDetailId', $schoolDetailId)->exists();
+    }
+    public function toggleLike(int $reviewId)
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            throw new \Exception('User harus login untuk like review.');
+        }
+
+        $review = Review::find($reviewId);
+
+        if (!$review) {
+            throw new \Exception('Review tidak ditemukan.');
+        }
+
+        // Cek apakah user sudah like review ini
+        $existingLike = ReviewLike::where('reviewId', $reviewId)
+            ->where('userId', $userId)
+            ->first();
+
+        if ($existingLike) {
+            // Unlike - hapus like
+            $existingLike->delete();
+
+            return [
+                'success' => true,
+                'action' => 'unliked',
+                'message' => 'Review berhasil di-unlike',
+                'likes_count' => $review->fresh()->likes_count
+            ];
+        } else {
+            // Like - tambah like baru
+            ReviewLike::create([
+                'reviewId' => $reviewId,
+                'userId' => $userId,
+                'createdAt' => now()
+            ]);
+
+            return [
+                'success' => true,
+                'action' => 'liked',
+                'message' => 'Review berhasil di-like',
+                'likes_count' => $review->fresh()->likes_count
+            ];
+        }
+    }
+
+    /**
+     * Mendapatkan total likes untuk sebuah review
+     */
+    public function getLikesCount(int $reviewId)
+    {
+        return ReviewLike::where('reviewId', $reviewId)->count();
+    }
+
+    /**
+     * Cek apakah user sudah like review tertentu
+     */
+    public function isLikedByUser(int $reviewId, int $userId = null)
+    {
+        $userId = $userId ?? Auth::id();
+
+        if (!$userId) {
+            return false;
+        }
+
+        return ReviewLike::where('reviewId', $reviewId)
+            ->where('userId', $userId)
+            ->exists();
+    }
+
+    /**
+     * Mendapatkan list user yang like review tertentu
+     */
+    public function getUsersWhoLiked(int $reviewId, int $limit = 10)
+    {
+        return ReviewLike::where('reviewId', $reviewId)
+            ->with('user:id,fullname,image')
+            ->orderByDesc('createdAt')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Mendapatkan review yang paling banyak di-like
+     */
+    public function getMostLikedReviews(int $limit = 10)
+    {
+        return Review::withCount('likes')
+            ->where('status', Review::STATUS_APPROVED)
+            ->orderByDesc('likes_count')
+            ->limit($limit)
+            ->get();
     }
 }

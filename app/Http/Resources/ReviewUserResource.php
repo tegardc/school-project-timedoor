@@ -14,10 +14,8 @@ class ReviewUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
             'id'           => $this->id ?? '-',
-            // 'reviewText'   => $this->reviewText,
             'rating'       => $this->rating,
             'userId'       => $this->userId,
 
@@ -33,6 +31,10 @@ class ReviewUserResource extends JsonResource
             'improved'     => $this->improved,
             'status'       => $this->status,
 
+            // ✅ LIKES INFORMATION
+            'likesCount'   => $this->likes_count ?? 0,  // dari withCount('likes')
+            'isLiked'      => $this->is_liked ?? false, // dari transform di service
+
             // timestamps
             'createdAt'    => $this->createdAt,
             'updatedAt'    => $this->updatedAt,
@@ -45,22 +47,38 @@ class ReviewUserResource extends JsonResource
         ];
     }
 
+    /**
+     * Map school validation data
+     * Ambil validasi terbaru dari relasi
+     */
     private function mapSchoolValidation()
-{
-    $validations = $this->schoolValidation()
-        ->orderBy('createdAt', 'desc')
-        ->get();
+    {
+        // Cek apakah relasi users ter-load
+        if (!$this->relationLoaded('users') || !$this->users) {
+            return null;
+        }
 
-    if ($validations->isEmpty()) {
-        return null;
-    }
+        // Cek apakah schoolValidations ter-load via eager loading
+        if (!$this->users->relationLoaded('schoolValidations')) {
+            return null;
+        }
 
-    return $validations->map(function ($v) {
+        // Filter validasi yang sesuai dengan schoolDetailId dari review ini
+        $validations = $this->users->schoolValidations
+            ->where('schoolDetailId', $this->schoolDetailId)
+            ->sortByDesc('createdAt');
+
+        if ($validations->isEmpty()) {
+            return null;
+        }
+
+        // Return yang terbaru saja
+        $latest = $validations->first();
+
         return [
-            'file'       => $v->fileUrl,
-            'userStatus' => $v->status,
-            'createdAt'  => $v->createdAt,
+            'file'       => $latest->fileUrl,
+            'userStatus' => $latest->status,
+            'createdAt'  => $latest->createdAt,
         ];
-    });
-}
+    }
 }
