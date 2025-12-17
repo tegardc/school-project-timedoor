@@ -31,7 +31,7 @@ class Review extends Model
         'createdAt',
         'updatedAt'
     ];
-    protected $appends = ['likes_count'];
+    protected $appends = ['likesCount'];
     public function users()
     {
         return $this->belongsTo(User::class, 'userId', 'id');

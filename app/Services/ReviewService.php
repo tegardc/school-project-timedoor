@@ -683,7 +683,7 @@ class ReviewService extends BaseService
                 'success' => true,
                 'action' => 'unliked',
                 'message' => 'Review berhasil di-unlike',
-                'likes_count' => $review->fresh()->likes_count
+                'likesCount' => $review->fresh()->likesCount
             ];
         } else {
             // Like - tambah like baru
@@ -697,7 +697,7 @@ class ReviewService extends BaseService
                 'success' => true,
                 'action' => 'liked',
                 'message' => 'Review berhasil di-like',
-                'likes_count' => $review->fresh()->likes_count
+                'likesCount' => $review->fresh()->likesCount
             ];
         }
     }
@@ -745,7 +745,7 @@ class ReviewService extends BaseService
     {
         return Review::withCount('likes')
             ->where('status', Review::STATUS_APPROVED)
-            ->orderByDesc('likes_count')
+            ->orderByDesc('likesCount')
             ->limit($limit)
             ->get();
     }

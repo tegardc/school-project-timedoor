@@ -85,9 +85,9 @@ class ReviewController extends Controller
                     'questionStats'  => $result['questionStats'],
 
                     'likesStats' => [
-                        'totalLikes' => $result['reviews']->sum('likes_count'),
+                        'totalLikes' => $result['reviews']->sum('likesCount'),
                         'reviewsWithLikes' => $result['reviews']->filter(function ($review) {
-                            return $review->likes_count > 0;
+                            return $review->likesCount > 0;
                         })->count(),
                     ],
                 ],
@@ -457,8 +457,8 @@ class ReviewController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'review_id' => $reviewId,
-                    'likes_count' => $count
+                    'reviewId' => $reviewId,
+                    'likesCount' => $count
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -481,8 +481,8 @@ class ReviewController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'review_id' => $reviewId,
-                    'is_liked' => $isLiked
+                    'reviewId' => $reviewId,
+                    'isLiked' => $isLiked
                 ]
             ], 200);
         } catch (\Exception $e) {

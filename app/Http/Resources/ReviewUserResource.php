@@ -32,7 +32,7 @@ class ReviewUserResource extends JsonResource
             'status'       => $this->status,
 
             // ✅ LIKES INFORMATION
-            'likesCount'   => $this->likes_count ?? 0,  // dari withCount('likes')
+            'likesCount'   => $this->likesCount ?? 0,  // dari withCount('likes')
             // 'isLiked'      => $this->is_liked ?? false, // dari transform di service
 
             // timestamps
