@@ -279,7 +279,7 @@ class ReviewController extends Controller
             if ($review->isEmpty()) {
                 return ResponseHelper::notFound('Reviews not found');
             }
-            return ResponseHelper::success(ReviewResource::collection($review), 'Review recent items retrieved successfully');
+            return ResponseHelper::success(ReviewUserResource::collection($review), 'Review recent items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW RECENT]: ");
         }
