@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\ReviewSubmitRequest;
 use App\Http\Resources\ReviewResource;
+use App\Http\Resources\ReviewResourceGeneral;
 use App\Http\Resources\ReviewUserResource;
 use App\Models\Review;
 use App\Services\ReviewService;
@@ -279,7 +280,7 @@ class ReviewController extends Controller
             if ($review->isEmpty()) {
                 return ResponseHelper::notFound('Reviews not found');
             }
-            return ResponseHelper::success(ReviewUserResource::collection($review), 'Review recent items retrieved successfully');
+            return ResponseHelper::success(ReviewResourceGeneral::collection($review), 'Review recent items retrieved successfully');
         } catch (\Exception $e) {
             return ResponseHelper::serverError("Oops display review is failed ", $e, "[REVIEW RECENT]: ");
         }

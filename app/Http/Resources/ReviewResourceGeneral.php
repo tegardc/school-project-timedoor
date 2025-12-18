@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReviewUserResource extends JsonResource
+class ReviewResourceGeneral extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,7 +17,7 @@ class ReviewUserResource extends JsonResource
 
         return [
             'id'           => $this->id,
-            'reviewText'   => $this->reviewText,
+            // 'reviewText'   => $this->reviewText,
             'rating'       => $this->rating,
             'userId'       => $this->userId,
 
@@ -35,34 +35,27 @@ class ReviewUserResource extends JsonResource
 
             'likesCount'   => $this->likes_count ?? 0,  // dari withCount('likes')
 
+            'userStatus'   => $this->getLatestUserStatus(),
+
             // timestamps
             'createdAt'    => $this->createdAt,
-            'updatedAt'    => $this->updatedAt,
+            // 'updatedAt'    => $this->updatedAt,
 
             // review details
-            'reviewDetails' => ReviewDetailResource::collection($this->whenLoaded('reviewDetails')),
+            // 'reviewDetails' => ReviewDetailResource::collection($this->whenLoaded('reviewDetails')),
 
             // school validation
-            'schoolValidation' => $this->mapSchoolValidation(),
+            // 'schoolValidation' => $this->mapSchoolValidation(),
         ];
     }
 
-    private function mapSchoolValidation()
-{
-    $validations = $this->schoolValidation()
-        ->orderBy('createdAt', 'desc')
-        ->get();
 
-    if ($validations->isEmpty()) {
-        return null;
+    private function getLatestUserStatus()
+    {
+        $latestValidation = $this->schoolValidation()
+            ->orderBy('createdAt', 'desc')
+            ->first();
+
+        return $latestValidation?->status;
     }
-
-    return $validations->map(function ($v) {
-        return [
-            'file'       => $v->fileUrl,
-            'userStatus' => $v->status,
-            'createdAt'  => $v->createdAt,
-        ];
-    });
-}
 }

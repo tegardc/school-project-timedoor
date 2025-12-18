@@ -126,16 +126,20 @@ class ReviewService extends BaseService
     {
         return Review::select([
             'id',
-            'reviewText',
             'rating',
+            'liked',
+            'improved',
+            'status',
             'userId',
             'schoolDetailId',
             'createdAt'
         ])
             ->where('status', Review::STATUS_APPROVED)
             ->with([
-                'users:id,fullname,image',
+                'users.schoolValidations',
                 'schoolDetails:id,name',
+
+
                 'reviewDetails' => function ($q) {
                     $q->with('question:id,question');
                 }
