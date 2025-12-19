@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class ForgotPasswordJob implements ShouldQueue
+class VerificationEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -18,21 +18,24 @@ class ForgotPasswordJob implements ShouldQueue
     public $timeout = 120;
 
     protected $email;
-    protected $resetLink;
+    protected $verificationLink;
+    protected $userName;
 
-    public function __construct(string $email, string $resetLink)
+    public function __construct(string $email, string $verificationLink, ?string $userName = null)
     {
         $this->email = $email;
-        $this->resetLink = $resetLink;
+        $this->verificationLink = $verificationLink;
+        $this->userName = $userName;
     }
 
     public function handle(SendEmailService $emailService)
     {
         $result = $emailService->sendWithTemplate(
             email: $this->email,
-            templateId: 'forgot_password_ui',
+            templateId: 'schoolpedia',
             parameters: [
-                'link_url' => $this->resetLink
+                'verification_link' => $this->verificationLink,
+                'user_name' => $this->userName ?? 'User'
             ]
         );
 
@@ -40,12 +43,12 @@ class ForgotPasswordJob implements ShouldQueue
             throw new \Exception($result['message']);
         }
 
-        Log::info('Forgot password email sent', ['email' => $this->email]);
+        Log::info('Verification email sent', ['email' => $this->email]);
     }
 
     public function failed(\Throwable $exception)
     {
-        Log::error('Forgot password job failed', [
+        Log::error('Verification email job failed', [
             'email' => $this->email,
             'error' => $exception->getMessage()
         ]);

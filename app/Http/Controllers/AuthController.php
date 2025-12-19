@@ -3,33 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\UpdateForgotPaswordRequest;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserResource;
-use App\Models\Child;
 use App\Models\User;
+use App\Models\VerificationToken;
 use App\Services\AuthService;
+use App\Services\TokenService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     protected $authService;
+    protected $tokenService;
 
-    public function __construct(AuthService $authService)
+    public function __construct(AuthService $authService, TokenService $tokenService)
     {
         $this->authService = $authService;
+        $this->tokenService = $tokenService;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
 
     public function register(UserRequest $request)
     {
@@ -40,6 +34,7 @@ class AuthController extends Controller
             return ResponseHelper::serverError('Failed to register user', $e, '[REGISTER]');
         }
     }
+
     public function login(Request $request)
     {
         try {
@@ -49,7 +44,7 @@ class AuthController extends Controller
                 'expiresAt' => $result['expiresAt']
             ], 'Login Successfully');
         } catch (ValidationException $e) {
-        throw $e;
+            throw $e;
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to login user', $e, '[LOGIN]');
         }
@@ -59,60 +54,52 @@ class AuthController extends Controller
     {
         try {
             $service->logout($request);
-            return ResponseHelper::success(null,'Logged out successfully.');
+            return ResponseHelper::success(null, 'Logged out successfully.');
         } catch (\Exception $e) {
             return ResponseHelper::serverError('Failed to logout user', $e, '[LOGOUT]');
         }
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // FORGOT PASSWORD
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
-        //
+        try {
+            $payload = $request->validated();
+            $this->authService->forgotPassword($payload['email']);
+
+            return ResponseHelper::success(null, 'Forgot password process initiated. Please check your email.');
+        } catch (\Exception $e) {
+            return ResponseHelper::serverError('Failed to process forgot password', $e, '[FORGOT_PASSWORD]');
+        }
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function updateForgotPasswordUser(UpdateForgotPaswordRequest $request)
     {
-        //
-    }
+        try {
+            $payload = $request->validated();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+            DB::beginTransaction();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            $result = $this->tokenService->validateToken($payload['token'], VerificationToken::TYPE_PASSWORD_RESET);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            if (!$result) {
+                DB::rollBack();
+                return ResponseHelper::badRequest('Token sudah tidak valid atau telah digunakan.', null, '[INVALID_TOKEN]');
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            User::where('id', $result->user_id)
+                ->update([
+                    'password' => bcrypt($payload['password'])
+                ]);
+
+            $this->tokenService->markAsUsed($result);
+
+            DB::commit();
+
+            return ResponseHelper::success(null, 'Password berhasil direset.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::serverError('Failed to reset password', $e, '[RESET_PASSWORD]');
+        }
     }
 }

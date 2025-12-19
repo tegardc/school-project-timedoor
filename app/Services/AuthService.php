@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Jobs\ForgotPasswordJob;
 use App\Models\Child;
 use App\Models\User;
+use App\Models\VerificationToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
+    protected $tokenService;
+
+    public function __construct(TokenService $tokenService)
+    {
+        $this->tokenService = $tokenService;
+    }
+
     // public function register(array $data): User
     // {
     //     return DB::transaction(function () use ($data) {
@@ -63,27 +72,23 @@ class AuthService
     //     });
     // }
     public function register(array $data): User
-{
-    return DB::transaction(function () use ($data) {
-        $parts = explode(' ', trim($data['fullname']));
-        $firstName = array_shift($parts);
-        $lastName  = count($parts) ? implode(' ', $parts) : null;
+    {
+        return DB::transaction(function () use ($data) {
+            $parts = explode(' ', trim($data['fullname']));
 
-        $user = User::create([
-            'fullname' => $data['fullname'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+            $user = User::create([
+                'fullname' => $data['fullname'],
+                'email'    => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
 
-        // ✅ Assign role dari request
-        if (!empty($data['role'])) {
-            $user->assignRole($data['role']);
-        }
+            if (!empty($data['role'])) {
+                $user->assignRole($data['role']);
+            }
 
-        return $user;
-    });
-}
-
+            return $user;
+        });
+    }
 
     public function login(Request $request)
     {
@@ -106,6 +111,23 @@ class AuthService
             'expiresAt' => now()->addHours($hours)->toDateTimeString(),
         ];
     }
+
+    public function forgotPassword(string $email)
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('Akun dengan email tersebut tidak ditemukan.');
+        }
+
+        $resultToken = $this->tokenService->createToken($user, VerificationToken::TYPE_PASSWORD_RESET, 60);
+        $createFrontendUrl = env('APP_FRONTEND_URL') . '/reset-password?token=' . $resultToken . '&email=' . urlencode($email);
+
+        ForgotPasswordJob::dispatch($user->email, $createFrontendUrl);
+
+        return true;
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

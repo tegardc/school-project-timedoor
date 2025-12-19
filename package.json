@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "concurrently \"php artisan serve\" \"php artisan queue:listen --tries=3\""
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

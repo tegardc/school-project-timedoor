@@ -186,8 +186,6 @@
     Route::get('/districts/{id}/sub-districts', [SubdistrictController::class, 'getByDistrict']);
     Route::get('/sub-districts/{id}/school-details', [SchoolDetailController::class, 'getBySubDistrict']);
 
-
-
     Route::prefix('facilities')->group(function () {
         Route::get('/', [FacilityController::class, 'index']);
         Route::post('/', [FacilityController::class, 'store']);
@@ -201,8 +199,11 @@
 
     Route::get('/education-programs', [EducationProgramController::class, 'index']);
 
-    //IMPORT CSV
+    // ------------ FORGOT PASSWORD ------------
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'updateForgotPasswordUser']);
 
+    //IMPORT CSV
     Route::prefix('csv')->group(function () {
         Route::post('/preview', [CSVImportController::class, 'previews']);
         Route::post('/import', [CsvImportController::class, 'imports']);

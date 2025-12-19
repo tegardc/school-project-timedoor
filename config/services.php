@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'notificationapi' => [
+        'client_id' => env('NOTIFICATION_CLIENT_ID'),
+        'client_secret' => env('NOTIFICATION_CLIENT_SECRET'),
+        'type' => env('NOTIFICATION_TYPE', 'underground_app_v1'),
+    ],
 ];
