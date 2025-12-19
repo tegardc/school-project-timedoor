@@ -203,6 +203,9 @@
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'updateForgotPasswordUser']);
 
+    // ------------ VERIFIED ACCOUNT USER ------------
+    Route::get('/verify-account', [AuthController::class, 'verfiedAccountUser']);
+
     //IMPORT CSV
     Route::prefix('csv')->group(function () {
         Route::post('/preview', [CSVImportController::class, 'previews']);

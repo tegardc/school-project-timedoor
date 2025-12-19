@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\ForgotPasswordJob;
+use App\Jobs\VerificationEmailJob;
 use App\Models\Child;
 use App\Models\User;
 use App\Models\VerificationToken;
@@ -73,21 +74,25 @@ class AuthService
     // }
     public function register(array $data): User
     {
-        return DB::transaction(function () use ($data) {
-            $parts = explode(' ', trim($data['fullname']));
+        DB::beginTransaction();
 
-            $user = User::create([
-                'fullname' => $data['fullname'],
-                'email'    => $data['email'],
-                'password' => Hash::make($data['password']),
-            ]);
+        explode(' ', trim($data['fullname']));
 
-            if (!empty($data['role'])) {
-                $user->assignRole($data['role']);
-            }
+        $user = User::create([
+            'fullname' => $data['fullname'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
 
-            return $user;
-        });
+        if (!empty($data['role'])) {
+            $user->assignRole($data['role']);
+        }
+
+        $this->sendVerificationAccount($user);
+
+        DB::commit();
+
+        return $user;
     }
 
     public function login(Request $request)
@@ -96,6 +101,15 @@ class AuthService
             'email' => 'required',
             'password' => 'required'
         ]);
+
+        $currentUser = User::where('email', $credentials['email'])->first();
+
+        if ($currentUser && !$currentUser->emailVerifiedAt) {
+            throw ValidationException::withMessages([
+                'login' => ['Please verify your email before logging in.'],
+            ]);
+        }
+
         if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'login' => ['Invalid credential or account disabled.'],
@@ -124,6 +138,16 @@ class AuthService
         $createFrontendUrl = env('APP_FRONTEND_URL') . '/reset-password?token=' . $resultToken . '&email=' . urlencode($email);
 
         ForgotPasswordJob::dispatch($user->email, $createFrontendUrl);
+
+        return true;
+    }
+
+    public function sendVerificationAccount(User $user)
+    {
+        $resultToken = $this->tokenService->createToken($user, VerificationToken::TYPE_EMAIL_VERIFICATION, 1440);
+        $createFrontendUrl = env('APP_FRONTEND_URL') . '/verify-account?token=' . $resultToken . '&email=' . urlencode($user->email);
+
+        VerificationEmailJob::dispatch($user->email, $createFrontendUrl, $user->fullname);
 
         return true;
     }

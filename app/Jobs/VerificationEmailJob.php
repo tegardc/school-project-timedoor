@@ -32,10 +32,10 @@ class VerificationEmailJob implements ShouldQueue
     {
         $result = $emailService->sendWithTemplate(
             email: $this->email,
-            templateId: 'schoolpedia',
+            templateId: 'verification_account_ui',
             parameters: [
-                'verification_link' => $this->verificationLink,
-                'user_name' => $this->userName ?? 'User'
+                'link_url' => $this->verificationLink,
+                'fullname' => $this->userName ?? 'User'
             ]
         );
 

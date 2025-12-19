@@ -102,4 +102,33 @@ class AuthController extends Controller
             return ResponseHelper::serverError('Failed to reset password', $e, '[RESET_PASSWORD]');
         }
     }
+
+    public function verfiedAccountUser(Request $request)
+    {
+        try {
+            $token = $request->query('token');
+
+            $result = $this->tokenService->validateToken($token, VerificationToken::TYPE_EMAIL_VERIFICATION);
+
+            if (!$result) {
+                return ResponseHelper::badRequest('Token sudah tidak valid atau telah digunakan.', null, '[INVALID_TOKEN]');
+            }
+
+            DB::beginTransaction();
+
+            User::where('id', $result->user_id)
+                ->update([
+                    'emailVerifiedAt' => now()
+                ]);
+
+            $this->tokenService->markAsUsed($result);
+
+            DB::commit();
+
+            return ResponseHelper::success(null, 'Password berhasil direset.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::serverError('Failed to reset password', $e, '[RESET_PASSWORD]');
+        }
+    }
 }
