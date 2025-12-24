@@ -328,17 +328,21 @@ class ReviewController extends Controller
         if ($service->checkSchoolValidation($request->schoolDetailId, $user->id))
             return ResponseHelper::badRequest('Review Anda Masih Belum Divalidasi');
 
-        $review = $service->submitFullReview($request->validated());
+        try {
+            $review = $service->submitFullReview($request->validated());
 
-        $datas = [
-            'user' => $user,
-            'review' => $review
-        ];
+            $datas = [
+                'user' => $user,
+                'review' => $review
+            ];
 
-        return ResponseHelper::success(
-            new ReviewResource($datas),
-            'Review berhasil dikirim dan menunggu verifikasi admin.'
-        );
+            return ResponseHelper::success(
+                new ReviewResource($datas),
+                'Review berhasil dikirim dan menunggu verifikasi admin.'
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::badRequest($e->getMessage());
+        }
     }
 
     public function togglePin($id, ReviewService $reviewService)
