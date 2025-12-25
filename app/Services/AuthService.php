@@ -134,8 +134,10 @@ class AuthService
             throw new \Exception('Akun dengan email tersebut tidak ditemukan.');
         }
 
+        $baseUrl = config('app.frontend_url');
+
         $resultToken = $this->tokenService->createToken($user, VerificationToken::TYPE_PASSWORD_RESET, 60);
-        $createFrontendUrl = env('APP_FRONTEND_URL') . '/reset-password?token=' . $resultToken . '&email=' . urlencode($email);
+        $createFrontendUrl = $baseUrl . '/reset-password?token=' . $resultToken . '&email=' . urlencode($email);
 
         ForgotPasswordJob::dispatch($user->email, $createFrontendUrl);
 
@@ -144,8 +146,10 @@ class AuthService
 
     public function sendVerificationAccount(User $user)
     {
+        $baseUrl = config('app.frontend_url');
+
         $resultToken = $this->tokenService->createToken($user, VerificationToken::TYPE_EMAIL_VERIFICATION, 1440);
-        $createFrontendUrl = env('APP_FRONTEND_URL') . '/verify-account?token=' . $resultToken . '&email=' . urlencode($user->email);
+        $createFrontendUrl = $baseUrl . '/verify-account?token=' . $resultToken . '&email=' . urlencode($user->email);
 
         VerificationEmailJob::dispatch($user->email, $createFrontendUrl, $user->fullname);
 
