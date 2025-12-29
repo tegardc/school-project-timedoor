@@ -134,12 +134,14 @@ class ReviewController extends Controller
 
             DB::beginTransaction();
 
-            DeclineCommentEmailJob::dispatch(
-                $currentUser->email,
-                $currentUser->fullname,
-                $review->reviewText,
-                $validated['admin_reason']
-            );
+            if ($review->reviewText) {
+                DeclineCommentEmailJob::dispatch(
+                    $currentUser->email,
+                    $currentUser->fullname,
+                    $review->reviewText,
+                    $validated['admin_reason']
+                );
+            }
 
             $review->status = review::STATUS_REJECTED;
             $review->save();
