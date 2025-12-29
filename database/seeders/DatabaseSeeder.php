@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
             EducationProgram::class,
             Accreditation::class,
             StatusSchool::class,
-            SchoolSeeder::class,
-            SchoolDetailSeeder::class,
-            SchoolGallerySeeder::class,
+            // SchoolSeeder::class,
+            // SchoolDetailSeeder::class,
+            // SchoolGallerySeeder::class,
             UserSeeder::class,
             QuestionsSeeder::class,
-            ContactSeeder::class,
-            ReviewSeeder::class
+            // ContactSeeder::class,
+            // ReviewSeeder::class
 
         ]);
         $user = User::find(1);

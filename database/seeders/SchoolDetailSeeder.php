@@ -6,72 +6,106 @@ use Illuminate\Database\Seeder;
 use App\Models\SchoolDetail;
 use App\Models\Address;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SchoolDetailSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
-            $schools = [
-                [
-                    'name' => 'SDN 1 Kuta',
-                    'institutionCode' => 'INST0001',
-                    'schoolId' => 1,
-                    'statusId' => 1,
-                    'educationLevelId' => 1,
-                    'educationProgramId' => 1,
-                    'ownershipStatus' => 'Negeri',
-                    'dateEstablishmentDecree' => '2000-01-01',
-                    'operationalLicense' => 'IZIN-001',
-                    'dateOperationalLicense' => '2001-01-01',
-                    'principal' => 'Ketut Putra',
-                    'operator' => 'Made Dewi',
-                    'accreditationId' => 1,
-                    'curriculum' => 'K13',
-                    'tuitionFee' => 0,
-                    'numStudent' => 300,
-                    'numTeacher' => 25,
-                    'movie' => 'https://youtube.com/dummy1',
-                    'examInfo' => 'UNBK',
-                ],
-                [
-                    'name' => 'SMPN 2 Kuta',
-                    'institutionCode' => 'INST0002',
-                    'schoolId' => 2,
-                    'statusId' => 2,
-                    'educationLevelId' => 2,
-                    'educationProgramId' => 1,
-                    'ownershipStatus' => 'Swasta',
-                    'dateEstablishmentDecree' => '2005-02-01',
-                    'operationalLicense' => 'IZIN-002',
-                    'dateOperationalLicense' => '2006-01-01',
-                    'principal' => 'Ni Luh Sari',
-                    'operator' => 'Komang Gede',
-                    'accreditationId' => 2,
-                    'curriculum' => 'Kurikulum Merdeka',
-                    'tuitionFee' => 150000,
-                    'numStudent' => 400,
-                    'numTeacher' => 30,
-                    'movie' => 'https://youtube.com/dummy2',
-                    'examInfo' => 'UNBK',
-                ],
-                // 👉 lanjutkan data lain sama pola ini...
-            ];
+        // Data lengkap dari JSON Response
+        $jsonPayload = '{"data":[
+            {"npsn":"50103117","nama_sekolah":"SMKN 2 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"","sk_izin_operasional":"-","tanggal_sk_izin_operasional":"","kepsek":"I Made Bajeggiarta, M.Pd.","operator":"I Putu Gede Widiantara","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1120","num_of_teacher":"58","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"SIDAKARYA","kode_pos":"80224","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103116","nama_sekolah":"SMKN 3 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"1/1/1976","sk_izin_operasional":"0311/0/1975","tanggal_sk_izin_operasional":"1/1/1976","kepsek":"Anak Agung Bagus Wijaya Putra","operator":"Putu Indra Pradana Bagiayadnya, S.Kom","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1613","num_of_teacher":"77","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Sanur Kauh","kode_pos":"80227","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103642","nama_sekolah":"SMKS KERTHA WISATA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"5/15/1989","sk_izin_operasional":"187/I.19/L.1/I.1991","tanggal_sk_izin_operasional":"4/2/1991","kepsek":"Made Wika Wibawa","operator":"I Gede Oka Satria Yudha","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"300","num_of_teacher":"21","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Renon","kode_pos":"80226","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103635","nama_sekolah":"SMKS PARIWISATA HARAPAN DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"1/9/1989","sk_izin_operasional":"2/I 19/Kep/I.89","tanggal_sk_izin_operasional":"1/9/1989","kepsek":"I Gusti Made Artika","operator":"Ni Ketut Ayu Ariani","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"486","num_of_teacher":"27","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Sesetan","kode_pos":"80223","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103906","nama_sekolah":"SMKS PGRI 6 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"5/21/2009","sk_izin_operasional":"421.3/2537/DIKPORA","tanggal_sk_izin_operasional":"5/21/2009","kepsek":"Drs. I Wayan Sukarta","operator":"I Komang Budiarta","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"217","num_of_teacher":"10","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Panjer","kode_pos":"80225","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103911","nama_sekolah":"SMKS TEKNOLOGI NASIONAL","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"2/10/2009","sk_izin_operasional":"421.3/1015/Dikpora","tanggal_sk_izin_operasional":"2/10/2009","kepsek":"Ni Wayan Parwati Asih","operator":"I Made Peri Ardiyasa","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"427","num_of_teacher":"22","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Panjer","kode_pos":"80225","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103643","nama_sekolah":"SMKS TI BALI GLOBAL","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"11/10/2006","sk_izin_operasional":"421.3/3399/DIKBUD","tanggal_sk_izin_operasional":"11/10/2006","kepsek":"I Gusti Made Murjana","operator":"I Gede Pradipta Adi Nugraha","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1212","num_of_teacher":"60","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Selatan","desa":"Panjer","kode_pos":"80225","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"70042893","nama_sekolah":"SMK NEGERI 7 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"6/27/2023","sk_izin_operasional":"B.30.420/3699/IZIN-D/DPMPTSP","tanggal_sk_izin_operasional":"6/27/2023","kepsek":"I Made Bajeggiarta, M.Pd.","operator":"I Gede Agus Sukariana Yasa, S.Kom","akreditasi":"Tidak diisi","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"235","num_of_teacher":"19","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Barat","desa":"Pemecutan Klod","kode_pos":"80119","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"69987343","nama_sekolah":"SMK Muhammadiyah Denpasar","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/28/2019","sk_izin_operasional":"420/202/IV-B/DISPMPT/2019","tanggal_sk_izin_operasional":"2/7/2019","kepsek":"Tauhid Hidayat","operator":"Sony Harqi","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"105","num_of_teacher":"7","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Barat","desa":"Dauh Puri Kauh","kode_pos":"","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50105467","nama_sekolah":"SMKS BINTANG PERSADA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"12/4/2018","sk_izin_operasional":"2440/03-A/HK/2018","tanggal_sk_izin_operasional":"12/4/2018","kepsek":"Ida Ayu Ary Pradnyawati","operator":"DEWA PUTU RUDY SETIAWAN, S.Kom","akreditasi":"B","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"813","num_of_teacher":"30","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Barat","desa":"Padangsambian Kaja","kode_pos":"80117","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103112","nama_sekolah":"SMKS PGRI 2 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"6/12/2006","sk_izin_operasional":"B.31.420/30718/SMK/DIKPORA","tanggal_sk_izin_operasional":"8/11/2022","kepsek":"I Wayan Ginastra","operator":"Ni Ketut Rumanis","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"483","num_of_teacher":"28","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Barat","desa":"Dauh Puri Klod","kode_pos":"80119","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103129","nama_sekolah":"SMKS PGRI 4 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Lainnya","tanggal_sk_pendirian":"5/11/2000","sk_izin_operasional":"494/I.19.TI/MN/2000","tanggal_sk_izin_operasional":"5/11/2000","kepsek":"I Ketut Suarya","operator":"I Made Adi Santika Putra","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"682","num_of_teacher":"30","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Barat","desa":"Padangsambian","kode_pos":"80117","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103118","nama_sekolah":"SMKN 1 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"9/24/1962","sk_izin_operasional":"B.31.420/25465/SMK/DIKPORA","tanggal_sk_izin_operasional":"9/24/1962","kepsek":"I Wayan Mustika","operator":"I Wayan Suantika, A.Md","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"2476","num_of_teacher":"156","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Pemecutan Kaja","kode_pos":"80118","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103146","nama_sekolah":"SMK SARASWATI 1 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"1/1/1970","sk_izin_operasional":"34567/D/4/75","tanggal_sk_izin_operasional":"7/7/1975","kepsek":"Gek Ayu Hendrastuti","operator":"I GUSTI AGUNG AGUSTIKA","akreditasi":"B","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"163","num_of_teacher":"14","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Dangin Puri Kangin","kode_pos":"80116","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103907","nama_sekolah":"SMKS  WIRA BHAKTI DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/10/2009","sk_izin_operasional":"421.3/1732/DIKPORA","tanggal_sk_izin_operasional":"3/10/2009","kepsek":"Ida Bagus Bawa Keniten","operator":"Anak Agung Istri Agung Sinta Kusuma","akreditasi":"B","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"704","num_of_teacher":"28","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Dangin Puri Kangin","kode_pos":"80233","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103908","nama_sekolah":"SMKS BALI DEWATA","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"5/27/2009","sk_izin_operasional":"421.3/2600/Dikpora/2009","tanggal_sk_izin_operasional":"5/27/2009","kepsek":"Ni Ketut Sutarsih","operator":"Livi Ivoni Leo, S.Ak","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1036","num_of_teacher":"32","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Peguyangan","kode_pos":"80115","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50105447","nama_sekolah":"SMKS BINA MADINA","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"10/11/2010","sk_izin_operasional":"421:3/10511/DIKPORA/2010","tanggal_sk_izin_operasional":"12/30/2010","kepsek":"Tri Ayu Wahyuni","operator":"ALIF SALSABILA","akreditasi":"C","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"113","num_of_teacher":"15","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Ubung","kode_pos":"80116","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103909","nama_sekolah":"SMKS DUTA BANGSA","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"5/21/2009","sk_izin_operasional":"421.3/2538/Dikpora","tanggal_sk_izin_operasional":"5/21/2009","kepsek":"Pande Gede Mahendra Sila","operator":"I Wayan Edi Purwanta","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"42","num_of_teacher":"10","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Tonja","kode_pos":"80280","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103833","nama_sekolah":"SMKS DWIJENDRA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/14/2008","sk_izin_operasional":"Nomor. 421.3/610/DIKBUD","tanggal_sk_izin_operasional":"3/14/2008","kepsek":"Ida Ayu Estri Sanjiwani","operator":"Ni Kadek Sukasani, SE","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"174","num_of_teacher":"19","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Peguyangan","kode_pos":"80115","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103633","nama_sekolah":"SMKS FARMASI SARASWATI 3 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"8/25/1996","sk_izin_operasional":"421.3/1015/DIKPORA","tanggal_sk_izin_operasional":"2/10/2009","kepsek":"Dewa Gede Sukmantara, S.E., M.M","operator":"I Gusti Ngurah Putra Wirawan S.Pd","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"173","num_of_teacher":"9","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Dangin Puri Kangin","kode_pos":"80233","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"69765015","nama_sekolah":"SMKS KESEHATAN BALI DEWATA","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"11/26/2012","sk_izin_operasional":"421.3/4329.A/DIKPORA/2012","tanggal_sk_izin_operasional":"11/26/2012","kepsek":"Ni Kadek Bayu Sintha Sri Utami","operator":"Ni Luh Putu Ari Indriani","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"282","num_of_teacher":"14","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Peguyangan Kaja","kode_pos":"80115","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103910","nama_sekolah":"SMKS KESEHATAN BALI MEDIKA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"8/18/2010","sk_izin_operasional":"421.3/1013/DIKPORA","tanggal_sk_izin_operasional":"2/10/2009","kepsek":"I Komang Rika Adi Putra","operator":"I Made Sunaryana,S.Pd","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"493","num_of_teacher":"12","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Ubung Kaja","kode_pos":"80116","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103636","nama_sekolah":"SMKS Mild Bali","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/15/1970","sk_izin_operasional":"363/1/1/pp/E/B/1970","tanggal_sk_izin_operasional":"3/15/1971","kepsek":"Ni Luh Martina","operator":"Komang Adi Sudiantara, S.Pd","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"61","num_of_teacher":"7","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Dangin Puri Kaja","kode_pos":"80233","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103113","nama_sekolah":"SMKS PGRI 1 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"1/9/1989","sk_izin_operasional":"2/I.19/Kep/I/1990-","tanggal_sk_izin_operasional":"1/9/1989","kepsek":"I Made Rana","operator":"NI KOMANG SANTHI ROSITA","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"229","num_of_teacher":"18","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Tonja","kode_pos":"80280","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103130","nama_sekolah":"SMKS REKAYASA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/11/1987","sk_izin_operasional":"30/I19/Kep/I.87","tanggal_sk_izin_operasional":"3/11/1987","kepsek":"Aditya Jelantik","operator":"I Made Darsana","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"330","num_of_teacher":"23","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Peguyangan","kode_pos":"80116","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103145","nama_sekolah":"SMKS TP 45 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"2/23/1983","sk_izin_operasional":"969/BAN-SM/SK/2019","tanggal_sk_izin_operasional":"11/5/2019","kepsek":"Drs. I Wayan Sujana","operator":"I Nyoman Rahina","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"61","num_of_teacher":"9","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Utara","desa":"Dangin Puri Kangin","kode_pos":"80223","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"70013037","nama_sekolah":"SMK NEGERI 6 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"9/10/2021","sk_izin_operasional":"B.30.420/5774/IzinC/DPMPTSP","tanggal_sk_izin_operasional":"9/10/2021","kepsek":"Putu Pasek Suardiana","operator":"Made Dimas Dwi Sutanegara, S.Kom","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"207","num_of_teacher":"18","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Kesiman Kertalangu","kode_pos":"80237","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103115","nama_sekolah":"SMKN 4 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Pusat","tanggal_sk_pendirian":"11/4/1966","sk_izin_operasional":"239/B.3/Kedj","tanggal_sk_izin_operasional":"11/4/1966","kepsek":"I Made Buda Astika","operator":"KOMANG DEVA SURYANTA","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1119","num_of_teacher":"64","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kelod","kode_pos":"80239","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103638","nama_sekolah":"SMKN 5 DENPASAR","status":"Negeri","bentuk_pendidikan":"SMK","status_kepemilikan":"Pemerintah Daerah","tanggal_sk_pendirian":"3/14/1989","sk_izin_operasional":"0917/C4.3/MN/98","tanggal_sk_izin_operasional":"6/26/1998","kepsek":"I Made Buda Astika","operator":"Ni Wayan Eka Putri Antarini","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1962","num_of_teacher":"97","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kauh","kode_pos":"80236","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"69948489","nama_sekolah":"SMK PENERBANGAN CAKRA NUSANTARA DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"7/15/2014","sk_izin_operasional":"421.3/3991/Dikpora/2016.","tanggal_sk_izin_operasional":"8/2/2016","kepsek":"Nova Alvinda Anugrah","operator":"Ni Komang Sri","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"133","num_of_teacher":"23","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kelod","kode_pos":"80232","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"69759223","nama_sekolah":"SMKS KESEHATAN PGRI DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"9/27/2002","sk_izin_operasional":"421.3/4222/DIKPORA/2012","tanggal_sk_izin_operasional":"11/20/2012","kepsek":"I Made Sedana Yasa","operator":"I Made Ariana,SE.,MM","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"184","num_of_teacher":"12","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kaja","kode_pos":"80235","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103110","nama_sekolah":"SMKS PGRI 3 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"1/24/2000","sk_izin_operasional":"38/I.19/H/MN/00","tanggal_sk_izin_operasional":"1/24/2000","kepsek":"Ni Putu Ayu Agustin Karisma Dewi","operator":"I Komang Adi Putra","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1692","num_of_teacher":"49","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kelod","kode_pos":"80235","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103637","nama_sekolah":"SMKS PGRI 5 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"7/5/2005","sk_izin_operasional":"188/1759/DIKBUD","tanggal_sk_izin_operasional":"7/5/2005","kepsek":"Ni Ketut Nuka","operator":"Ni Putu Sri Laksmi","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"1625","num_of_teacher":"47","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta Kaja","kode_pos":"80236","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50103147","nama_sekolah":"SMKS SARASWATI 2 DENPASAR","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"1/7/2020","sk_izin_operasional":"421.5/4681/Disdikpora","tanggal_sk_izin_operasional":"1/7/2020","kepsek":"I Gede Muliana","operator":"Ni Komang Ayu Giovani","akreditasi":"A","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"156","num_of_teacher":"13","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Kesiman Kertalangu","kode_pos":"80237","lintang":"-8","bujur":"115","video":""},
+            {"npsn":"50105493","nama_sekolah":"SMKS TARUNA WARMADEWA","status":"Swasta","bentuk_pendidikan":"SMK","status_kepemilikan":"Yayasan","tanggal_sk_pendirian":"3/11/1987","sk_izin_operasional":"421.3/1567/Dikpora/2010","tanggal_sk_izin_operasional":"5/17/2010","kepsek":"I Dewa Made Wahyu Dityatmika S.sn., S.S., M.Hum","operator":"NI PUTU ANA NATHASIA DEWI GANDHI","akreditasi":"C","kurikulum":"Kurikulum Merdeka","telephone_number":"","tution_fee":"","num_of_students":"89","num_of_teacher":"9","provinsi":"Bali","kabupaten":"Denpasar","kecamatan":"Denpasar Timur","desa":"Sumerta","kode_pos":"80235","lintang":"-8","bujur":"115","video":""}
+        ]}';
 
-            foreach ($schools as $data) {
+        $dataArr = json_decode($jsonPayload, true);
+        $schools = $dataArr['data'];
+
+        // Mapping Akreditasi ke ID (Asumsi ID 1=A, 2=B, 3=C, 4=Lainnya/Tidak Diisi)
+        $accreditationMap = [
+            'A' => 1,
+            'B' => 2,
+            'C' => 3,
+        ];
+
+        DB::transaction(function () use ($schools, $accreditationMap) {
+            foreach ($schools as $index => $item) {
+                // 1. Create Address
                 $address = Address::create([
-                    'provinceId'   => 1,
-                    'districtId'   => 1,
-                    'subdistrictId'=> 1,
-                    'street'       => 'Jl. Raya Kuta No. 1',
-                    'postalCode'   => '80361',
-                    'latitude'     => '-8.7237',
-                    'longitude'    => '115.1767',
+                    'provinceId'    => 1, // Default, karena tidak ada data ID provinsi di JSON
+                    'districtId'    => 1,
+                    'subdistrictId' => 1,
+                    'street'        => 'Kec. ' . $item['kecamatan'] . ', Desa ' . $item['desa'],
+                    'postalCode'    => $item['kode_pos'] ?: '00000',
+                    'latitude'      => $item['lintang'],
+                    'longitude'     => $item['bujur'],
                 ]);
 
-                SchoolDetail::create(array_merge($data, [
-                    'addressId'     => $address->id, // ✅ foreign key
-                ]));
+                // 2. Parse Date (Format M/D/YYYY ke Y-m-d)
+                $dateEst = $item['tanggal_sk_pendirian'] ? Carbon::createFromFormat('m/d/Y', $item['tanggal_sk_pendirian'])->format('Y-m-d') : null;
+                $dateOps = $item['tanggal_sk_izin_operasional'] ? Carbon::createFromFormat('m/d/Y', $item['tanggal_sk_izin_operasional'])->format('Y-m-d') : null;
+
+                // 3. Status ID (1: Negeri, 2: Swasta)
+                $statusId = ($item['status'] === 'Negeri') ? 1 : 2;
+
+                // 4. Accreditation ID
+                $accId = $accreditationMap[$item['akreditasi']] ?? 4; // Default ke 4 jika tidak ada di map
+
+                SchoolDetail::create([
+                    'schoolId'            => $index + 1, // Asumsi auto-increment mulai dari 1 sesuai urutan loop
+                    'name'                => $item['nama_sekolah'],
+                    'institutionCode'     => $item['npsn'],
+                    'statusId'            => $statusId,
+                    'educationLevelId'    => 3, // Asumsi ID 3 adalah SMK (sesuaikan dengan tabel education_levels Anda)
+                    'educationProgramId'  => 1, // Default
+                    'ownershipStatus'     => $item['status_kepemilikan'],
+                    'dateEstablishmentDecree' => $dateEst,
+                    'operationalLicense'  => $item['sk_izin_operasional'],
+                    'dateOperationalLicense' => $dateOps,
+                    'principal'           => $item['kepsek'],
+                    'operator'            => $item['operator'],
+                    'accreditationId'     => $accId,
+                    'curriculum'          => $item['kurikulum'],
+                    'tuitionFee'          => 0, // Tidak ada data di JSON
+                    'numStudent'          => (int)$item['num_of_students'],
+                    'numTeacher'          => (int)$item['num_of_teacher'],
+                    'movie'               => $item['video'] ?: null,
+                    'examInfo'            => 'UNBK', // Default value
+                    'addressId'           => $address->id,
+                ]);
             }
         });
     }
