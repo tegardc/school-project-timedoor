@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\RejectReviewFromAdminRequest;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\ReviewSubmitRequest;
 use App\Http\Resources\ReviewResource;
 use App\Http\Resources\ReviewResourceGeneral;
 use App\Http\Resources\ReviewUserResource;
+use App\Jobs\DeclineCommentEmailJob;
 use App\Models\Review;
+use App\Models\User;
 use App\Services\ReviewService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
@@ -111,15 +115,36 @@ class ReviewController extends Controller
             return ResponseHelper::serverError("Oops approved review is failed ", $e, "[REVIEW APPROVE]: ");
         }
     }
-    public function reject($id)
+    public function reject(RejectReviewFromAdminRequest $request, int $id)
     {
         try {
+            $validated = $request->validated();
+
             $review = Review::find($id);
+
             if (!$review) {
                 return ResponseHelper::notFound('Review Not Found');
             }
+
+            $currentUser = User::find($validated['user_id']);
+
+            if (!$currentUser) {
+                return ResponseHelper::notFound('User Not Found');
+            }
+
+            DB::beginTransaction();
+
+            DeclineCommentEmailJob::dispatch(
+                email: $currentUser->email,
+                fullname: $currentUser->fullname,
+                userComment: $review->reviewText,
+                adminReason: $validated['admin_reason']
+            );
+
             $review->status = review::STATUS_REJECTED;
             $review->save();
+
+            DB::commit();
 
             return ResponseHelper::success('Review Reject and Delete');
         } catch (\Exception $e) {
