@@ -12,7 +12,7 @@ class SchoolGalleryController extends Controller
     public function uploadFile(Request $request)
     {
         try {
-            $request->validate(['files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048']]);
+            $request->validate(['files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120']]); // SEMENTARA 5MB
             $uploadedFiles = [];
             foreach ($request->file('files') as $file) {
                 if (!$file->isValid()) {
