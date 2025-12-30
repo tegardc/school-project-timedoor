@@ -75,7 +75,7 @@ class SchoolDetailRequest extends FormRequest
                 'operator' => ['nullable', 'string'],
                 'accreditationId' => ['nullable', 'exists:accreditations,id'],
                 'curriculum' => ['nullable', 'string'],
-                'facilityIds' => ['array'],
+                'facilityIds' => ['nullable','array'],
                 'facilityIds.*' => ['exists:facilities,id'],
                 'contacts' => ['nullable', 'array'],
                 'contacts.*.type' => ['nullable', 'string'],
