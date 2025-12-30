@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sub_districts', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
+            $table->string("name")->nullable();
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
         });
