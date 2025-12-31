@@ -134,9 +134,9 @@ class ReviewController extends Controller
 
             DB::beginTransaction();
 
-            $mergeReview = $review?->likes ?? "" . " dan " . $review?->improved ?? "";
+            $mergeReview = $review?->liked ?? "" . " dan " . $review?->improved ?? "";
 
-            if ($review?->likes || $review?->improved) {
+            if ($review?->liked && $review?->improved) {
                 DeclineCommentEmailJob::dispatch(
                     $currentUser->email,
                     $currentUser->fullname,
