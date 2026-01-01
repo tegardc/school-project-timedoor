@@ -26,7 +26,8 @@ class UserService extends BaseService
             'phoneNo',
             'nisn',
             'gender',
-            'image'
+            'image',
+            'schoolValidation'
         ]);
         if ($keyword) {
             $query->where(function ($q) use ($keyword) {

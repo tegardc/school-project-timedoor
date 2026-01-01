@@ -1,24 +1,34 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\{
-    Province, District, SubDistrict, School, SchoolDetail,
-    SchoolStatus, EducationLevel, Accreditation, Address, SchoolGallery
+    Province,
+    District,
+    SubDistrict,
+    School,
+    SchoolDetail,
+    SchoolStatus,
+    EducationLevel,
+    Accreditation,
+    Address,
+    SchoolGallery,
+    Contact
 };
 use Illuminate\Support\Facades\DB;
 
 class CSVImportService
 {
     private function parseDate($date)
-{
-    if (empty($date)) return null;
-    $parsed = \DateTime::createFromFormat('d/m/Y', $date);
-    if (!$parsed) {
-        $parsed = \DateTime::createFromFormat('m/d/Y', $date);
-    }
+    {
+        if (empty($date)) return null;
+        $parsed = \DateTime::createFromFormat('d/m/Y', $date);
+        if (!$parsed) {
+            $parsed = \DateTime::createFromFormat('m/d/Y', $date);
+        }
 
-    return $parsed ? $parsed->format('Y-m-d') : null;
-}
+        return $parsed ? $parsed->format('Y-m-d') : null;
+    }
     public function import(array $data)
     {
         DB::beginTransaction();
@@ -46,7 +56,8 @@ class CSVImportService
                     'village' => $item['desa'] ?? null,
                     'street' => $item['alamat'] ?? null,
                     'postalCode' => $item['kode_pos'] ?? null,
-                    'latitude' => $item['lintang'] ?? null, 'longitude' => $item['bujur'] ?? null,
+                    'latitude' => $item['lintang'] ?? null,
+                    'longitude' => $item['bujur'] ?? null,
                 ]);
 
                 $schoolDetail = SchoolDetail::create([
@@ -57,7 +68,7 @@ class CSVImportService
                     'educationLevelId' => $educationLevel->id,
                     'accreditationId' => $accreditation->id,
                     'ownershipStatus' => $item['status_kepemilikan'] ?? null,
-                    'dateEstablishmentDecree' => $this->parseDate($item['tanggal_sk_pendirian']) ?? null    ,
+                    'dateEstablishmentDecree' => $this->parseDate($item['tanggal_sk_pendirian']) ?? null,
                     'dateOperationalLicense' => $this->parseDate($item['tanggal_sk_izin_operasional']) ?? null,
                     'operationalLicense' => $item['sk_izin_operasional'] ?? null,
                     'principal' => $item['kepsek'] ?? null,
@@ -71,6 +82,24 @@ class CSVImportService
                     'addressId' => $address->id
 
                 ]);
+
+                // EMAIL
+                if (!empty($item['email'])) {
+                    Contact::create([
+                        'schoolDetailId' => $schoolDetail->id,
+                        'type' => 'email',
+                        'value' => $item['email'],
+                    ]);
+                }
+
+                // WEBSITE
+                if (!empty($item['website'])) {
+                    Contact::create([
+                        'schoolDetailId' => $schoolDetail->id,
+                        'type' => 'website',
+                        'value' => $item['website'],
+                    ]);
+                }
 
                 if (!empty($item['gambar'])) {
                     SchoolGallery::create([
@@ -87,7 +116,7 @@ class CSVImportService
             throw $e;
         }
     }
-       public function preview($file): array
+    public function preview($file): array
     {
         $csvData = [];
         if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
