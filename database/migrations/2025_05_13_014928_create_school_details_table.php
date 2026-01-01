@@ -29,7 +29,7 @@ return new class extends Migration
             $table->unsignedBigInteger('educationProgramId')->nullable();
             $table->string('curriculum')->nullable();
             // $table->string('telpNo')->nullable();
-            $table->decimal('tuitionFee', 10, 2)->nullable();
+            $table->string('tuitionFee')->nullable();
             $table->integer('numStudent')->nullable();
             $table->integer('numTeacher')->nullable();
             $table->text('movie')->nullable();

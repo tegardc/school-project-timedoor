@@ -13,7 +13,8 @@ use App\Models\{
     Accreditation,
     Address,
     SchoolGallery,
-    Contact
+    Contact,
+    Facility
 };
 use Illuminate\Support\Facades\DB;
 
@@ -106,6 +107,35 @@ class CSVImportService
                         'schoolDetailId' => $schoolDetail->id,
                         'imageUrl' => $item['gambar'],
                     ]);
+                }
+                // FACILITIES
+                if (!empty($item['fasilitas'])) {
+
+                    // split "Toilet|Perpustakaan|Laboratorium"
+                    $facilityNames = explode('|', $item['fasilitas']);
+
+                    foreach ($facilityNames as $facilityName) {
+                        $facilityName = trim($facilityName);
+
+                        if ($facilityName === '') continue;
+
+                        // create / get facility
+                        $facility = Facility::firstOrCreate(
+                            ['name' => $facilityName],
+                            [
+                                'createdAt' => now(),
+                                'updatedAt' => now(),
+                            ]
+                        );
+
+                        // attach ke pivot (hindari duplicate)
+                        $schoolDetail->facilities()->syncWithoutDetaching([
+                            $facility->id => [
+                                'createdAt' => now(),
+                                'updatedAt' => now(),
+                            ]
+                        ]);
+                    }
                 }
             }
 
