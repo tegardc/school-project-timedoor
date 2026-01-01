@@ -134,11 +134,16 @@ class ReviewController extends Controller
 
             DB::beginTransaction();
 
-            if ($review->reviewText) {
+            $likedText = trim(strip_tags($review->liked));
+            $improvedText = trim(strip_tags($review->improved));
+
+            $mergeReview = "{$likedText} dan {$improvedText}";
+
+            if (!empty($likedText) && !empty($improvedText)) {
                 DeclineCommentEmailJob::dispatch(
                     $currentUser->email,
                     $currentUser->fullname,
-                    $review->reviewText,
+                    $mergeReview,
                     $validated['admin_reason']
                 );
             }

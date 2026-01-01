@@ -38,7 +38,7 @@ class DeclineCommentEmailJob implements ShouldQueue
             parameters: [
                 'fullname' => $this->fullname,
                 'admin_reason' => $this->adminReason,
-                'user_comment' => $this->userComment
+                'user_comment' => $this->userComment ?? 'Tidak ada komentar dari pengguna.',
             ]
         );
 
