@@ -21,6 +21,7 @@ class UpdateProfileRequest extends FormRequest
             'phoneNo'     => 'nullable|string|max:20',
             'address'     => 'nullable|string|max:500',
             'image'       => 'nullable|string|max:255',
+            'nisn'        => 'nullable|string|max:50',
             'relation'    => 'nullable|string|max:50',
         ];
 

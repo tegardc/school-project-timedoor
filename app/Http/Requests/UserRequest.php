@@ -63,6 +63,7 @@ class UserRequest extends FormRequest
         'gender'    => ['nullable', 'in:male,female'],
         'phoneNo'   => ['nullable', 'string'],
         'image'     => ['nullable', 'string'],
+
         'address'   => ['nullable', 'string'],
         'email'     => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
         'current_password' => ['nullable', 'required_with:new_password'],

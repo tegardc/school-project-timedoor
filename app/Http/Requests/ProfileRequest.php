@@ -40,6 +40,7 @@ class ProfileRequest extends FormRequest
                 'relation'         => 'required|string|max:50',
                 'schoolDetailId'   => 'required|exists:school_details,id',
                 'schoolValidation' => 'nullable|string|max:255',
+                
             ];
         }
 
