@@ -244,7 +244,8 @@ class SchoolDetailService extends BaseService
                 $query->orderBy($sortField, $sortDirection);
             }
         } else {
-            $query->orderByDesc('createdAt');
+            $query->orderByDesc('createdAt')->orderByDesc('id');
+
         }
 
         return $query;
