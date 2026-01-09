@@ -12,11 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reviews', function (Blueprint $table) {
-            $table->unsignedBigInteger('userId')->nullable();
-            $table->string('reviewer_name')->nullable();
-            $table->enum('source', ['internal', 'google'])->default('internal');
+            $table->dropForeign(['userId']);
 
-            $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('userId')->nullable()->change();
+
+            if (!Schema::hasColumn('reviews', 'reviewer_name')) {
+                $table->string('reviewer_name')->nullable()->after('userId');
+            }
+            if (!Schema::hasColumn('reviews', 'source')) {
+                $table->string('source')->default('internal')->after('reviewer_name');
+            }
+            $table->foreign('userId')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
@@ -26,9 +35,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reviews', function (Blueprint $table) {
-            $table->dropColumn('userId');
-            $table->dropColumn('reviewer_name');
-            $table->dropColumn('source');
+            $table->dropColumn(['reviewer_name', 'source']);
         });
     }
 };
