@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('reviewText')->nullable();
             $table->decimal('rating', 2, 1);
-            $table->unsignedBigInteger('userId')->nullable();
-            $table->string('reviewer_name')->nullable();
-            $table->enum('source', ['internal', 'google'])->default('internal');
+            $table->unsignedBigInteger('userId');
             $table->unsignedBigInteger('schoolDetailId');
             $table->timestamp('createdAt')->nullable();
             $table->timestamp('updatedAt')->nullable();
