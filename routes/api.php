@@ -12,7 +12,8 @@
     use App\Http\Controllers\ProvinceController;
     use App\Http\Controllers\QuestionController;
     use App\Http\Controllers\ReviewController;
-    use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\ReviewImportController;
+use App\Http\Controllers\SchoolController;
     use App\Http\Controllers\SchoolDetailController;
     use App\Http\Controllers\SchoolGalleryController;
     use App\Http\Controllers\SchoolImageController;
@@ -43,6 +44,8 @@
             'status' => 'ok'
         ], "PRABOWO SAID: HIDUP JOKOWII!!!");
     });
+    Route::post('/reviews/preview', [ReviewImportController::class, 'previews']);
+    Route::post('/reviews/import', [ReviewImportController::class, 'imports']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('education-experiences', EducationExperienceController::class);

@@ -10,6 +10,7 @@ class Review extends Model
 {
     use HasFactory, SoftDeletes;
     public $timestamps = true;
+    protected $guarded = ['id'];
     // protected $appends = ['like_count'];
     public const CREATED_AT = 'createdAt';
     public const UPDATED_AT = 'updatedAt';
@@ -25,6 +26,8 @@ class Review extends Model
         'schoolDetailId',
         'liked',
         'improved',
+        'reviewer_name',
+        'source',
         // 'approved',
         'status',
         'isPinned',
@@ -68,4 +71,13 @@ class Review extends Model
     // {
     //     return $this->likes()->count();
     // }
+    public function getAuthorNameAttribute()
+    {
+        if ($this->source === 'google') {
+            return $this->reviewer_name; // Ambil nama manual dari kolom
+        }
+
+        // Jika internal, ambil dari relasi user, jika user sudah dihapus return 'Anonim'
+        return $this->user ? $this->user->name : 'Pengguna Terhapus';
+    }
 }

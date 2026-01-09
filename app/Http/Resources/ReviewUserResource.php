@@ -14,7 +14,7 @@ class ReviewUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
+        $displayName = $this->users?->fullname ?? $this->reviewer_name ?? 'Anonim';
         return [
             'id'           => $this->id,
             'reviewText'   => $this->reviewText,
@@ -22,7 +22,7 @@ class ReviewUserResource extends JsonResource
             'userId'       => $this->userId,
 
             // user section
-            'fullname'     => $this->users?->fullname,
+            'fullname'     => $displayName,
             'image'        => $this->users?->image,
 
             // school detail
@@ -32,6 +32,7 @@ class ReviewUserResource extends JsonResource
             'liked'        => $this->liked,
             'improved'     => $this->improved,
             'status'       => $this->status,
+            'source'       => $this->source,
 
             'likesCount'   => $this->likes_count ?? 0,  // dari withCount('likes')
 

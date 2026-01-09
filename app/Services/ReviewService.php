@@ -262,89 +262,86 @@ class ReviewService extends BaseService
 
 
     public function getSchoolReviewsWithRating(int $schoolDetailId, array $filters = [], int $perPage = 10)
-    {
-        $userId = Auth::id();
+{
+    $userId = Auth::id();
 
-        // Query utama dengan eager load + likes count
-        $query = Review::with([
-            'users' => function ($q) {
-                $q->select('id', 'fullname', 'email', 'image', 'status')
-                    ->with(['educationExperiences.schoolDetail:id,name']);
-            },
-            'schoolDetails:id,name',
-            'reviewDetails:id,reviewId,questionId,score'
-        ])
-            ->withCount('likes') // Hitung total likes per review
-            ->where('schoolDetailId', $schoolDetailId)
-            ->where('status', Review::STATUS_APPROVED);
+    $query = Review::with([
+        'users' => function ($q) {
+            $q->select('id', 'fullname', 'email', 'image', 'status')
+                ->with(['educationExperiences.schoolDetail:id,name']);
+        },
+        'schoolDetails:id,name',
+        'reviewDetails:id,reviewId,questionId,score'
+    ])
+        ->withCount('likes')
+        ->where('schoolDetailId', $schoolDetailId)
+        ->where('status', Review::STATUS_APPROVED);
 
-        // Apply filters jika ada
-        if (!empty($filters)) {
-            $this->applyFilters($query, $filters);
-        }
+    if (!empty($filters)) {
+        $this->applyFilters($query, $filters);
+    }
 
-        // PAGINATION
-        $reviews = $query->paginate($perPage);
+    $reviews = $query->paginate($perPage);
 
-        // Return early jika tidak ada review
-        if ($reviews->isEmpty()) {
-            return [
-                'reviews' => $reviews,
-                'questionStats' => [],
-                'finalRating' => 0,
-                'totalRating' => 0
-            ];
-        }
-
-        /**
-         * Tambahkan flag is_liked untuk setiap review
-         * Menggunakan single query untuk efisiensi
-         */
-        if ($userId) {
-            $reviewIds = $reviews->getCollection()->pluck('id')->toArray();
-
-            // Get semua review yang sudah di-like oleh user ini dalam satu query
-            $likedReviewIds = DB::table('review_likes')
-                ->where('userId', $userId)
-                ->whereIn('reviewId', $reviewIds)
-                ->pluck('reviewId')
-                ->toArray();
-
-            // Transform collection dan tambahkan flag is_liked
-            $reviews->getCollection()->transform(function ($review) use ($likedReviewIds) {
-                $review->is_liked = in_array($review->id, $likedReviewIds);
-                return $review;
-            });
-        } else {
-            // User belum login, set semua is_liked = false
-            $reviews->getCollection()->transform(function ($review) {
-                $review->is_liked = false;
-                return $review;
-            });
-        }
-
-        // Hitung statistik rating per question
-        $reviewIds = $reviews->pluck('id');
-
-        $questionStats = ReviewDetail::select(
-            'questionId',
-            DB::raw('AVG(score) as avg_score'),
-            DB::raw('SUM(score) as total_score')
-        )
-            ->whereIn('reviewId', $reviewIds)
-            ->groupBy('questionId')
-            ->get();
-
-        $totalRating = $reviews->sum('rating');
-        $finalRating = $questionStats->avg('avg_score');
-
+    if ($reviews->isEmpty()) {
         return [
             'reviews' => $reviews,
-            'questionStats' => $questionStats,
-            'finalRating' => round($finalRating, 2),
-            'totalRating' => round($totalRating, 2),
+            'questionStats' => [],
+            'finalRating' => 0,
+            'totalRating' => 0
         ];
     }
+
+    if ($userId) {
+        $reviewIds = $reviews->getCollection()->pluck('id')->toArray();
+
+        $likedReviewIds = DB::table('review_likes')
+            ->where('userId', $userId)
+            ->whereIn('reviewId', $reviewIds)
+            ->pluck('reviewId')
+            ->toArray();
+
+        $reviews->getCollection()->transform(function ($review) use ($likedReviewIds) {
+            $review->is_liked = in_array($review->id, $likedReviewIds);
+            return $review;
+        });
+    } else {
+        $reviews->getCollection()->transform(function ($review) {
+            $review->is_liked = false;
+            return $review;
+        });
+    }
+
+    $reviewIds = $reviews->pluck('id');
+
+    $questionStats = ReviewDetail::select(
+        'questionId',
+        DB::raw('AVG(score) as avg_score'),
+        DB::raw('SUM(score) as total_score')
+    )
+        ->whereIn('reviewId', $reviewIds)
+        ->groupBy('questionId')
+        ->get();
+
+
+
+    $globalStats = DB::table('reviews')
+        ->where('schoolDetailId', $schoolDetailId)
+        ->where('status', Review::STATUS_APPROVED)
+        ->selectRaw('AVG(rating) as global_avg, COUNT(*) as total_reviews')
+        ->first();
+
+    $finalRating = $globalStats->global_avg ? round($globalStats->global_avg, 1) : 0;
+
+    $totalRating = $globalStats->total_reviews ?? 0;
+
+    return [
+        'reviews'       => $reviews,
+        'questionStats' => $questionStats,
+        'finalRating'   => $finalRating,
+        'totalRating'   => $totalRating,
+    ];
+}
 
     // public function submitFullReview(array $data)
     // {
