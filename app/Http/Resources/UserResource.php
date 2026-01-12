@@ -61,7 +61,7 @@ class UserResource extends JsonResource
                                 'id'           => $edu->id,
                                 'schoolDetail' => optional($edu->schoolDetail)->name,
                                 'status'       => $edu->status,
-                                'schoolValidation' => $this->schoolValidation,
+                                 'schoolValidation' => $this->child?->schoolValidation,
                             ];
                         }),
                     ];
