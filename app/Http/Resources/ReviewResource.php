@@ -74,7 +74,6 @@ class ReviewResource extends JsonResource
         return [
             'id'             => $reviewData['id'] ?? null,
             'userId'         => $user->id ?? null,
-            'fullname'       => $user->fullname ?? null,
             'image'          => $user->image ?? null,
 
             'userStatus'     => $svArr['status'] ?? null, // Sekarang pasti muncul
