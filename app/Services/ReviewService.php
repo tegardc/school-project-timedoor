@@ -138,6 +138,7 @@ class ReviewService extends BaseService
             ->with([
                 'users.schoolValidations',
                 'schoolDetails:id,name',
+                'users.children:id,userId,fullname,nisn',
 
 
                 'reviewDetails' => function ($q) {
@@ -271,7 +272,8 @@ class ReviewService extends BaseService
                 ->with(['educationExperiences.schoolDetail:id,name']);
         },
         'schoolDetails:id,name',
-        'reviewDetails:id,reviewId,questionId,score'
+        'reviewDetails:id,reviewId,questionId,score',
+        'users.children:id,userId,fullname,nisn',
     ])
         ->withCount('likes')
         ->where('schoolDetailId', $schoolDetailId)
@@ -534,7 +536,8 @@ class ReviewService extends BaseService
                         ->orderBy('id', 'desc');
                 },
                 'schoolDetails',
-                'reviewDetails.question'
+                'reviewDetails.question',
+                'users.children:id,userId,fullname,nisn',
             ])
             ->orderBy('createdAt', 'desc');
 

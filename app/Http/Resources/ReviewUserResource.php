@@ -14,6 +14,17 @@ class ReviewUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $children = null;
+
+        if ($this->users && $this->users->relationLoaded('children')) {
+            $children = $this->users->children->map(function ($child) {
+                return [
+                    'fullname' => $child->fullname,
+                    'nisn'     => $child->nisn,
+                ];
+            })->values();
+        }
+
         $displayName = $this->users?->fullname ?? $this->reviewer_name ?? 'Anonim';
         return [
             'id'           => $this->id,
@@ -24,6 +35,8 @@ class ReviewUserResource extends JsonResource
             // user section
             'fullname'     => $displayName,
             'image'        => $this->users?->image,
+
+            'children'     => $children,
 
             // school detail
             'schoolDetailName' => $this->schoolDetails?->name,
@@ -49,21 +62,21 @@ class ReviewUserResource extends JsonResource
     }
 
     private function mapSchoolValidation()
-{
-    $validations = $this->schoolValidation()
-        ->orderBy('createdAt', 'desc')
-        ->get();
+    {
+        $validations = $this->schoolValidation()
+            ->orderBy('createdAt', 'desc')
+            ->get();
 
-    if ($validations->isEmpty()) {
-        return null;
+        if ($validations->isEmpty()) {
+            return null;
+        }
+
+        return $validations->map(function ($v) {
+            return [
+                'file'       => $v->fileUrl,
+                'userStatus' => $v->status,
+                'createdAt'  => $v->createdAt,
+            ];
+        });
     }
-
-    return $validations->map(function ($v) {
-        return [
-            'file'       => $v->fileUrl,
-            'userStatus' => $v->status,
-            'createdAt'  => $v->createdAt,
-        ];
-    });
-}
 }

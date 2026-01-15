@@ -14,6 +14,17 @@ class ReviewResourceGeneral extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $children = null;
+
+        if ($this->users && $this->users->relationLoaded('children')) {
+            $children = $this->users->children->map(function ($child) {
+                return [
+                    'fullname' => $child->fullname,
+                    'nisn'     => $child->nisn,
+                ];
+            })->values();
+        }
+
 
         return [
             'id'           => $this->id,
@@ -21,9 +32,10 @@ class ReviewResourceGeneral extends JsonResource
             'rating'       => $this->rating,
             'userId'       => $this->userId,
 
-            // user section
             'fullname'     => $this->users?->fullname,
             'image'        => $this->users?->image,
+
+            'children'     => $children,
 
             // school detail
             'schoolDetailName' => $this->schoolDetails?->name,
