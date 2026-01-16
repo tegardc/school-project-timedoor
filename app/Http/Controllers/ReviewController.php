@@ -9,6 +9,7 @@ use App\Http\Requests\ReviewSubmitRequest;
 use App\Http\Resources\ReviewResource;
 use App\Http\Resources\ReviewResourceGeneral;
 use App\Http\Resources\ReviewUserResource;
+use App\Jobs\ApprovedCommentEmailJob;
 use App\Jobs\DeclineCommentEmailJob;
 use App\Models\Review;
 use App\Models\User;
@@ -105,16 +106,40 @@ class ReviewController extends Controller
     {
         try {
             $review = Review::find($id);
+
             if (!$review) {
                 return ResponseHelper::notFound('Review Not Found');
             }
+
+            $currentUser = User::find($review['userId']);
+
+            DB::beginTransaction();
+
+            $likedText = trim(strip_tags($review->liked));
+            $improvedText = trim(strip_tags($review->improved));
+
+            $mergeReview = "{$likedText} dan {$improvedText}";
+
+            if (!empty($likedText) && !empty($improvedText)) {
+                ApprovedCommentEmailJob::dispatch(
+                    $currentUser->email,
+                    $currentUser->fullname,
+                    $mergeReview,
+                );
+            }
+
             $review->status = review::STATUS_APPROVED;
             $review->save();
+
+            DB::commit();
+
             return ResponseHelper::success('Review Approved Successfully');
         } catch (\Exception $e) {
+            DB::rollBack();
             return ResponseHelper::serverError("Oops approved review is failed ", $e, "[REVIEW APPROVE]: ");
         }
     }
+
     public function reject(RejectReviewFromAdminRequest $request, int $id)
     {
         try {
@@ -370,7 +395,7 @@ class ReviewController extends Controller
 
             return ResponseHelper::success(
                 new ReviewResource($datas),
-                
+
                 'Review berhasil dikirim dan menunggu verifikasi admin.'
             );
         } catch (\Exception $e) {
