@@ -38,6 +38,7 @@ class ReviewResourceGeneral extends JsonResource
             'children'     => $children,
 
             // school detail
+            'schoolDetailId' => $this->schoolDetails?->id,
             'schoolDetailName' => $this->schoolDetails?->name,
 
             // text
