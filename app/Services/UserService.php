@@ -37,6 +37,8 @@ class UserService extends BaseService
                     ->orWhere('nisn', 'like', "%{$keyword}%");
             });
         }
+        $query->orderByDesc('createdAt')
+          ->orderByDesc('id');
         return $query->paginate($perPage ?? 10);
     }
 
