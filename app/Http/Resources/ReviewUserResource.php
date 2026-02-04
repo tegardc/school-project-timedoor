@@ -40,6 +40,7 @@ class ReviewUserResource extends JsonResource
 
             // school detail
             'schoolDetailName' => $this->schoolDetails?->name,
+            'schoolDetailId'   => $this->schoolDetails?->id,
 
             // text
             'liked'        => $this->liked,
